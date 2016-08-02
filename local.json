@@ -1,6 +1,0 @@
-{
-	"TMPDIR":"/home/patrick/temp_processing",
-	"PICARD":"/home/patrick/programs/picard/dist/picard.jar",
-	"DROPSEQ":"/home/patrick/programs/Drop-seq_tools-1.12",
-	"STAREXEC":"/home/patrick/programs/STAR/bin/Linux_x86_64/STAR"
-}
