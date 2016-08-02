@@ -39,7 +39,7 @@ rule stage1:
 	shell:
 		"""{DROPSEQ}/TagBamWithReadSequenceExtended\
 		SUMMARY={params}\
-		BASE_RANGE=1-10\
+		BASE_RANGE=1-12\
 		BASE_QUALITY=10\
 		BARCODED_READ=1\
 		DISCARD_READ=false\
@@ -50,7 +50,7 @@ rule stage1:
 		\
 		{DROPSEQ}/TagBamWithReadSequenceExtended\
 		SUMMARY={params}\
-		BASE_RANGE=13-18\
+		BASE_RANGE=13-20\
 		BASE_QUALITY=10\
 		BARCODED_READ=1\
 		DISCARD_READ=true\
