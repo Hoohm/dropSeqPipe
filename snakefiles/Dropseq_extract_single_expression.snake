@@ -1,0 +1,21 @@
+SPECIES = ['MOUSE']
+
+configfile: 'config.json'
+DROPSEQ = config['DROPSEQ']
+
+rule all:
+	input: expand('expression/{sample}_{species}_exon_tagged.txt.gz', sample=config['Samples'], species=SPECIES)
+
+
+rule extract_expression:
+	input: '{sample}_final.bam'
+	output: 'expression/{sample}_{species}_exon_tagged.txt.gz'
+	params:
+		sample = '{sample}',
+		species = '{species}'
+	shell:
+		"""{DROPSEQ}/DigitalExpression\
+		I={input}\
+		O={output}\
+		SUMMARY=expression/{params.sample}_{params.species}_dge.summary.txt \
+		CELL_BC_FILE=barcodes/{params.sample}_{params.species}.csv"""	
