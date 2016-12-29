@@ -18,7 +18,7 @@ rule all:
 
 rule sort:
 	input: 
-		samples = '{sample}_STAR_Aligned.out.sam'
+		samples = '{sample}_Aligned.sam'
 	output: temp('{sample}_Aligned_sorted.sam')
 	threads:1
 	shell:

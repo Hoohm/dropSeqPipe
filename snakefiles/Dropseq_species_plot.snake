@@ -1,4 +1,4 @@
-SPECIES = ['HUMAN','MOUSE']
+SPECIES = ['HUMAN', 'MOUSE']
 
 configfile: 'config.json'
 
@@ -10,7 +10,7 @@ rule all:
 
 rule filter_species:
 	input: '{sample}_final.bam'
-	output: temp('{sample}_{species}.bam')
+	output: '{sample}_{species}.bam'
 	params: '{species}'
 	shell:
 		"""{DROPSEQ}/FilterBAM\
@@ -29,4 +29,4 @@ rule extract_expression:
 		I={input}\
 		O={output}\
 		SUMMARY=summary/{params.sample}_{params.species}_dge.summary.txt \
-		CELL_BC_FILE={params.sample}.csv"""
+		CELL_BC_FILE=summary/{params.sample}_barcodes.csv"""

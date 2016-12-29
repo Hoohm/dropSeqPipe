@@ -1,3 +1,4 @@
 #Ignore config files
 *.json
 *.Rhistory
+*.temp.snake

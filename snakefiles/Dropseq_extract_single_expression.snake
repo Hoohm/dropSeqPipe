@@ -4,12 +4,12 @@ configfile: 'config.json'
 DROPSEQ = config['DROPSEQ']
 
 rule all:
-	input: expand('expression/{sample}_{species}_exon_tagged.txt.gz', sample=config['Samples'], species=SPECIES)
+	input: expand('summary/{sample}_{species}_exon_tagged.txt', sample=config['Samples'], species=SPECIES)
 
 
 rule extract_expression:
 	input: '{sample}_final.bam'
-	output: 'expression/{sample}_{species}_exon_tagged.txt.gz'
+	output: 'summary/{sample}_{species}_exon_tagged.txt.gz'
 	params:
 		sample = '{sample}',
 		species = '{species}'
@@ -17,5 +17,11 @@ rule extract_expression:
 		"""{DROPSEQ}/DigitalExpression\
 		I={input}\
 		O={output}\
-		SUMMARY=expression/{params.sample}_{params.species}_dge.summary.txt \
-		CELL_BC_FILE=barcodes/{params.sample}_{params.species}.csv"""	
+		SUMMARY=summary/{params.sample}_{params.species}_dge.summary.txt \
+		CELL_BC_FILE=summary/{params.sample}_{params.species}_barcodes.csv"""
+
+rule gunzip:
+	input: 'summary/{sample}_{species}_exon_tagged.txt.gz'
+	output: 'summary/{sample}_{species}_exon_tagged.txt'
+	shell:
+		"""gunzip {input}"""

@@ -1,15 +1,15 @@
 #Configfile
-configfile:'config.json'
+configfile: 'config.json'
 
 STAREXEC = config['STAREXEC']
 
-METAREF= config['METAREF']
+METAREF = config['METAREF']
 
 
 
 
 rule all:
-	input: expand('{sample}_STAR_Aligned.out.sam', sample=config['Samples'])
+	input: expand('{sample}_Aligned.sam', sample=config['Samples'])
 	shell:"""{STAREXEC}\
 		--genomeDir {METAREF}\
 		--genomeLoad Remove"""
@@ -17,7 +17,7 @@ rule all:
 
 rule STAR_align:
 	input:  '{sample}_tagged_unmapped.fastq'
-	output: '{sample}_STAR_Aligned.out.sam'
+	output: 'logs/{sample}_STAR_Aligned.out.sam'
 	threads: 8
 	params: prefix = '{sample}_STAR_'
 	shell:"""{STAREXEC}\
@@ -26,4 +26,10 @@ rule STAR_align:
 			--outFilterMismatchNmax=4\
 			--readFilesIn {input}\
 			--genomeLoad LoadAndKeep\
-			--outFileNamePrefix {params.prefix}"""
+			--outFileNamePrefix logs/{params.prefix}"""
+
+rule mv_sam:
+	input: 'logs/{sample}_STAR_Aligned.out.sam'
+	output: '{sample}_Aligned.sam'
+	shell:"""mv {input} {output};"""
+
