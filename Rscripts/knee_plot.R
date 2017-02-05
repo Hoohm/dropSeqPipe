@@ -1,5 +1,6 @@
 library(jsonlite)
 args = commandArgs(TRUE)
+path = args[1]
 
 # You can tweak here the fraction of reads you expect
 # when a cell is captured. I've found that this value often
@@ -9,7 +10,6 @@ fraction = 0.001
 #You can tweak the multiplier of barcodes you need here
 # to change the value on the X axis
 xlim = 2.5 * fromJSON(paste0(path,'/config.json'))$Barcodes
-path = args[1]
 
 samples = names(fromJSON(paste0(path,'/config.json'))$Samples)
 
