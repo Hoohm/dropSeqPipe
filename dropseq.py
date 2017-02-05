@@ -5,7 +5,7 @@ import os
 try:
 	sys.argv[1]
 except:
-	print('You need to provid a folder on which to run on. Exiting')
+	print('You need to provide a folder on which to run on. Exiting')
 	exit()
 wrkdir = sys.argv[1]
 configfile = os.path.join(wrkdir, 'config.json')
@@ -18,6 +18,7 @@ for folder in FOLDERS:
 	joined = os.path.join(wrkdir, folder)
 	if(not os.path.isdir(joined)):
 		os.mkdir(joined)
+        
 #Optimized Run for dropseq
 first = 'snakemake -s snakefiles/Dropseq_pre_align.snake --cores 6 -pT -d {} --configfile local.json'.format(sys.argv[1])
 second = 'snakemake -s snakefiles/Star_align.snake --cores 6 -pT -d {} --configfile local.json'.format(sys.argv[1])
