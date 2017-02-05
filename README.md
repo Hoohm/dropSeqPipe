@@ -77,6 +77,7 @@ The main idea is that I want to load the reference once, process all the samples
 
 Future implementations:
 * Automated Species plot or Barnyard plot
+* Automated extraction of the raw count matrix
 * Cluster version (One of the reasons it's based on snakemake)
 
 
