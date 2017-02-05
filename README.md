@@ -18,7 +18,8 @@ One in the root folder of the pipeline which will contain the paths to your exec
     "TMPDIR":"/path/to/temp",
     "PICARD":"/path/to/picard/dist/picard.jar",
     "DROPSEQ":"/path/to/Drop-seq_tools-1.12",
-    "STAREXEC":"/path/to/STAR/bin/Linux_x86_64/STAR"
+    "STAREXEC":"/path/to/STAR/bin/Linux_x86_64/STAR",
+    "CORES": X
 }
 ```
 
@@ -27,6 +28,7 @@ I had some issues because I had not enough space on / so I added a temp folder t
 * PICARD is the path to the picard.jar
 * DROPSEQ is the path to the folder of Drop-Seq tools
 * STAREXEC is the path to the STAR executable
+* CORES is the number of cores you want to use in the pipeline (snakemake is great at balancing tasks!)
 
 The other json file should be in the folder containing all your fastq files and should look like that.
 ```
