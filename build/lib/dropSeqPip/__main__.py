@@ -67,6 +67,7 @@ def main():
         print('Running post-alignement')
         subprocess.call(post_align, shell=True)
     if(args.mode == "knee-plot"):
+        print(package_dir)
         knee_plot = 'Rscript {}/Rscripts/knee_plot.R {}'.format(package_dir, args.folder_path)
         print('Plotting knee plots')
         subprocess.call(knee_plot, shell=True)
@@ -85,10 +86,6 @@ def main():
             extract_expression = ('snakemake -s {}/Snakefiles/extract_expression.snake --cores {} -pT -d {} --configfile {}'.format(scripts_dir, yaml_data['CORES'], args.folder_path, args.config_file_path), 'Extracting species')  
             print('Extracting expression')
             subprocess.call(extract_expression, shell=True)
-        if(len(samples_yaml['SPECIES']) == 1):
-            extract_expression_single = ('snakemake -s {}/Snakefiles/extract_expression_single.snake --cores {} -pT -d {} --configfile {}'.format(scripts_dir, yaml_data['CORES'], args.folder_path, args.config_file_path), 'Extracting species')  
-            print('Extracting expression')
-            subprocess.call(extract_expression_single, shell=True)
     print('Pipeline finished')
 if __name__ == "__main__":
     sys.exit(main())

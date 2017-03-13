@@ -1,0 +1,30 @@
+configfile: 'config.yaml'
+
+DROPSEQ = config['DROPSEQ']
+SPECIES = config['SPECIES']
+rule all:
+	input: expand('{sample}_{species}_expression_matrix.txt.gz', sample=config['Samples'], species=SPECIES)
+
+
+rule filter_species:
+	input: '{sample}_final.bam'
+	output: '{sample}_{species}.bam'
+	params: '{species}'
+	shell:
+		"""{DROPSEQ}/FilterBAM\
+		REF_SOFT_MATCHED_RETAINED={params}\
+		INPUT={input}\
+		OUTPUT={output}"""
+
+rule extract_expression:
+	input: '{sample}_{species}.bam'
+	output: '{sample}_{species}_expression_matrix.txt.gz'
+	params:
+		sample = '{sample}',
+		species = '{species}'
+	shell:
+		"""{DROPSEQ}/DigitalExpression\
+		I={input}\
+		O={output}\
+		SUMMARY=summary/{params.sample}_{params.species}_dge.summary.txt \
+		CELL_BC_FILE=summary/{params.sample}_barcodes.csv"""

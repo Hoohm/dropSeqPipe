@@ -111,6 +111,7 @@ This is the folder structure you get in the end:
 | -- plots
 | -- summary
 | -- logs
+| congi.yaml
 ```
 
 * plots contains the knee plots and species plots.

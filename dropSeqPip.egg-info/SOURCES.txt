@@ -1,0 +1,17 @@
+setup.py
+dropSeqPip/__init__.py
+dropSeqPip/__main__.py
+dropSeqPip.egg-info/PKG-INFO
+dropSeqPip.egg-info/SOURCES.txt
+dropSeqPip.egg-info/dependency_links.txt
+dropSeqPip.egg-info/entry_points.txt
+dropSeqPip.egg-info/not-zip-safe
+dropSeqPip.egg-info/top_level.txt
+dropSeqPip/Rscripts/knee_plot.R
+dropSeqPip/Rscripts/species_plot.R
+dropSeqPip/Snakefiles/Dropseq_post_kallisto_align.temp.snake
+dropSeqPip/Snakefiles/extract_expression.snake
+dropSeqPip/Snakefiles/extract_species.snake
+dropSeqPip/Snakefiles/post_align.snake
+dropSeqPip/Snakefiles/pre_align.snake
+dropSeqPip/Snakefiles/star_align.snake

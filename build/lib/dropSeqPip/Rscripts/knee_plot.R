@@ -23,6 +23,9 @@ for(i in 1:length(samples)){
   fraction = config_file_data$Samples[[i]]$fraction
   temp = plotCumulativePlot(file_path = paste0(path,"summary/",samples[i],"_hist_out_cell.txt"), title = paste0(samples[i],"\nMinCellFraction = ", fraction), fraction = fraction, x_scale = config_file_data$Samples[[i]]$expected_cells * 5)
   dev.off()
-  write.table(temp, file = paste0(path,"summary/",samples[i],"_barcodes.csv"),col.names = F, quote = F, row.names = F)
-  
+  if(length(config_file_data$SPECIES) == 1){
+    write.table(temp, file = paste0(path,"summary/", samples[i], '_', config_file_data$SPECIES, "_barcodes.csv"),col.names = F, quote = F, row.names = F)
+  } else if (length(config_file_data$SPECIES) == 2){
+    write.table(temp, file = paste0(path,"summary/",samples[i],"_barcodes.csv"),col.names = F, quote = F, row.names = F)
+  }
 }
