@@ -1,3 +1,0 @@
-[console_scripts]
-dropSeqPip = dropSeqPip.__main__:main
-
