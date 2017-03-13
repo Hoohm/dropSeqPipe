@@ -1,16 +1,17 @@
 """Extract expression for both species after species plot."""
-SPECIES = ['HUMAN', 'MOUSE']
 
-configfile: 'config.json'
+
+configfile: 'config.yaml'
 DROPSEQ = config['DROPSEQ']
+SPECIES = config['SPECIES']
 
 rule all:
-	input: expand('summary/{sample}_{species}_exon_tagged.txt', sample=config['Samples'], species=SPECIES)
+	input: expand('summary/{sample}_{species}_expression_matrix.txt', sample=config['Samples'], species=SPECIES)
 
 
 rule extract_expression:
 	input: '{sample}_{species}.bam'
-	output: 'summary/{sample}_{species}_exon_tagged.txt.gz'
+	output: 'summary/{sample}_{species}_expression_matrix.txt.gz'
 	params:
 		sample = '{sample}',
 		species = '{species}'
@@ -22,7 +23,7 @@ rule extract_expression:
 		CELL_BC_FILE=summary/{params.sample}_{params.species}_barcodes.csv"""
 
 rule gunzip:
-	input: 'summary/{sample}_{species}_exon_tagged.txt.gz'
-	output: 'summary/{sample}_{species}_exon_tagged.txt'
+	input: 'summary/{sample}_{species}_expression_matrix.txt.gz'
+	output: 'summary/{sample}_{species}_expression_matrix.txt'
 	shell:
 		"""gunzip {input}"""

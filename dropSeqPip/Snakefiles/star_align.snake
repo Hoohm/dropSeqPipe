@@ -1,5 +1,5 @@
 #Configfile
-configfile: 'config.json'
+configfile: 'config.yaml'
 
 STAREXEC = config['STAREXEC']
 

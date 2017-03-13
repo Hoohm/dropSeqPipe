@@ -1,11 +1,9 @@
-SPECIES = ['HUMAN', 'MOUSE']
-
-configfile: 'config.json'
+configfile: 'config.yaml'
 
 DROPSEQ = config['DROPSEQ']
-
+SPECIES = config['SPECIES']
 rule all:
-	input: expand('{sample}_{species}_exon_tagged.txt.gz', sample=config['Samples'], species=SPECIES)
+	input: expand('{sample}_{species}_expression_matrix.txt.gz', sample=config['Samples'], species=SPECIES)
 
 
 rule filter_species:
@@ -20,7 +18,7 @@ rule filter_species:
 
 rule extract_expression:
 	input: '{sample}_{species}.bam'
-	output: '{sample}_{species}_exon_tagged.txt.gz'
+	output: '{sample}_{species}_expression_matrix.txt.gz'
 	params:
 		sample = '{sample}',
 		species = '{species}'

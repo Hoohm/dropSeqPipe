@@ -2,3 +2,4 @@
 *.json
 *.Rhistory
 *.temp.snake
+*.yaml
