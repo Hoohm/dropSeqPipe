@@ -38,11 +38,6 @@ def main():
     configfile = os.path.join(args.folder_path, 'config.yaml')
     sub_folders = ['summary', 'logs', 'plots']
     package_dir = os.path.dirname(__file__)
-
-    #if (not os.path.isfile(configfile)):
-        #print('No configfile. Exiting')
-        #sys.exit()
-    #Create folder if not present
     for folder in sub_folders:
         joined = os.path.join(args.folder_path, folder)
         if(not os.path.isdir(joined)):

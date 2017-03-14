@@ -130,6 +130,7 @@ Future implementations
 * Cross language dependencies installation
 * Mixed reference genome generation
 * reflat generation
+* UMI and Barcode range in config.yaml
 
 
 I hope it can help you out in your drop-seq experiment!
