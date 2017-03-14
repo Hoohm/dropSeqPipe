@@ -18,18 +18,20 @@ I switched to yaml for config files. It will probably be easier to read in the l
 D.
 Primers are no longer asked for. For the time being it is hard coded in the post_align.snake file.
 
+E.
+Dependencies added. Snakemake and pyyaml
+
 Installation
 --------
 This small pipeline allows you to run the basic steps to align and extract expression from a drop-seq experiment.
 
 Before using it you will need to install some softwares/packages:
 
-1. [Snakemake](https://snakemake.readthedocs.io/en/latest/) (based on python)
-2. [R](https://cran.r-project.org/)
-3. [STAR aligner](https://github.com/alexdobin/STAR)
-4. [Drop-seq tools (1.12)](http://mccarrolllab.com/dropseq/)
-5. [Picard tools](https://broadinstitute.github.io/picard/)
-6. [yaml R package](https://cran.r-project.org/web/packages/yaml/index.html)
+1. [R](https://cran.r-project.org/)
+2. [STAR aligner](https://github.com/alexdobin/STAR)
+3. [Drop-seq tools (1.12)](http://mccarrolllab.com/dropseq/)
+4. [Picard tools](https://broadinstitute.github.io/picard/)
+5. [yaml R package](https://cran.r-project.org/web/packages/yaml/index.html)
 
 Once you have everything just run: `python3 setup.py install`
 
@@ -111,7 +113,7 @@ This is the folder structure you get in the end:
 | -- plots
 | -- summary
 | -- logs
-| congi.yaml
+| config.yaml
 ```
 
 * plots contains the knee plots and species plots.
@@ -126,6 +128,8 @@ Future implementations
 ---------------------------
 * Cluster version (One of the reasons it's based on snakemake)
 * Cross language dependencies installation
+* Mixed reference genome generation
+* reflat generation
 
 
 I hope it can help you out in your drop-seq experiment!
