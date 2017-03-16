@@ -3,7 +3,7 @@ from setuptools import setup
 from setuptools import find_packages
 
 setup(name='dropSeqPip',
-      version='0.2',
+      version='0.21',
       description='A drop-seq pipeline',
       url='http://github.com/hoohm/Drop-seq',
       author='Roelli Patrick',

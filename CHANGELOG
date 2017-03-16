@@ -1,0 +1,29 @@
+# Change Log
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](http://keepachangelog.com/)
+and this project adheres to [Semantic Versioning](http://semver.org/).
+
+
+## [0.21]
+### Added
+- Changelog file to track changes
+- --rerun option to force a rerun
+- Multiple steps allowd now
+
+## [0.2] - 2017-03-14
+### Changed
+- The pipeline is now a python package being called as an executable
+- Went from json to yaml for config files
+
+### Added
+- setup.py and dependencies
+- Species plot available
+
+### Removed
+- primer handling, went to default: AAGCAGTGGTATCAACGCAGAGTAC
+
+
+## [0.1] - 2017-02-13
+### First release
+- Allows for preprocessing, alignement with STAR, post align processing until knee-plot

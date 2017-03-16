@@ -1,25 +1,15 @@
-NEWS
+NEWS -- Version 0.21
 --------------
 A.
-As it was getting a bit complicated to run everything in only one "mode", I adapted the pipeline. Now there are 4 different steps.
-All the steps involve some feedback from you before continuing. the knee-plot allows you to decide where you want the inflection point and the species plot helps deciding which STAMPs are mixed and which are pure.
-
-1. pre-process: Go from sample_R1.fastq.gz to the final.bam file containing the aligned sorted data.
-2. knee-plot: Make the knee plot. Needs step 1.
-3. species-plot: Make the species plot. Needs step 1 and 2. Won't run if you have only one species. (specific for mixing experiments)
-4. extract-expression: Extract the expression data. Needs step 1 and 2 (3 for mixing experiment)
+Rerun option. Allows to force a rerun of a step. This means you don't have to delete files anymore to rerun a particular step, just add `--rerun`
 
 B.
-I also added a setup.py in order to make the install a bit easier. You can now install the pipeline using the classic: `python3 setup.py install`
+Possbility to run multiple steps at once in the --mode option:`-m pre-process knee-plot extract-expression`
 
-C.
-I switched to yaml for config files. It will probably be easier to read in the long run.
+Description
+------------------
+This pipeline is based on [snakemake](https://snakemake.readthedocs.io/en/stable/) and the dropseq tools provided by the [McCarroll Lab](http://mccarrolllab.com/dropseq/). It allows to handle raw data from your dropseq experiment until the count of UMI counts.
 
-D.
-Primers are no longer asked for. For the time being it is hard coded in the post_align.snake file.
-
-E.
-Dependencies added. Snakemake and pyyaml
 
 Installation
 --------
@@ -33,7 +23,12 @@ Before using it you will need to install some softwares/packages:
 4. [Picard tools](https://broadinstitute.github.io/picard/)
 5. [yaml R package](https://cran.r-project.org/web/packages/yaml/index.html)
 
-Once you have everything just run: `python3 setup.py install`
+Once you have everything just run:
+```
+git clone https://github.com/Hoohm/Drop-seq
+cd Drop-seq
+python3 setup.py install
+```
 
 Summary
 -------
@@ -106,6 +101,17 @@ Note: The name of the species is relevant in the mixed experiment, it has to mat
 Once everything is in place, you can run the pipeline using the following command:
 
 `python3 dropSeqPip -f /path/to/your/samples/ -c /path/to/local/config/file.yaml -m mode`
+
+You can choose from four different modes to run:
+
+1. pre-process: Go from sample_R1.fastq.gz to the final.bam file containing the aligned sorted data.
+2. knee-plot: Make the knee plot. Needs step 1.
+3. species-plot: Make the species plot. Needs step 1 and 2. Won't run if you have only one species. (specific for mixing experiments)
+4. extract-expression: Extract the expression data. Needs step 1 and 2 (3 for mixing experiment)
+
+If you don't need to change values in the config files for the different steps, you can also simply run multiple modes at a time. ie:
+
+`python3 dropSeqPip -f /path/to/your/samples/ -c /path/to/local/config/file.yaml -m pre-process knee-plot extract-expression`
 
 This is the folder structure you get in the end:
 ```
