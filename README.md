@@ -13,8 +13,6 @@ This pipeline is based on [snakemake](https://snakemake.readthedocs.io/en/stable
 
 Installation
 --------
-This small pipeline allows you to run the basic steps to align and extract expression from a drop-seq experiment.
-
 Before using it you will need to install some softwares/packages:
 
 1. [R](https://cran.r-project.org/)
@@ -100,7 +98,7 @@ Note: The name of the species is relevant in the mixed experiment, it has to mat
 
 Once everything is in place, you can run the pipeline using the following command:
 
-`python3 dropSeqPip -f /path/to/your/samples/ -c /path/to/local/config/file.yaml -m mode`
+`dropSeqPip -f /path/to/your/samples/ -c /path/to/local/config/file.yaml -m mode`
 
 You can choose from four different modes to run:
 
@@ -111,14 +109,14 @@ You can choose from four different modes to run:
 
 If you don't need to change values in the config files for the different steps, you can also simply run multiple modes at a time. ie:
 
-`python3 dropSeqPip -f /path/to/your/samples/ -c /path/to/local/config/file.yaml -m pre-process knee-plot extract-expression`
+`dropSeqPip -f /path/to/your/samples/ -c /path/to/local/config/file.yaml -m pre-process knee-plot extract-expression`
 
 This is the folder structure you get in the end:
 ```
 /path/to/your/samples/
-| -- plots
-| -- summary
-| -- logs
+| -- plots/
+| -- summary/
+| -- logs/
 | config.yaml
 ```
 
