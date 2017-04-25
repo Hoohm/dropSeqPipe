@@ -1,27 +1,31 @@
-#Configfile
+"""Generate all the post alignement steps."""
+
+
+# Configfile
 configfile: 'config.yaml'
 
-#Executables
+# Executables
 TMPDIR = config['TMPDIR']
 PICARD = config['PICARD']
 DROPSEQ = config['DROPSEQ']
 
-#References files
+# References files
 GENOMEREF = config['GENOMEREF']
 REFFLAT = config['REFFLAT']
+RRNAINTERVALS = config['RRNAINTERVALS']
 
-#Species
+# Species
 SPECIES = config["SPECIES"]
 
 
 rule all:
-	input: expand('summary/{sample}_hist_out_cell.txt', sample=config['Samples'])
+	input: expand('logs/{sample}_hist_out_cell.txt', sample=config['Samples'])
 	log: 'logs/Dropseq_post_align.log'
 
 rule sort:
-	input: 
+	input:
 		samples = '{sample}_Aligned.sam'
-	output: '{sample}_Aligned_sorted.sam'
+	output: temp('{sample}_Aligned_sorted.sam')
 	threads:1
 	shell:
 		"""java	-Djava.io.tmpdir={TMPDIR} -Dsamjdk.buffer_size=131072 -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10 -Xmx4000m -jar {PICARD} SortSam\
@@ -33,8 +37,8 @@ rule sort:
 rule stage3:
 	input:	unmapped = '{sample}_tagged_unmapped.bam',
 			mapped = '{sample}_Aligned_sorted.sam'
-	output: '{sample}_gene_exon_tagged.bam'
-	threads:2
+	output: temp('{sample}_gene_exon_tagged.bam')
+	threads: 2
 	shell:
 		"""java -Djava.io.tmpdir={TMPDIR} -Xmx4000m -jar {PICARD} MergeBamAlignment\
 		REFERENCE_SEQUENCE={GENOMEREF}\
@@ -52,14 +56,15 @@ rule stage3:
 		CREATE_INDEX=true
 		"""
 
-rule bead_errors:
+rule bead_errors_metrics:
 	input: '{sample}_gene_exon_tagged.bam'
 	output: '{sample}_final.bam'
 	params:
-		out_stats = 'summary/{sample}_synthesis_stats_summary.txt',
-		summary = 'summary/{sample}_synthesis_stats_summary.txt',
-		#primer = lambda wildcards: config['Primers'][config['Samples'][wildcards.sample]['Primer']],
-		barcodes = lambda wildcards: config['Samples'][wildcards.sample]['expected_cells'] * 2
+		out_stats = 'logs/{sample}_synthesis_stats_summary.txt',
+		summary = 'logs/{sample}_synthesis_stats_summary.txt',
+		barcodes = lambda wildcards: config['Samples'][wildcards.sample]['expected_cells'] * 2,
+		cells = lambda wildcards: config['Samples'][wildcards.sample]['expected_cells'],
+		metrics = 'logs/{sample}_rna_metrics.txt'
 	shell:
 		"""{DROPSEQ}/DetectBeadSynthesisErrors\
 		INPUT={input}\
@@ -67,12 +72,18 @@ rule bead_errors:
 		OUTPUT_STATS={params.out_stats}\
 		SUMMARY={params.summary}\
 		NUM_BARCODES={params.barcodes}\
-		PRIMER_SEQUENCE=AAGCAGTGGTATCAACGCAGAGTAC
+		PRIMER_SEQUENCE=AAGCAGTGGTATCAACGCAGAGTAC;
+		{DROPSEQ}/SingleCellRnaSeqMetricsCollector\
+		INPUT={input}\
+		OUTPUT={params.metrics}\
+		ANNOTATIONS_FILE={REFFLAT}\
+		NUM_CORE_BARCODES={params.cells}\
+		RIBOSOMAL_INTERVALS={RRNAINTERVALS}
 		"""
 
 rule bam_hist:
 	input: '{sample}_final.bam'
-	output: 'summary/{sample}_hist_out_cell.txt'
+	output: 'logs/{sample}_hist_out_cell.txt'
 	shell:
 		"""{DROPSEQ}/BAMTagHistogram\
 		I={input}\

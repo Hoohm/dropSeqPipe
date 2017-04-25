@@ -1,12 +1,15 @@
-#Configfile
-configfile:'config.yaml'
+"""Generate pre alignement steps."""
 
-#Executables
+
+# Configfile
+configfile: 'config.yaml'
+
+# Executables
 TMPDIR = config['TMPDIR']
 PICARD = config['PICARD']
 DROPSEQ = config['DROPSEQ']
 
-#Reference files
+# Reference files
 GENOMEREF = config['GENOMEREF']
 REFFLAT = config['REFFLAT']
 METAREF = config['METAREF']
@@ -15,7 +18,6 @@ METAREF = config['METAREF']
 
 rule all:
 	input: expand('{sample}_tagged_unmapped.fastq', sample=config['Samples'])
-	
 
 rule fastq_to_sam:
 	"""Create an empty bam file linking cell/UMI barcodes to reads"""
@@ -34,12 +36,20 @@ rule fastq_to_sam:
 rule stage1:
 	input: '{sample}_unaligned.bam'
 	output: '{sample}_tagged_unmapped.bam'
-	params: 'summary/{sample}_cell_tagging_summary.txt'
+	params:
+		BC_summary = 'logs/{sample}_CELL_barcode.txt',
+		UMI_summary = 'logs/{sample}_UMI_barcode.txt',
+		start_trim = 'logs/{sample}_start_trim.txt',
+		polyA_trim = 'logs/{sample}_polyA_trim.txt',
+		BC_range_1 = config['GLOBAL']['BC_range']['first'],
+		BC_range_2 = config['GLOBAL']['BC_range']['last'],
+		UMI_range_1 = config['GLOBAL']['UMI_range']['first'],
+		UMI_range_2 = config['GLOBAL']['UMI_range']['last']
 	threads: 4
 	shell:
 		"""{DROPSEQ}/TagBamWithReadSequenceExtended\
-		SUMMARY={params}\
-		BASE_RANGE=1-12\
+		SUMMARY={params.BC_summary}\
+		BASE_RANGE={params.BC_range_1}-{params.BC_range_2}\
 		BASE_QUALITY=10\
 		BARCODED_READ=1\
 		DISCARD_READ=false\
@@ -49,8 +59,8 @@ rule stage1:
 		OUTPUT=/dev/stdout COMPRESSION_LEVEL=0 |\
 		\
 		{DROPSEQ}/TagBamWithReadSequenceExtended\
-		SUMMARY={params}\
-		BASE_RANGE=13-20\
+		SUMMARY={params.UMI_summary}\
+		BASE_RANGE={params.UMI_range_1}-{params.UMI_range_2}\
 		BASE_QUALITY=10\
 		BARCODED_READ=1\
 		DISCARD_READ=true\
@@ -64,7 +74,7 @@ rule stage1:
 		OUTPUT=/dev/stdout COMPRESSION_LEVEL=0|\
 		\
 		{DROPSEQ}/TrimStartingSequence\
-		OUTPUT_SUMMARY={params}\
+		OUTPUT_SUMMARY={params.start_trim}\
 		SEQUENCE=AAGCAGTGGTATCAACGCAGAGTGAATGGG\
 		MISMATCHES=0\
 		NUM_BASES=5\
@@ -72,7 +82,7 @@ rule stage1:
 		OUTPUT=/dev/stdout COMPRESSION_LEVEL=0|\
 		\
 		{DROPSEQ}/PolyATrimmer\
-    	OUTPUT_SUMMARY={params}\
+		OUTPUT_SUMMARY={params.polyA_trim}\
     	MISMATCHES=0\
     	NUM_BASES=6\
     	OUTPUT={output}\

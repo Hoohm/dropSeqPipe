@@ -1,7 +1,6 @@
 #Functions used to plot the species plot for drop-seq mixed protocol
 # Credit to James Nemesh
 
-
 library(yaml)
 args = commandArgs(TRUE)
 path = args[1]

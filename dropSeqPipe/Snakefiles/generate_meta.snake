@@ -1,0 +1,94 @@
+"""Generate meta data."""
+
+
+import glob
+GENOME = glob.glob('*.fa')[0].split('.fa')[0]
+GENOME_fa = '{}.fa'.format(GENOME)
+GENOME_dict = '{}.dict'.format(GENOME)
+GENOME_rRNA_intervals = '{}.rRNA.intervals'.format(GENOME)
+
+
+ANNOTATION = glob.glob('*.gtf')[0].split('.gtf')[0]
+ANNOTATION_reduced_gtf = '{}_reduced.gtf'.format(ANNOTATION)
+ANNOTATION_gtf = '{}.gtf'.format(ANNOTATION)
+ANNOTATION_refFlat = '{}.refFlat'.format(ANNOTATION)
+
+#Executables
+TMPDIR = config['TMPDIR']
+PICARD = config['PICARD']
+DROPSEQ = config['DROPSEQ']
+STAREXEC = config['STAREXEC']
+CORES = config['CORES']
+
+
+rule all:
+	input:
+		GENOME_rRNA_intervals,
+		'STAR_INDEX/SA'
+
+rule create_dict:
+	input:GENOME_fa
+	output: GENOME_dict
+	threads:1
+	shell:
+		"""java -jar -Djava.io.tmpdir={TMPDIR} {PICARD} CreateSequenceDictionary\
+		REFERENCE={input}\
+		OUTPUT={output}
+		"""
+
+rule reduce_gtf:
+	input:
+		GENOME_dict
+	output: ANNOTATION_reduced_gtf
+	threads:1
+	shell:
+		"""{DROPSEQ}/ReduceGTF\
+		GTF={ANNOTATION_gtf}\
+		OUTPUT={output}\
+		SEQUENCE_DICTIONARY={input}\
+		IGNORE_FUNC_TYPE='null'\
+		ENHANCE_GTF='false'
+		"""
+
+rule create_refFlat:
+	input:
+		gtf=ANNOTATION_gtf,
+		reduced=ANNOTATION_reduced_gtf,
+		dict=GENOME_dict
+	output: ANNOTATION_refFlat
+	threads: 1
+	shell:
+		"""{DROPSEQ}/ConvertToRefFlat\
+		ANNOTATIONS_FILE={input.gtf}\
+		OUTPUT={output}\
+		SEQUENCE_DICTIONARY={input.dict}
+		"""
+
+rule create_intervals:
+	input:
+		gtf = ANNOTATION_reduced_gtf,
+		refFlat = ANNOTATION_refFlat,
+		dict = GENOME_dict
+	output:
+		GENOME_rRNA_intervals
+	threads: 1
+	shell:
+		"""{DROPSEQ}/CreateIntervalsFiles\
+		REDUCED_GTF={input.gtf}\
+		SEQUENCE_DICTIONARY={input.dict}\
+		O='.'\
+		PREFIX={GENOME}
+		"""
+
+rule create_star_index:
+	input: GENOME_fa
+	output: 'STAR_INDEX/SA'
+	threads: CORES
+	shell:
+		"""{STAREXEC}\
+		--runThreadN {CORES}\
+		--runMode genomeGenerate\
+		--genomeDir STAR_INDEX\
+		--genomeFastaFiles {input}\
+		--sjdbGTFfile {ANNOTATION_gtf}
+		"""

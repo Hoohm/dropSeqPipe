@@ -1,3 +1,6 @@
+"""Extract species specific expression to prepare the species plot."""
+
+
 configfile: 'config.yaml'
 
 DROPSEQ = config['DROPSEQ']

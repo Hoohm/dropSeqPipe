@@ -26,4 +26,4 @@ rule gunzip:
 	input: 'summary/{sample}_{species}_expression_matrix.txt.gz'
 	output: 'summary/{sample}_{species}_expression_matrix.txt'
 	shell:
-		"""gunzip -q {input}"""
+		"""gunzip -qf {input}"""

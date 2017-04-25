@@ -1,8 +1,8 @@
-"""Extract expression for both species after species plot."""
-
+"""Extract expression fof single species."""
 
 configfile: 'config.yaml'
 DROPSEQ = config['DROPSEQ']
+
 
 rule all:
 	input: expand('summary/{sample}_expression_matrix.txt', sample=config['Samples'])
@@ -24,4 +24,4 @@ rule gunzip:
 	input: 'summary/{sample}_expression_matrix.txt.gz'
 	output: 'summary/{sample}_expression_matrix.txt'
 	shell:
-		"""gunzip -q {input}"""
+		"""gunzip -qf {input}"""

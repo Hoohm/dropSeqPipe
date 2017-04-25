@@ -1,11 +1,14 @@
-#Configfile
+"""Align the data with STAR."""
+
+
+# Configfile
 configfile: 'config.yaml'
 
 STAREXEC = config['STAREXEC']
-
 METAREF = config['METAREF']
+CORES = config['CORES']
 
-
+MISMATCH = config['GLOBAL']['allowed_mismatch']
 
 
 rule all:
@@ -18,12 +21,14 @@ rule all:
 rule STAR_align:
 	input:  '{sample}_tagged_unmapped.fastq'
 	output: 'logs/{sample}_STAR_Aligned.out.sam'
-	threads: 8
-	params: prefix = '{sample}_STAR_'
+	params:
+		prefix = '{sample}_STAR_',
+		mismatch = MISMATCH
+	threads: CORES
 	shell:"""{STAREXEC}\
 			--genomeDir {METAREF}\
-			--runThreadN 8\
-			--outFilterMismatchNmax=4\
+			--runThreadN {CORES}\
+			--outFilterMismatchNmax={params.mismatch}\
 			--readFilesIn {input}\
 			--genomeLoad LoadAndKeep\
 			--outFileNamePrefix logs/{params.prefix}"""
@@ -32,4 +37,3 @@ rule mv_sam:
 	input: 'logs/{sample}_STAR_Aligned.out.sam'
 	output: '{sample}_Aligned.sam'
 	shell:"""mv {input} {output};"""
-
