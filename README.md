@@ -192,11 +192,12 @@ Here are examples of the plots you will get:
 ## Fastqc summary
 <img src="dropSeqPipe/images/fastqc.png" alt="fastqc">
 
+
 ## Poly trimming per sample
 <img src="dropSeqPipe/images/sample1_polya_trimmed.png" alt="polya" width = '600px'>
 
 ## Knee-plot per sample
-<img src="dropSeqPipe/images/knee_plot.png" alt="knee-plot" width='500px'>
+<img src="dropSeqPipe/images/sample1_knee_plot.png" alt="knee-plot" width='500px'>
 
 ## Cell barcode base frequency per sample
 <img src="dropSeqPipe/images/sample1_base_freq_plot.png" alt="base-freq" width = '450px'>
@@ -206,6 +207,8 @@ Here are examples of the plots you will get:
 
 ## Star alignement summary
 <img src="dropSeqPipe/images/STAR_Log_Stat.png" alt="STAR summary">
+
+*The code for the fastqc and STAR log plots are highly inspired by code I found on github but can't find anymore. Please, if you know who wrote it,tell me I would like to reference it*
 
 
 Future implementations
