@@ -13,7 +13,14 @@ class PostInstallCommand(install):
         from rpy2.robjects.packages import importr
         utils = rpackages.importr('utils')
         utils.chooseCRANmirror(ind=1)
-        packnames = ['ggplot2', 'reshape', 'gtable', 'grid', 'stringr', 'plyr', 'yaml', 'gridExtra']
+        packnames = ['ggplot2',
+                     'reshape',
+                     'gtable',
+                     'grid',
+                     'stringr',
+                     'plyr',
+                     'yaml',
+                     'gridExtra']
         for package in packnames:
             try:
                 importr(package)
@@ -25,14 +32,17 @@ class PostInstallCommand(install):
         devtools.install_github("kassambara/ggpubr")
 
 setup(name='dropSeqPipe',
-      version='0.22',
+      version='0.23',
       description='A drop-seq pipeline',
       url='http://github.com/hoohm/Drop-seq',
       author='Roelli Patrick',
       author_email='patrick.roelli@gmail.com',
       license='GNU GPL3',
       packages=['dropSeqPipe'],
-      package_data={'dropSeqPipe': ['Rscripts/*.R', 'Snakefiles/*.snake']},
+      package_data={'dropSeqPipe': ['Rscripts/*.R',
+                                    'Snakefiles/singleCell/*.snake',
+                                    'Python/*.py',
+                                    'Snakefiles/bulk/*.snake']},
       zip_safe=False,
       install_requires=['snakemake', 'pyyaml', 'rpy2'],
       entry_points={

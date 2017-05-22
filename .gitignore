@@ -1,5 +1,6 @@
 #Ignore config files
 *.json
 *.Rhistory
-*.temp.snake
+*.temp.*
 *.yaml
+*/Drop-seq_tools

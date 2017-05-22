@@ -1,6 +1,5 @@
 """Align the data with STAR."""
 
-
 # Configfile
 configfile: 'config.yaml'
 
@@ -8,25 +7,26 @@ STAREXEC = config['STAREXEC']
 METAREF = config['METAREF']
 CORES = config['CORES']
 
-MISMATCH = config['GLOBAL']['allowed_mismatch']
-
+MISMATCH = config['GLOBAL']['allowed_aligner_mismatch']
 
 rule all:
-	input: expand('{sample}_Aligned.sam', sample=config['Samples'])
+	input: expand('{sample}.Aligned.sam', sample=config['Samples'])
 	shell:"""{STAREXEC}\
 		--genomeDir {METAREF}\
-		--genomeLoad Remove"""
+		--genomeLoad Remove;\
+		rm -rf Aligned.out.sam Log.out Log.progress.out _STARtmp"""
 
 
 rule STAR_align:
-	input:  '{sample}_tagged_unmapped.fastq'
-	output: 'logs/{sample}_STAR_Aligned.out.sam'
+	input:  '{sample}_tagged_unmapped.fastq.gz'
+	output: 'logs/{sample}.Aligned.out.sam'
 	params:
-		prefix = '{sample}_STAR_',
+		prefix = '{sample}.',
 		mismatch = MISMATCH
 	threads: CORES
 	shell:"""{STAREXEC}\
 			--genomeDir {METAREF}\
+			--readFilesCommand zcat\
 			--runThreadN {CORES}\
 			--outFilterMismatchNmax={params.mismatch}\
 			--readFilesIn {input}\
@@ -34,6 +34,6 @@ rule STAR_align:
 			--outFileNamePrefix logs/{params.prefix}"""
 
 rule mv_sam:
-	input: 'logs/{sample}_STAR_Aligned.out.sam'
-	output: '{sample}_Aligned.sam'
-	shell:"""mv {input} {output};"""
+	input: 'logs/{sample}.Aligned.out.sam'
+	output: '{sample}.Aligned.sam'
+	shell:"""mv {input} {output}"""

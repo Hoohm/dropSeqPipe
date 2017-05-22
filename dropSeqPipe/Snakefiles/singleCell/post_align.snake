@@ -24,7 +24,7 @@ rule all:
 
 rule sort:
 	input:
-		samples = '{sample}_Aligned.sam'
+		samples = '{sample}.Aligned.sam'
 	output: temp('{sample}_Aligned_sorted.sam')
 	threads:1
 	shell:
@@ -47,10 +47,10 @@ rule stage3:
 		INCLUDE_SECONDARY_ALIGNMENTS=false\
 		PAIRED_RUN=false\
 		OUTPUT=/dev/stdout COMPRESSION_LEVEL=0|\
-		\
+
 		{DROPSEQ}/TagReadWithGeneExon\
-		O={output}\
-		I=/dev/stdin\
+		OUTPUT={output}\
+		INPUT=/dev/stdin\
 		ANNOTATIONS_FILE={REFFLAT}\
 		TAG=GE\
 		CREATE_INDEX=true

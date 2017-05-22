@@ -1,0 +1,50 @@
+#Configfile
+configfile:'config.yaml'
+
+ruleorder: trim_paired > trim_single
+
+#Executables
+TMPDIR = config['TMPDIR']
+TRIMEXEC = config['TRIMEXEC']
+#Reference files
+ILLUMINACLIP = config['ILLUMINACLIP']
+CORES = config['CORES']
+
+
+rule all:
+    input: expand('logs/{sample}_trimlog.txt', sample=config['Samples'])
+
+rule trim_single:
+    input: '{sample}.fastq.gz'
+    output: '{sample}_trimmed.fastq.gz'
+    threads: CORES
+    log: 'logs/{sample}_trimlog.txt'
+    shell:
+        """java -Djava.io.tmpdir={TMPDIR} -jar {TRIMEXEC}\
+        SE {input} {output}\
+        ILLUMINACLIP:{ILLUMINACLIP}:2:30:10\
+        LEADING:3\
+        TRAILING:3\
+        SLIDINGWINDOW:4:15\
+        MINLEN:36 > {log} 2>&1"""
+
+
+rule trim_paired:
+    input:
+        R1 = '{sample}_R1.fastq.gz',
+        R2 = '{sample}_R2.fastq.gz'
+    output:
+        PR1 = '{sample}_trimmed_R1.fastq.gz',
+        PR2 = temp('{sample}_trimmed_UR1.fastq.gz'),
+        UR1 = '{sample}_trimmed_R2.fastq.gz',
+        UR2 = temp('{sample}_trimmed_UR2.fastq.gz'),
+        log = 'logs/{sample}_trimlog.txt'
+    threads: CORES
+    shell:
+        """java -Djava.io.tmpdir={TMPDIR} -jar {TRIMEXEC}\
+        PE {input.R1} {input.R2} {output.PR1} {output.PR2} {output.UR1} {output.UR2}\
+        ILLUMINACLIP:{ILLUMINACLIP}:2:30:10\
+        LEADING:3\
+        TRAILING:3\
+        SLIDINGWINDOW:4:15\
+        MINLEN:36 > {output.log} 2>&1"""

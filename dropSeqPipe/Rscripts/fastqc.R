@@ -8,7 +8,7 @@ library(ggplot2)
 
 args = commandArgs(TRUE)
 folder_path = args[1]
-qc.folders = file.path(folder_path, 'fastqc')
+qc.folders = file.path(folder_path, 'logs')
 out.file = file.path(folder_path,'summary/fastqc')
 fastqc_plot = file.path(folder_path,'plots/fastqc.pdf')
 

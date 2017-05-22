@@ -1,0 +1,49 @@
+#Configfile
+configfile: 'config.yaml'
+GTF = config['GTF']
+PICARD = config['PICARD']
+REFFLAT = config['REFFLAT']
+RRNAINTERVALS = config['RRNAINTERVALS']
+TMPDIR = config['TMPDIR']
+
+#rule order
+ruleorder: gene_count_paired > gene_count_single
+
+rule all:
+	input: expand('summary/{sample}', sample=config['Samples'])
+
+rule sort:
+    input: temp('{sample}.Aligned.sam')
+    output: '{sample}.sorted.sam'
+    shell:
+        """java -Djava.io.tmpdir={TMPDIR} -Dsamjdk.buffer_size=131072 -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10 -Xmx4000m -jar {PICARD} SortSam\
+        INPUT={input}\
+        OUTPUT={output}\
+        SORT_ORDER=queryname\
+        TMP_DIR={TMPDIR}"""
+
+rule rna_metrics:
+    input: '{sample}.sorted.sam'
+    output: 'logs/{sample}_rna_metrics.txt'
+    shell:
+        """java -Xmx4000m -jar -Djava.io.tmpdir={TMPDIR} {PICARD} CollectRnaSeqMetrics\
+        INPUT={input}\
+        OUTPUT={output}\
+        REF_FLAT={REFFLAT}\
+        STRAND=NONE\
+        RIBOSOMAL_INTERVALS={RRNAINTERVALS}
+        """
+
+rule gene_count_single:
+	input:  sorted_sam = '{sample}.sorted.sam',
+            metrics = 'logs/{sample}_rna_metrics.txt'
+	output: 'summary/{sample}'
+	shell:
+		"""htseq-count -i gene_name -m union -a 10 --stranded=no {input.sorted_sam} {GTF} > {output}"""
+
+rule gene_count_paired:
+    input:  sorted_sam = '{sample}.sorted.sam',
+            metrics = 'logs/{sample}_rna_metrics.txt'
+    output: 'summary/{sample}'
+    shell:
+        """htseq-count -i gene_name -m union -a 10 --stranded=no -r name {input.sorted_sam} {GTF} > {output}"""

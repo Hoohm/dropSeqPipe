@@ -24,7 +24,7 @@ def get_args():
                         required=True)
     parser.add_argument('-m', '--mode',
                         help='Which mode to run.',
-                        choices=['pre-process', 'generate-plots', 'species-plot', 'extract-expression', 'fastqc', 'generate_meta'],
+                        choices=['pre-process', 'generate-plots', 'species-plot', 'extract-expression', 'fastqc', 'generate_meta', 'test'],
                         action='store',
                         nargs='+',
                         required=True)
@@ -58,9 +58,14 @@ def main():
     except:
         pass
     if("generate_meta" in args.mode):
-        shell('snakemake -s {}/Snakefiles/generate_meta.snake --cores {} -pT -d {} --configfile {} {}'.format(scripts_dir, yaml_data['CORES'], args.folder_path, args.config_file_path, complementory_args))
+        shell('snakemake -s {}/Snakefiles/singleCell/generate_meta.snake --cores {} -pT -d {} --configfile {} {}'.format(
+            scripts_dir,
+            yaml_data['CORES'],
+            args.folder_path,
+            args.config_file_path,
+            complementory_args))
     else:
-        sub_folders = ['summary', 'logs', 'plots', 'fastqc']
+        sub_folders = ['summary', 'logs', 'plots']
         package_dir = os.path.dirname(__file__)
         for folder in sub_folders:
             joined = os.path.join(args.folder_path, folder)
@@ -69,17 +74,45 @@ def main():
     # Select step and run
     if("fastqc" in args.mode):
         print("Mode is fastqc.")
-        fastqc = 'snakemake -s {}/Snakefiles/fastqc.snake --cores {} -pT -d {} --configfile {} {}'.format(scripts_dir, yaml_data['CORES'], args.folder_path, args.config_file_path, complementory_args)
-        fastqc_summary = 'Rscript {}/Rscripts/fastqc.R {}'.format(package_dir, args.folder_path)
+        fastqc = 'snakemake -s {}/Snakefiles/{}/fastqc.snake --cores {} -pT -d {} --configfile {} {}'.format(
+            scripts_dir,
+            samples_yaml['GLOBAL']['data_type'],
+            yaml_data['CORES'],
+            args.folder_path,
+            args.config_file_path,
+            complementory_args)
+        fastqc_summary = 'Rscript {}/Rscripts/fastqc.R {}'.format(
+            package_dir,
+            args.folder_path)
         print('Running fastqc')
         shell(fastqc)
         shell(fastqc_summary)
     if("pre-process" in args.mode):
         print("Mode is pre-processing.")
-        pre_align = 'snakemake -s {}/Snakefiles/pre_align.snake --cores {} -pT -d {} --configfile {} {}'.format(scripts_dir, yaml_data['CORES'], args.folder_path, args.config_file_path,complementory_args)
-        star_align = 'snakemake -s {}/Snakefiles/star_align.snake --cores {} -pT -d {} --configfile {} {}'.format(scripts_dir, yaml_data['CORES'], args.folder_path, args.config_file_path, complementory_args)
-        star_summary = 'Rscript {}/Rscripts/STAR_log_plot.R {}'.format(package_dir, args.folder_path)
-        post_align = 'snakemake -s {}/Snakefiles/post_align.snake --cores {} -pT -d {} --configfile {} {}'.format(scripts_dir, yaml_data['CORES'], args.folder_path, args.config_file_path, complementory_args)
+        pre_align = 'snakemake -s {}/Snakefiles/{}/pre_align.snake --cores {} -pT -d {} --configfile {} {}'.format(
+            scripts_dir,
+            samples_yaml['GLOBAL']['data_type'],
+            yaml_data['CORES'],
+            args.folder_path,
+            args.config_file_path,
+            complementory_args)
+        star_align = 'snakemake -s {}/Snakefiles/{}/star_align.snake --cores {} -pT -d {} --configfile {} {}'.format(
+            scripts_dir,
+            samples_yaml['GLOBAL']['data_type'],
+            yaml_data['CORES'],
+            args.folder_path,
+            args.config_file_path,
+            complementory_args)
+        star_summary = 'Rscript {}/Rscripts/STAR_log_plot.R {}'.format(
+            package_dir,
+            args.folder_path)
+        post_align = 'snakemake -s {}/Snakefiles/{}/post_align.snake --cores {} -pT -d {} --configfile {} {}'.format(
+            scripts_dir,
+            samples_yaml['GLOBAL']['data_type'],
+            yaml_data['CORES'],
+            args.folder_path,
+            args.config_file_path,
+            complementory_args)
         print('Running pre-processing')
         shell(pre_align)
         print('Running Alignement')
@@ -91,9 +124,14 @@ def main():
         shell(star_summary)
         print('Running post-alignement')
         shell(post_align)
-    # if("test" in args.mode):
-    #     print('test')
-    #     shell('snakemake -s {}/Snakefiles/post_align.snake --cores {} -pT -d {} --configfile {} {}'.format(scripts_dir, yaml_data['CORES'], args.folder_path, args.config_file_path,complementory_args),'Pre-processing before alignement')        
+    if("test" in args.mode):
+        print('test')
+        shell('snakemake -s {}/Snakefiles/singleCell/test.snake --cores {} -pT -d {} --configfile {} {}'.format(
+            scripts_dir,
+            yaml_data['CORES'],
+            args.folder_path,
+            args.config_file_path,
+            complementory_args))
     if("generate-plots" in args.mode):
         knee_plot = 'Rscript {}/Rscripts/knee_plot.R {}'.format(package_dir, args.folder_path)
         base_summary = 'Rscript {}/Rscripts/rna_metrics.R {}'.format(package_dir, args.folder_path)
@@ -103,7 +141,7 @@ def main():
         shell(base_summary)
     if("species-plot" in args.mode):
         if(len(samples_yaml['SPECIES']) == 2):
-            extract_species = ('snakemake -s {}/Snakefiles/extract_species.snake --cores {} -pT -d {} --configfile {} {}'.format(scripts_dir, yaml_data['CORES'], args.folder_path, args.config_file_path, complementory_args), 'Extracting species')
+            extract_species = ('snakemake -s {}/Snakefiles/singleCell/extract_species.snake --cores {} -pT -d {} --configfile {} {}'.format(scripts_dir, yaml_data['CORES'], args.folder_path, args.config_file_path, complementory_args), 'Extracting species')
             print('Extracting species')
             shell(extract_species)
             species_plot = 'Rscript {}/Rscripts/species_plot.R {}'.format(package_dir, args.folder_path)
@@ -113,11 +151,11 @@ def main():
             print('You cannot run this with a number of species different than 2.\nPlease change the config file')
     if("extract-expression" in args.mode):
         if(len(samples_yaml['SPECIES']) == 2):
-            extract_expression = 'snakemake -s {}/Snakefiles/extract_expression.snake --cores {} -pT -d {} --configfile {} {}'.format(scripts_dir, yaml_data['CORES'], args.folder_path, args.config_file_path, complementory_args)
+            extract_expression = 'snakemake -s {}/Snakefiles/singleCell/extract_expression.snake --cores {} -pT -d {} --configfile {} {}'.format(scripts_dir, yaml_data['CORES'], args.folder_path, args.config_file_path, complementory_args)
             print('Extracting expression')
             shell(extract_expression)
         if(len(samples_yaml['SPECIES']) == 1):
-            extract_expression_single = 'snakemake -s {}/Snakefiles/extract_expression_single.snake --cores {} -pT -d {} --configfile {} {}'.format(scripts_dir, yaml_data['CORES'], args.folder_path, args.config_file_path, complementory_args)
+            extract_expression_single = 'snakemake -s {}/Snakefiles/singleCell/extract_expression_single.snake --cores {} -pT -d {} --configfile {} {}'.format(scripts_dir, yaml_data['CORES'], args.folder_path, args.config_file_path, complementory_args)
             print('Extracting expression')
             shell(extract_expression_single)
             merge_expression = 'Rscript {}/Rscripts/merge_counts_single.R {}'.format(package_dir, args.folder_path)

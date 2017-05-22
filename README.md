@@ -1,7 +1,8 @@
 Description
 ------------------
 This pipeline is based on [snakemake](https://snakemake.readthedocs.io/en/stable/) and the dropseq tools provided by the [McCarroll Lab](http://mccarrolllab.com/dropseq/). It allows to go from raw data of your dropSeq/scrbSeq experiment until the final count matrix with QC plots along the way.
-This is the tool we use in our lab to improve our wetlab protocol as well as provide an easy framework to reproduce and compare different experiments as well as different parameters.
+This is the tool we use in our lab to improve our wetlab protocol as well as provide an easy framework to reproduce and compare different experiments with different parameters.
+
 This package is trying to be as user friendly as possible. One of the hopes is that non-bioinformatician can make use of it without too much hassle.
 
 NEWS -- Version 0.22
@@ -33,7 +34,7 @@ Before using it you will need to install some softwares:
 3. [Drop-seq tools (1.12)](http://mccarrolllab.com/dropseq/)
 4. [Picard tools](https://broadinstitute.github.io/picard/)
 5. [fastqc](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/)
-6. [Python](https://www.python.org/)
+6. [Python3](https://www.python.org/)
 
 Once you have everything just run:
 ```
@@ -56,10 +57,12 @@ DROPSEQ: /path/to/Drop-seq_tools-1.12
 STAREXEC: /path/to/STAR/bin/Linux_x86_64/STAR
 FASTQCEXEC: /path/to/fastqc
 CORES: X
+
 ```
 Please note the "space" after the semi-colon, is needed for the yaml to work.
 
 * TMPDIR is the temp folder on the disk with enough space
+
 Note: I had some issues because I had not enough space on / so I added a temp folder to fix that. If you have the same problem, this TMPDIR variable won't make the change for the calls inside the drop-seq-tools. You have to edit all the *.sh files in the drop-seq tools and add it manually there.
 * PICARD is the path to the picard.jar
 * DROPSEQ is the path to the folder of Drop-Seq tools
@@ -100,6 +103,8 @@ STAR_INDEX/
 Experiment configuration - step 3
 ----------------------------------
 The second yaml file should be in the folder containing all your fastq.gz files and should look like that.
+
+IMPORTANT: It has to be called config.yaml
 ```
 Samples:
     sample1:
@@ -116,13 +121,19 @@ SPECIES:
     - MOUSE
     - HUMAN
 GLOBAL:
-    allowed_mismatch: 10
-    BC_range:
-        first: 1
-        last: 12
-    UMI_range:
-        first: 13
-        last: 20
+    data_type:SingleCell
+    allowed_aligner_mismatch: 10
+    Cell_barcode:
+        start: 1
+        end: 12
+        min_quality: 10
+        num_below_quality: 1
+    UMI:
+        start: 13
+        end: 20
+        min_quality: 10
+        num_below_quality: 1
+
 ```
 
 * Samples contains a list of the names of your samples. In this example the samples in the folder should look like:
@@ -132,6 +143,7 @@ sample1_R2.fastq.gz
 sample2_R1.fastq.gz
 sample2_R2.fastq.gz
 ```
+*Note: In DropSeq or ScrbSeq you expect a paired sequencing. R1 will hold the information of your barcode and UMI, R2 will hold the 3' end of the captured gene.*
 
 * fraction is the fraction of reads per cell you expect. This is to find the bend in the knee plot. Tweaking it changes where you cut and decides which are valid STAMPs and which are not. 0.001 is a good place to start testing.
 * expected_cells is the amount of cells you expect from your sample.
@@ -154,7 +166,10 @@ or
 Note: The name of the species is relevant in the mixed experiment, it has to match the name used in the mixed reference.
 * GLOBAL is a sub category applied to all samples listed above to tweak three values.
 * allowed_mismatch is the number of mismatches you want to allow when aligning. Bellow that it is discarded as non mapped.
-* BC_range and UMI_range are the barcode and UMI range. the example above contains the typical positions for a dropseq experiment.
+* Cell_barcode and UMI are the options for the barcodes and UMIs. the example above contains the typical positions for a dropseq experiment.
+* start and end are respectively the positions where the BC/UMI starts or ends.
+* min_quality allows you to select the quality filtering for bases in your cell barcodes or UMI to discard reads.
+* num_below_quality allows you to choose how many bases you are needed to not pass the min_quality. In the example, if any base from the UMI or the BC are bellow 10, the read is discarded.
 
 Running the pipeline
 ------------------------
@@ -208,7 +223,7 @@ Here are examples of the plots you will get:
 ## Star alignement summary
 <img src="dropSeqPipe/images/STAR_Log_Stat.png" alt="STAR summary">
 
-*The code for the fastqc and STAR log plots are highly inspired by code I found on github but can't find anymore. Please, if you know who wrote it,tell me I would like to reference it*
+*The code for the fastqc and STAR log plots are highly inspired by code I found on github but can't find anymore. Please, if you know who wrote it, tell me I would like to reference it*
 
 
 Future implementations
@@ -220,6 +235,8 @@ Future implementations
 * Integration of [UMI-tools](https://github.com/CGATOxford/UMI-tools) for UMI selection
 * RData object of all the summary data and plots so that you can create your own report.
 * Docker for the package.
+* Add summary plots for UMI, BC and start trim
+* Add custom dropseqtools with TMPDIR
 
 I hope it can help you out in your drop-seq experiment!
 

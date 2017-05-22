@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+
+## [0.23]
+### Changed
+- pre_align steps will output a fastq.gz instead of a fastq file.
+- Using subworkflows in snakefiles making dependencies directly inside the snakefile instead of running them seperately from __main__.py
+- Changed a few options in `GLOBAL` for `UMI` and `Cell_barcodes` options. Now possible to change filtering settings. See README
+- STAR logs have been stripped of the `STAR` string. This is to allow for better compatibility with [multiqc](https://github.com/ewels/MultiQC/)
+- Rmove `fastqc` folder and moved items to `logs` folder. Grouping all logs files for better [multiqc](https://github.com/ewels/MultiQC/) compatibility.
+
+### Added
+- Started a wiki with a FAQ
+
+
 ## [0.22]
 ### Changed
 - all subprocess.call replaced by shell from snakemake

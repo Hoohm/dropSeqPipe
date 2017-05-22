@@ -10,14 +10,14 @@ FASTQC = config['FASTQCEXEC']
 
 
 rule all:
-	input: expand('fastqc/{sample}_R1_fastqc.html', sample=config['Samples'])
+	input: expand('logs/{sample}_R1_fastqc.html', sample=config['Samples'])
 
 rule fastqc:
 	"""Create fastqc report"""
 	input:
 		r1='{sample}_R1.fastq.gz',
 		r2='{sample}_R2.fastq.gz'
-	output: 'fastqc/{sample}_R1_fastqc.html'
+	output: 'logs/{sample}_R1_fastqc.html'
 	threads: 2
 	shell:
 		"""{FASTQC} {input.r1} {input.r2} -t 2 -o fastqc --extract"""

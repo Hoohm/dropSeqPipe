@@ -17,7 +17,7 @@ METAREF = config['METAREF']
 
 
 rule all:
-	input: expand('{sample}_tagged_unmapped.fastq', sample=config['Samples'])
+	input: expand('{sample}_tagged_unmapped.fastq.gz', sample=config['Samples'])
 
 rule fastq_to_sam:
 	"""Create an empty bam file linking cell/UMI barcodes to reads"""
@@ -41,31 +41,35 @@ rule stage1:
 		UMI_summary = 'logs/{sample}_UMI_barcode.txt',
 		start_trim = 'logs/{sample}_start_trim.txt',
 		polyA_trim = 'logs/{sample}_polyA_trim.txt',
-		BC_range_1 = config['GLOBAL']['BC_range']['first'],
-		BC_range_2 = config['GLOBAL']['BC_range']['last'],
-		UMI_range_1 = config['GLOBAL']['UMI_range']['first'],
-		UMI_range_2 = config['GLOBAL']['UMI_range']['last']
+		BC_start = config['GLOBAL']['Cell_barcode']['start'],
+		BC_end = config['GLOBAL']['Cell_barcode']['end'],
+		BC_min_quality = config['GLOBAL']['Cell_barcode']['min_quality'],
+		BC_min_quality_num = config['GLOBAL']['Cell_barcode']['num_below_quality'],
+		UMI_start = config['GLOBAL']['UMI']['start'],
+		UMI_end = config['GLOBAL']['UMI']['end'],
+		UMI_min_quality = config['GLOBAL']['UMI']['min_quality'],
+		UMI_min_quality_num = config['GLOBAL']['Cell_barcode']['num_below_quality']
 	threads: 4
 	shell:
 		"""{DROPSEQ}/TagBamWithReadSequenceExtended\
 		SUMMARY={params.BC_summary}\
-		BASE_RANGE={params.BC_range_1}-{params.BC_range_2}\
-		BASE_QUALITY=10\
+		BASE_RANGE={params.BC_start}-{params.BC_end}\
+		BASE_QUALITY={params.BC_min_quality}\
 		BARCODED_READ=1\
 		DISCARD_READ=false\
 		TAG_NAME=XC\
-		NUM_BASES_BELOW_QUALITY=1\
+		NUM_BASES_BELOW_QUALITY={params.BC_min_quality_num}\
 		INPUT={input}\
 		OUTPUT=/dev/stdout COMPRESSION_LEVEL=0 |\
 		\
 		{DROPSEQ}/TagBamWithReadSequenceExtended\
 		SUMMARY={params.UMI_summary}\
-		BASE_RANGE={params.UMI_range_1}-{params.UMI_range_2}\
-		BASE_QUALITY=10\
+		BASE_RANGE={params.UMI_start}-{params.UMI_end}\
+		BASE_QUALITY={params.UMI_min_quality}\
 		BARCODED_READ=1\
 		DISCARD_READ=true\
 		TAG_NAME=XM\
-		NUM_BASES_BELOW_QUALITY=1\
+		NUM_BASES_BELOW_QUALITY={params.UMI_min_quality_num}\
 		INPUT=/dev/stdin\
 		OUTPUT=/dev/stdout COMPRESSION_LEVEL=0|\
 		\
@@ -83,16 +87,16 @@ rule stage1:
 		\
 		{DROPSEQ}/PolyATrimmer\
 		OUTPUT_SUMMARY={params.polyA_trim}\
-    	MISMATCHES=0\
-    	NUM_BASES=6\
-    	OUTPUT={output}\
-    	INPUT=/dev/stdin"""
+		MISMATCHES=0\
+		NUM_BASES=6\
+		OUTPUT={output}\
+		INPUT=/dev/stdin"""
 
 rule sam_to_fastq:
 	input: '{sample}_tagged_unmapped.bam'
-	output: '{sample}_tagged_unmapped.fastq'
+	output: '{sample}_tagged_unmapped.fastq.gz'
 	shell:
 		"""java -Xmx500m -jar -Djava.io.tmpdir={TMPDIR}	{PICARD} SamToFastq\
 		INPUT={input}\
-		FASTQ={output}"""
-
+		FASTQ=/dev/stdout COMPRESSION_LEVEL=0|\
+		gzip > {output}"""
