@@ -176,9 +176,13 @@ pdf(fastqc_plot,
 # setup the grid
 
 grid.newpage()
-
+if(length(r2$len) !=0){
 my.layout <- grid.layout(5,5, width = c(0.05,1,0.0,1,0.05),
                          height=c(0.1,0.7,1,1,0.1))
+}else{
+  my.layout <- grid.layout(5,3, width = c(0.05,1,0.0,1,0.05),
+                           height=c(0.1,0.7,1,1,0.1))
+}
 pushViewport(viewport(layout = my.layout))
 gp = gpar(col="grey90", lwd=5)
 
@@ -196,19 +200,20 @@ grid.draw(gg.link.plt)
 grid.roundrect(gp =gp)
 upViewport()
 
-
-# plot READ1 in Col 2
-pushViewport( viewport(layout.pos.col=4, layout.pos.row= 2))
-gg.link.plt <- gg.linkF( 'base', r2, 'READ2' )
-grid.draw(gg.link.plt)
-grid.roundrect(gp =gp)
-upViewport()
-
-pushViewport( viewport(layout.pos.col=4, layout.pos.row= 3:4))
-gg.link.plt <- gg.linkF( 'qual', r2, 'READ2' )
-grid.draw(gg.link.plt)
-grid.roundrect(gp =gp)
-upViewport()
+if(length(r2$len) !=0){
+# plot READ2 in Col 2
+  pushViewport( viewport(layout.pos.col=4, layout.pos.row= 2))
+  gg.link.plt <- gg.linkF( 'base', r2, 'READ2' )
+  grid.draw(gg.link.plt)
+  grid.roundrect(gp =gp)
+  upViewport()
+  
+  pushViewport( viewport(layout.pos.col=4, layout.pos.row= 3:4))
+  gg.link.plt <- gg.linkF( 'qual', r2, 'READ2' )
+  grid.draw(gg.link.plt)
+  grid.roundrect(gp =gp)
+  upViewport()
+}
 dev.off()
 
 

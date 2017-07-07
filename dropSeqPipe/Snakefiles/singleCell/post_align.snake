@@ -60,7 +60,7 @@ rule bead_errors_metrics:
 	input: '{sample}_gene_exon_tagged.bam'
 	output: '{sample}_final.bam'
 	params:
-		out_stats = 'logs/{sample}_synthesis_stats_summary.txt',
+		out_stats = 'logs/{sample}_synthesis_stats.txt',
 		summary = 'logs/{sample}_synthesis_stats_summary.txt',
 		barcodes = lambda wildcards: config['Samples'][wildcards.sample]['expected_cells'] * 2,
 		cells = lambda wildcards: config['Samples'][wildcards.sample]['expected_cells'],

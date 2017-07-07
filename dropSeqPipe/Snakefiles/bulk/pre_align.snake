@@ -15,18 +15,19 @@ rule all:
     input: expand('logs/{sample}_trimlog.txt', sample=config['Samples'])
 
 rule trim_single:
-    input: '{sample}.fastq.gz'
-    output: '{sample}_trimmed.fastq.gz'
+    input: '{sample}_R1.fastq.gz'
+    output:
+        R1 = '{sample}_trimmed_R1.fastq.gz',
+        log = 'logs/{sample}_trimlog.txt'
     threads: CORES
-    log: 'logs/{sample}_trimlog.txt'
     shell:
         """java -Djava.io.tmpdir={TMPDIR} -jar {TRIMEXEC}\
-        SE {input} {output}\
+        SE {input} {output.R1}\
         ILLUMINACLIP:{ILLUMINACLIP}:2:30:10\
         LEADING:3\
         TRAILING:3\
         SLIDINGWINDOW:4:15\
-        MINLEN:36 > {log} 2>&1"""
+        MINLEN:36 > {output.log} 2>&1"""
 
 
 rule trim_paired:

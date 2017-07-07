@@ -34,7 +34,7 @@ class PostInstallCommand(install):
 setup(name='dropSeqPipe',
       version='0.23',
       description='A drop-seq pipeline',
-      url='http://github.com/hoohm/Drop-seq',
+      url='http://github.com/hoohm/dropSeqPipe',
       author='Roelli Patrick',
       author_email='patrick.roelli@gmail.com',
       license='GNU GPL3',
@@ -44,7 +44,7 @@ setup(name='dropSeqPipe',
                                     'Python/*.py',
                                     'Snakefiles/bulk/*.snake']},
       zip_safe=False,
-      install_requires=['snakemake', 'pyyaml', 'rpy2'],
+      install_requires=['snakemake', 'pyyaml', 'rpy2', 'multiqc'],
       entry_points={
           'console_scripts': ['dropSeqPipe = dropSeqPipe.__main__:main']},
       cmdclass={'install': PostInstallCommand}

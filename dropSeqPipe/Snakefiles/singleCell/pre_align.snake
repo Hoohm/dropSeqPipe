@@ -48,7 +48,8 @@ rule stage1:
 		UMI_start = config['GLOBAL']['UMI']['start'],
 		UMI_end = config['GLOBAL']['UMI']['end'],
 		UMI_min_quality = config['GLOBAL']['UMI']['min_quality'],
-		UMI_min_quality_num = config['GLOBAL']['Cell_barcode']['num_below_quality']
+		UMI_min_quality_num = config['GLOBAL']['Cell_barcode']['num_below_quality'],
+		SmartAdapter = config['GLOBAL']['5PrimeSmartAdapter']
 	threads: 4
 	shell:
 		"""{DROPSEQ}/TagBamWithReadSequenceExtended\
@@ -71,19 +72,19 @@ rule stage1:
 		TAG_NAME=XM\
 		NUM_BASES_BELOW_QUALITY={params.UMI_min_quality_num}\
 		INPUT=/dev/stdin\
-		OUTPUT=/dev/stdout COMPRESSION_LEVEL=0|\
+		OUTPUT=/dev/stdout COMPRESSION_LEVEL=0 |\
 		\
 		{DROPSEQ}/FilterBAM TAG_REJECT=XQ\
 		INPUT=/dev/stdin\
-		OUTPUT=/dev/stdout COMPRESSION_LEVEL=0|\
+		OUTPUT=/dev/stdout COMPRESSION_LEVEL=0 |\
 		\
 		{DROPSEQ}/TrimStartingSequence\
 		OUTPUT_SUMMARY={params.start_trim}\
-		SEQUENCE=AAGCAGTGGTATCAACGCAGAGTGAATGGG\
+		SEQUENCE={params.SmartAdapter}\
 		MISMATCHES=0\
 		NUM_BASES=5\
 		INPUT=/dev/stdin\
-		OUTPUT=/dev/stdout COMPRESSION_LEVEL=0|\
+		OUTPUT=/dev/stdout COMPRESSION_LEVEL=0 |\
 		\
 		{DROPSEQ}/PolyATrimmer\
 		OUTPUT_SUMMARY={params.polyA_trim}\

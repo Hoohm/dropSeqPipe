@@ -6,22 +6,25 @@ GTF = config['GTF']
 METAREF = config['METAREF']
 MISMATCH = config['GLOBAL']['allowed_aligner_mismatch']
 
+#subworkflow align:
+    #snakefile: "pre_align.snake"
+
 #rule order
 ruleorder: STAR_align_paired > STAR_align_single
 
 rule all:
-	input: expand('{sample}.Aligned.sam', sample=config['Samples'])
+	input: expand('{sample}.Aligned.bam', sample=config['Samples'])
 	shell:"""{STAREXEC}\
 		--genomeDir {METAREF}\
 		--genomeLoad Remove;\
-		rm -rf Aligned.out.sam Log.out Log.progress.out _STARtmp"""
+		rm -rf Aligned.sortedByCoord.out.bam Log.out Log.progress.out _STARtmp"""
 
 
 rule STAR_align_paired:
 	input: 
 		R1 = temp('{sample}_trimmed_R1.fastq.gz'),
 		R2 = temp('{sample}_trimmed_R2.fastq.gz')
-	output: 'logs/{sample}.Aligned.out.sam'
+	output: 'logs/{sample}.Aligned.sortedByCoord.out.bam'
 	threads: 8
 	params:
 		prefix = '{sample}.',
@@ -34,11 +37,13 @@ rule STAR_align_paired:
 			--genomeLoad LoadAndKeep\
 			--quantMode GeneCounts\
 			--readFilesCommand zcat\
-			--outFileNamePrefix logs/{params.prefix}"""
+			--outFileNamePrefix logs/{params.prefix}\
+			--outSAMtype BAM SortedByCoordinate\
+			--limitBAMsortRAM 10000000000"""
 
 rule STAR_align_single:
-	input: temp('{sample}_trimmed.fastq.gz')
-	output: 'logs/{sample}.Aligned.out.sam'
+	input: temp('{sample}_trimmed_R1.fastq.gz')
+	output: 'logs/{sample}.Aligned.sortedByCoord.out.bam'
 	threads: 8
 	params:
 		prefix = '{sample}.',
@@ -51,12 +56,14 @@ rule STAR_align_single:
 			--genomeLoad LoadAndKeep\
 			--quantMode GeneCounts\
 			--readFilesCommand zcat\
-			--outFileNamePrefix logs/{params.prefix}"""
+			--outFileNamePrefix logs/{params.prefix}\
+			--outSAMtype BAM SortedByCoordinate\
+			--limitBAMsortRAM 10000000000"""
 
 
 rule mv_sam:
-	input: 'logs/{sample}.Aligned.out.sam'
-	output: '{sample}.Aligned.sam'
+	input: 'logs/{sample}.Aligned.sortedByCoord.out.bam'
+	output: '{sample}.Aligned.bam'
 	params: prefix = '{sample}'
 	shell:"""mv {input} {output}; mv logs/{params.prefix}.ReadsPerGene.out.tab summary/{params.prefix}.ReadsPerGene.out.tab"""
 

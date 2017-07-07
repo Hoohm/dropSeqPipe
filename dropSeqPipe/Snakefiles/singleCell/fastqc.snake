@@ -20,4 +20,4 @@ rule fastqc:
 	output: 'logs/{sample}_R1_fastqc.html'
 	threads: 2
 	shell:
-		"""{FASTQC} {input.r1} {input.r2} -t 2 -o fastqc --extract"""
+		"""{FASTQC} {input.r1} {input.r2} -t 2 -o logs --extract"""

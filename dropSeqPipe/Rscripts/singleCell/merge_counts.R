@@ -2,7 +2,7 @@ library(yaml)
 args = commandArgs(TRUE)
 path= args[1]
 species = args[2]
-samples = names(yaml.load_file(paste0(path,'/config.json'))$Samples)
+samples = names(yaml.load_file(paste0(path,'/config.yaml'))$Samples)
 
 read_list = c()
 for (i in 1:length(samples)){

@@ -15,11 +15,11 @@ rule all:
 
 rule fastqc_single:
 	"""Create fastqc report"""
-	input: '{sample}.fastq.gz'
-	output: 'logs/{sample}_fastqc.html'
+	input: '{sample}_R1.fastq.gz'
+	output: 'logs/{sample}_R1_fastqc.html'
 	threads: 1
 	shell:
-		"""{FASTQC} {input} -o fastqc --extract"""
+		"""{FASTQC} {input} -o logs --extract"""
 
 
 rule fastqc_paired:
@@ -27,7 +27,9 @@ rule fastqc_paired:
     input:
         R1 = '{sample}_R1.fastq.gz',
         R2 = '{sample}_R2.fastq.gz'
-    output: 'logs/{sample}_R1_fastqc.html'
+    output:
+        R1='logs/{sample}_R1_fastqc.html',
+        R2='logs/{sample}_R2_fastqc.html'
     threads: 2
     shell:
         """{FASTQC} {input.R1} {input.R2} -t 2 -o logs --extract"""

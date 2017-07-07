@@ -8,18 +8,21 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [0.23]
 ### Changed
 - pre_align steps will output a fastq.gz instead of a fastq file.
-- Using subworkflows in snakefiles making dependencies directly inside the snakefile instead of running them seperately from __main__.py
+- `fastqc.R` is now compatible with paired and single end data.
 - Changed a few options in `GLOBAL` for `UMI` and `Cell_barcodes` options. Now possible to change filtering settings. See README
 - STAR logs have been stripped of the `STAR` string. This is to allow for better compatibility with [multiqc](https://github.com/ewels/MultiQC/)
-- Rmove `fastqc` folder and moved items to `logs` folder. Grouping all logs files for better [multiqc](https://github.com/ewels/MultiQC/) compatibility.
+- Removed `fastqc` folder and moved items to `logs` folder. Grouping all logs files for better [multiqc](https://github.com/ewels/MultiQC/) compatibility.
+- Changed `generate_meta` to `generate-meta` for keeping similar syntax between modes.
+- Added seperate log files for stats and summary in the DetectBeadSynthesisErrors.
 
 ### Added
+- Bulk data single or paired end data processing capacity.
 - Started a wiki with a FAQ
 
 
 ## [0.22]
 ### Changed
-- all subprocess.call replaced by shell from snakemake
+- all `subprocess.call` replaced by `shell` from snakemake
 - STAR aligner now not limited to 8 cores or threads but will use the maximum number provided in the local.yaml file
 - Name from dropSeqPip to dropSeqPipe
 - Fixed a bug where all stage1 steps used the same summary file. Now BC tagging, UMI tagging, starting trim and polyA trim have different summary files

@@ -24,7 +24,14 @@ def get_args():
                         required=True)
     parser.add_argument('-m', '--mode',
                         help='Which mode to run.',
-                        choices=['pre-process', 'generate-plots', 'species-plot', 'extract-expression', 'fastqc', 'generate_meta', 'test'],
+                        choices=[
+                            'pre-process',
+                            'generate-plots',
+                            'species-plot',
+                            'extract-expression',
+                            'fastqc',
+                            'generate-meta',
+                            'test'],
                         action='store',
                         nargs='+',
                         required=True)
@@ -56,8 +63,9 @@ def main():
         with open(os.path.join(args.folder_path, 'config.yaml')) as samples_config:
             samples_yaml = yaml.load(samples_config)
     except:
-        pass
-    if("generate_meta" in args.mode):
+        print('Samples configuratin file not found or not formatted properly. Exiting')
+        os.exit()
+    if("generate-meta" in args.mode):
         shell('snakemake -s {}/Snakefiles/singleCell/generate_meta.snake --cores {} -pT -d {} --configfile {} {}'.format(
             scripts_dir,
             yaml_data['CORES'],
@@ -83,6 +91,7 @@ def main():
             complementory_args)
         fastqc_summary = 'Rscript {}/Rscripts/fastqc.R {}'.format(
             package_dir,
+            #samples_yaml['GLOBAL']['data_type'],
             args.folder_path)
         print('Running fastqc')
         shell(fastqc)
@@ -124,41 +133,74 @@ def main():
         shell(star_summary)
         print('Running post-alignement')
         shell(post_align)
+        if(samples_yaml['GLOBAL']['data_type'] == 'bulk'):
+            merge_expression = 'python3 {}/Python/merge_results.py {}'.format(package_dir, args.folder_path)
+            shell(merge_expression)
     if("test" in args.mode):
         print('test')
-        shell('snakemake -s {}/Snakefiles/singleCell/test.snake --cores {} -pT -d {} --configfile {} {}'.format(
+        shell('snakemake -s {}/Snakefiles/singleCell/sircel_align.snake --cores {} -pT -d {} --configfile {} {}'.format(
             scripts_dir,
             yaml_data['CORES'],
             args.folder_path,
             args.config_file_path,
             complementory_args))
     if("generate-plots" in args.mode):
-        knee_plot = 'Rscript {}/Rscripts/knee_plot.R {}'.format(package_dir, args.folder_path)
-        base_summary = 'Rscript {}/Rscripts/rna_metrics.R {}'.format(package_dir, args.folder_path)
+        print('Mode is generate-plots')
+        knee_plot = 'Rscript {}/Rscripts/{}/knee_plot.R {}'.format(
+            package_dir,
+            samples_yaml['GLOBAL']['data_type'],
+            args.folder_path)
+        base_summary = 'Rscript {}/Rscripts/{}/rna_metrics.R {}'.format(
+            package_dir,
+            samples_yaml['GLOBAL']['data_type'],
+            args.folder_path)
         print('Plotting knee plots')
         shell(knee_plot)
         print('Plotting base stats')
         shell(base_summary)
     if("species-plot" in args.mode):
         if(len(samples_yaml['SPECIES']) == 2):
-            extract_species = ('snakemake -s {}/Snakefiles/singleCell/extract_species.snake --cores {} -pT -d {} --configfile {} {}'.format(scripts_dir, yaml_data['CORES'], args.folder_path, args.config_file_path, complementory_args), 'Extracting species')
+            print('Mode is species-plots')
+            extract_species = ('snakemake -s {}/Snakefiles/singleCell/extract_species.snake --cores {} -pT -d {} --configfile {} {}'.format(
+                scripts_dir,
+                yaml_data['CORES'],
+                args.folder_path,
+                args.config_file_path,
+                complementory_args))
             print('Extracting species')
             shell(extract_species)
-            species_plot = 'Rscript {}/Rscripts/species_plot.R {}'.format(package_dir, args.folder_path)
+            species_plot = 'Rscript {}/Rscripts/{}/species_plot.R {}'.format(
+                package_dir,
+                samples_yaml['GLOBAL']['data_type'],
+                args.folder_path)
             print('Plotting species plots')
             shell(species_plot)
         else:
             print('You cannot run this with a number of species different than 2.\nPlease change the config file')
     if("extract-expression" in args.mode):
         if(len(samples_yaml['SPECIES']) == 2):
-            extract_expression = 'snakemake -s {}/Snakefiles/singleCell/extract_expression.snake --cores {} -pT -d {} --configfile {} {}'.format(scripts_dir, yaml_data['CORES'], args.folder_path, args.config_file_path, complementory_args)
+            print('Mode is generate-extract-expression')
+            extract_expression = 'snakemake -s {}/Snakefiles/singleCell/extract_expression.snake --cores {} -pT -d {} --configfile {} {}'.format(
+                scripts_dir,
+                yaml_data['CORES'],
+                args.folder_path,
+                args.config_file_path,
+                complementory_args)
             print('Extracting expression')
             shell(extract_expression)
         if(len(samples_yaml['SPECIES']) == 1):
-            extract_expression_single = 'snakemake -s {}/Snakefiles/singleCell/extract_expression_single.snake --cores {} -pT -d {} --configfile {} {}'.format(scripts_dir, yaml_data['CORES'], args.folder_path, args.config_file_path, complementory_args)
+            extract_expression_single = 'snakemake -s {}/Snakefiles/singleCell/extract_expression_single.snake --cores {} -pT -d {} --configfile {} {}'.format(
+                scripts_dir,
+                yaml_data['CORES'],
+                args.folder_path,
+                args.config_file_path,
+                complementory_args)
             print('Extracting expression')
             shell(extract_expression_single)
-            merge_expression = 'Rscript {}/Rscripts/merge_counts_single.R {}'.format(package_dir, args.folder_path)
+            merge_expression = 'Rscript {}/Rscripts/{}/merge_counts_single.R {}'.format(
+                package_dir,
+                samples_yaml['GLOBAL']['data_type'],
+                args.folder_path)
             shell(merge_expression)
     print('Pipeline finished')
 if __name__ == "__main__":
