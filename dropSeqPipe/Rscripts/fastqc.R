@@ -1,4 +1,6 @@
-#I am not the author of all of that code. I can't find it on github anymore. If you know who wrote it, please tell me.
+#I am not the author of all of that code.
+#I can't find it on github anymore.
+#If you know who wrote it, please tell me. I will reference it
 
 library(reshape)
 library(stringr)

@@ -30,8 +30,7 @@ def get_args():
                             'species-plot',
                             'extract-expression',
                             'fastqc',
-                            'generate-meta',
-                            'test'],
+                            'generate-meta'],
                         action='store',
                         nargs='+',
                         required=True)
@@ -91,7 +90,6 @@ def main():
             complementory_args)
         fastqc_summary = 'Rscript {}/Rscripts/fastqc.R {}'.format(
             package_dir,
-            #samples_yaml['GLOBAL']['data_type'],
             args.folder_path)
         print('Running fastqc')
         shell(fastqc)
@@ -134,30 +132,28 @@ def main():
         print('Running post-alignement')
         shell(post_align)
         if(samples_yaml['GLOBAL']['data_type'] == 'bulk'):
-            merge_expression = 'python3 {}/Python/merge_results.py {}'.format(package_dir, args.folder_path)
+            merge_expression = 'python3 {}/Python/merge_results.py {}'.format(
+                package_dir,
+                args.folder_path)
             shell(merge_expression)
-    if("test" in args.mode):
-        print('test')
-        shell('snakemake -s {}/Snakefiles/singleCell/sircel_align.snake --cores {} -pT -d {} --configfile {} {}'.format(
-            scripts_dir,
-            yaml_data['CORES'],
-            args.folder_path,
-            args.config_file_path,
-            complementory_args))
     if("generate-plots" in args.mode):
         print('Mode is generate-plots')
-        knee_plot = 'Rscript {}/Rscripts/{}/knee_plot.R {}'.format(
-            package_dir,
-            samples_yaml['GLOBAL']['data_type'],
-            args.folder_path)
-        base_summary = 'Rscript {}/Rscripts/{}/rna_metrics.R {}'.format(
-            package_dir,
-            samples_yaml['GLOBAL']['data_type'],
-            args.folder_path)
-        print('Plotting knee plots')
-        shell(knee_plot)
-        print('Plotting base stats')
-        shell(base_summary)
+        if(samples_yaml['GLOBAL']['data_type'] == 'singleCell'):
+            knee_plot = 'Rscript {}/Rscripts/{}/knee_plot.R {}'.format(
+                package_dir,
+                samples_yaml['GLOBAL']['data_type'],
+                args.folder_path)
+            base_summary = 'Rscript {}/Rscripts/{}/rna_metrics.R {}'.format(
+                package_dir,
+                samples_yaml['GLOBAL']['data_type'],
+                args.folder_path)
+            print('Plotting knee plots')
+            shell(knee_plot)
+            print('Plotting base stats')
+            shell(base_summary)
+        multiqc = 'multiqc {0}/logs {0}/summary --force'.format(args.folder_path)
+        print('Generating multiqc report')
+        shell(multiqc)
     if("species-plot" in args.mode):
         if(len(samples_yaml['SPECIES']) == 2):
             print('Mode is species-plots')
@@ -176,7 +172,7 @@ def main():
             print('Plotting species plots')
             shell(species_plot)
         else:
-            print('You cannot run this with a number of species different than 2.\nPlease change the config file')
+            sys.exit('You cannot run this with a number of species different than 2.\nPlease change the config file')
     if("extract-expression" in args.mode):
         if(len(samples_yaml['SPECIES']) == 2):
             print('Mode is generate-extract-expression')

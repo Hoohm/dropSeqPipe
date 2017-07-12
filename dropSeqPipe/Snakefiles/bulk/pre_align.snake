@@ -12,13 +12,13 @@ CORES = config['CORES']
 
 
 rule all:
-    input: expand('logs/{sample}_trimlog.txt', sample=config['Samples'])
+    input: expand('logs/{sample}_trimmolog.txt', sample=config['Samples'])
 
 rule trim_single:
     input: '{sample}_R1.fastq.gz'
     output:
         R1 = '{sample}_trimmed_R1.fastq.gz',
-        log = 'logs/{sample}_trimlog.txt'
+        log = temp('logs/{sample}_trimlog.txt')
     threads: CORES
     shell:
         """java -Djava.io.tmpdir={TMPDIR} -jar {TRIMEXEC}\
@@ -39,7 +39,7 @@ rule trim_paired:
         PR2 = temp('{sample}_trimmed_UR1.fastq.gz'),
         UR1 = '{sample}_trimmed_R2.fastq.gz',
         UR2 = temp('{sample}_trimmed_UR2.fastq.gz'),
-        log = 'logs/{sample}_trimlog.txt'
+        log = temp('logs/{sample}_trimlog.txt')
     threads: CORES
     shell:
         """java -Djava.io.tmpdir={TMPDIR} -jar {TRIMEXEC}\
@@ -49,3 +49,10 @@ rule trim_paired:
         TRAILING:3\
         SLIDINGWINDOW:4:15\
         MINLEN:36 > {output.log} 2>&1"""
+#Rule that renames the sample in the logfiles for multiQC to unify samples in the report.
+rule rename_samples:
+    input: 'logs/{sample}_trimlog.txt'
+    output: 'logs/{sample}_trimmolog.txt'
+    params: '{sample}'
+    shell:
+        """sed -E 's/{params}_R1.fastq.gz|{params}_R2.fastq.gz/{params}.fastq.gz/g' {input} > {output}"""
