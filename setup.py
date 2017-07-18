@@ -20,21 +20,24 @@ class PostInstallCommand(install):
                      'stringr',
                      'plyr',
                      'yaml',
-                     'gridExtra']
+                     'gridExtra',
+                     'devtools',
+                     'ggpubr',
+                     'ggseqlogo']
         for package in packnames:
             try:
                 importr(package)
             except:
                 print('installing {}'.format(package))
                 utils.install_packages(package)
-        devtools = importr('devtools')
-        devtools.install_github("omarwagih/ggseqlogo")
-        devtools.install_github("kassambara/ggpubr")
 
 setup(name='dropSeqPipe',
       version='0.23',
       description='A drop-seq pipeline',
+      keywords=['single cell', 'dropseq', 'drop-seq'],
+      classifiers = [],
       url='http://github.com/hoohm/dropSeqPipe',
+      download_url='http://github.com/hoohm/dropSeqPipe/archive/0.23.tar.gz',
       author='Roelli Patrick',
       author_email='patrick.roelli@gmail.com',
       license='GNU GPL3',

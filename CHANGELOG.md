@@ -9,16 +9,21 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - pre_align steps will output a fastq.gz instead of a fastq file.
 - `fastqc.R` is now compatible with paired and single end data.
-- Changed a few options in `GLOBAL` for `UMI` and `Cell_barcodes` options. Now possible to change filtering settings. See README
+- Changed a few options in `GLOBAL` for `UMI` and `Cell_barcodes` options. Now possible to change filtering settings. See [WIKI](https://github.com/Hoohm/dropSeqPipe/wiki/Create-config-files)
 - STAR logs have been stripped of the `STAR` string. This is to allow for better compatibility with [multiqc](https://github.com/ewels/MultiQC/)
 - Removed `fastqc` folder and moved items to `logs` folder. Grouping all logs files for better [multiqc](https://github.com/ewels/MultiQC/) compatibility.
 - Changed `generate_meta` to `generate-meta` for keeping similar syntax between modes.
 - Added seperate log files for stats and summary in the DetectBeadSynthesisErrors.
+- Moved part of the `README`to the wiki.
+- Changed the name of the first expression matrix extracted before the species plot to `unfiltered_expression.`
+
 
 ### Added
-- Bulk data single or paired end data processing capacity.
+- You can now run Bulk Single or paired end RNAseq data.
 - Started a wiki with a FAQ
-
+- Added options in `GLOBAL` config.yaml. You can now choose a range of options for UMI and Barcode filtering. please refer to the wiki for more information.
+- Support for [MultiQC](https://github.com/ewels/MultiQC/). MultiQC is a great way of summarising all of the logs from your experiment. As of today it supports 46 different modules (such as fastqc, trimmomatic, STAR, etc...) The `generate-plots` mode now produces a `multiqc_report.html` file in the plots folder.
+- New plot! BCDrop.pdf is a new plot showing you how many barcode and UMIs you dropped from the raw data before aligning. This helps to track how many samples you might loose because of low quality reads in the barcoding.
 
 ## [0.22]
 ### Changed

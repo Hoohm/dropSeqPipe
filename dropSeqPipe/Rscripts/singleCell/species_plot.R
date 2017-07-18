@@ -8,7 +8,6 @@ path = args[1]
 config_file_data = yaml.load_file(paste0(path,'/config.yaml'))
 samples = config_file_data$Samples
 species = config_file_data$SPECIES
-#num_cells = fromJSON(paste0(path,'/config.yaml'))$Barcodes
 
 
 

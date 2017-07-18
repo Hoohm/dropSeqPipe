@@ -14,6 +14,7 @@ GENOMEREF = config['GENOMEREF']
 REFFLAT = config['REFFLAT']
 METAREF = config['METAREF']
 
+starttrim_length = round(max((config['GLOBAL']['Cell_barcode']['end'] - config['GLOBAL']['Cell_barcode']['start'] + 1)/2,5))
 
 
 rule all:
@@ -82,7 +83,7 @@ rule stage1:
 		OUTPUT_SUMMARY={params.start_trim}\
 		SEQUENCE={params.SmartAdapter}\
 		MISMATCHES=0\
-		NUM_BASES=5\
+		NUM_BASES={starttrim_length}\
 		INPUT=/dev/stdin\
 		OUTPUT=/dev/stdout COMPRESSION_LEVEL=0 |\
 		\

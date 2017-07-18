@@ -16,7 +16,7 @@ I have not defined how to do this and am open for suggestions.
 This package is trying to be as user friendly as possible. One of the hopes is that non-bioinformatician can make use of it without too much hassle. It will still require some command line execution, this will not be an interactive package.
 
 
-NEWS -- Version 0.22
+NEWS -- Version 0.23
 --------------
 ### Changed
 - all subprocess.call replaced by shell from snakemake
@@ -54,8 +54,9 @@ cd dropSeqPipe
 sudo python3 setup.py install
 ```
 
-This will also automatically install all the R packages needed. (beta phase, warnings popping up, but it should work)
+This will also automatically install all the R packages needed. (warnings are popping up, but it should work)
 
+Please check our [Wiki](https://github.com/Hoohm/dropSeqPipe/wiki) before trying to run the pipeline.
 Configuration - step 1
 -------
 
@@ -237,16 +238,20 @@ Here are examples of the plots you will get:
 *The code for the fastqc and STAR log plots are highly inspired by code I found on github but can't find anymore. Please, if you know who wrote it, tell me I would like to reference it*
 
 
-Future implementations
+Future implementations (ordered by urgency)
 ---------------------------
-* Cluster version (One of the reasons it's based on snakemake)
+## Sooner
+* Integration of [sircel](https://github.com/pachterlab/sircel) for cell barcode selection
+* Integration of [UMI-tools](https://github.com/CGATOxford/UMI-tools) for UMI selection
+* Integration of [kallisto](https://github.com/pachterlab/kallisto) for pseudoalignement
+* Test data for automatic test of the pipeline
+## Later
+* Cluster version
 * Cross language dependencies installation (based on conda)
 * Mixed reference genome generation
 * Adding specificity on the knee-plot for mixed experience
-* Integration of [UMI-tools](https://github.com/CGATOxford/UMI-tools) for UMI selection
 * RData object of all the summary data and plots so that you can create your own report.
 * Docker for the package.
-* Add summary plots for UMI, BC and start trim
 * Add custom dropseqtools with TMPDIR
 
 I hope it can help you out in your drop-seq experiment!

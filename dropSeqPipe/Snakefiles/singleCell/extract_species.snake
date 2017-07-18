@@ -6,8 +6,7 @@ configfile: 'config.yaml'
 DROPSEQ = config['DROPSEQ']
 SPECIES = config['SPECIES']
 rule all:
-	input: expand('{sample}_{species}_expression_matrix.txt.gz', sample=config['Samples'], species=SPECIES)
-
+	input: expand('logs/{sample}_{species}_unfiltered_expression_matrix.txt.gz', sample=config['Samples'], species=SPECIES)
 
 rule filter_species:
 	input: '{sample}_final.bam'
@@ -21,7 +20,7 @@ rule filter_species:
 
 rule extract_expression:
 	input: '{sample}_{species}.bam'
-	output: '{sample}_{species}_expression_matrix.txt.gz'
+	output: 'logs/{sample}_{species}_unfiltered_expression_matrix.txt.gz'
 	params:
 		sample = '{sample}',
 		species = '{species}'

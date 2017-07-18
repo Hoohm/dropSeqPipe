@@ -2,7 +2,6 @@
 # coding=utf-8
 
 """Main."""
-
 import argparse
 import sys
 import os
@@ -65,7 +64,7 @@ def main():
         print('Samples configuratin file not found or not formatted properly. Exiting')
         os.exit()
     if("generate-meta" in args.mode):
-        shell('snakemake -s {}/Snakefiles/singleCell/generate_meta.snake --cores {} -pT -d {} --configfile {} {}'.format(
+        shell('snakemake -s {}/Snakefiles/generate_meta.snake --cores {} -pT -d {} --configfile {} {}'.format(
             scripts_dir,
             yaml_data['CORES'],
             args.folder_path,
@@ -151,7 +150,7 @@ def main():
             shell(knee_plot)
             print('Plotting base stats')
             shell(base_summary)
-        multiqc = 'multiqc {0}/logs {0}/summary --force'.format(args.folder_path)
+        multiqc = 'multiqc -o {0} {0}/logs {0}/summary --force'.format(args.folder_path)
         print('Generating multiqc report')
         shell(multiqc)
     if("species-plot" in args.mode):
