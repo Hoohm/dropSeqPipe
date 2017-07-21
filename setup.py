@@ -32,7 +32,7 @@ class PostInstallCommand(install):
         install.run(self)
 
 setup(name='dropSeqPipe',
-      version='0.23',
+      version='0.23a',
       description='A drop-seq pipeline',
       keywords=['single cell', 'dropseq', 'drop-seq'],
       classifiers = [],
