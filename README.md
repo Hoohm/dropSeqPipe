@@ -22,6 +22,10 @@ I have not defined how to do this and am open for suggestions.
 
 
 
+## [0.23a]
+### Changed
+- Changed the code for Cell and UMI barcode quality drop (per sample and overall). There was an error in the code not givint the right amount of dropped reads. Updated the images on the wiki accordingly.
+- Fixed the setup where r2py was called before getting installed.
 
 ## [0.23]
 ### Changed
