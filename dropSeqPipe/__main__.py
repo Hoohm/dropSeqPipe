@@ -29,7 +29,8 @@ def get_args():
                             'species-plot',
                             'extract-expression',
                             'fastqc',
-                            'generate-meta'],
+                            'generate-meta',
+                            'test'],
                         action='store',
                         nargs='+',
                         required=True)
@@ -135,6 +136,15 @@ def main():
                 package_dir,
                 args.folder_path)
             shell(merge_expression)
+    if("test" in args.mode):
+        test = 'snakemake -s {0}/Snakefiles/{1}/pre_align.snake --cores {2} -pT -d {3} --configfile {4} {5} --dag | dot -Tpdf > {3}pre_align.pdf'.format(
+            scripts_dir,
+            samples_yaml['GLOBAL']['data_type'],
+            yaml_data['CORES'],
+            args.folder_path,
+            args.config_file_path,
+            complementory_args)
+        shell(test)
     if("generate-plots" in args.mode):
         print('Mode is generate-plots')
         if(samples_yaml['GLOBAL']['data_type'] == 'singleCell'):

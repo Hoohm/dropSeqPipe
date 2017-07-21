@@ -46,12 +46,16 @@ plotBCDrop = function(path, samples, config_file_data){
     sample = samples[i]
     data[i,3] = as.integer(unique(as.character(fastqc_summary['Total Sequences',grep(sample, colnames(fastqc_summary))])))
     
-    BC_drop_data = read.table(file.path(path, 'logs',paste0(sample,'_CELL_barcode.txt')), header = TRUE, row.names = 1)
-    num_reads_BC_dropped = sum(BC_drop_data[(config_file_data$GLOBAL$Cell_barcode$num_below_quality+1):(1+BC_length),])
+    BC_drop_data = read.table(file.path(path, 'logs',paste0(sample,'_CELL_barcode.txt')), header = TRUE)
+    BC_drop_data = BC_drop_data[-1,] # delete 0 error line
+    ids = which(config_file_data$GLOBAL$Cell_barcode$num_below_quality < BC_drop_data$num_failed_bases)
+    num_reads_BC_dropped = sum(BC_drop_data$num_barcodes[ids])
     data[i,1] = num_reads_BC_dropped
     
-    UMI_drop_data = read.table(file.path(path, 'logs',paste0(sample,'_UMI_barcode.txt')), header = TRUE, row.names = 1)
-    num_reads_UMI_dropped = sum(UMI_drop_data[(config_file_data$GLOBAL$UMI$num_below_quality+1):(1+UMI_length),])
+    UMI_drop_data = read.table(file.path(path, 'logs',paste0(sample,'_UMI_barcode.txt')), header = TRUE)
+    UMI_drop_data = UMI_drop_data[-1,]# delete 0 error line
+    ids = which(config_file_data$GLOBAL$UMI$num_below_quality < UMI_drop_data$num_failed_bases)
+    num_reads_UMI_dropped = sum(UMI_drop_data$num_barcodes[ids])
     data[i,2] = num_reads_UMI_dropped
   }
   
@@ -75,35 +79,49 @@ plotBCDrop = function(path, samples, config_file_data){
 
 plotPolyATrim = function(file_path, sample_name, path){
   data = read.table(file = file_path, header=T, stringsAsFactors=F, skip = 4)
-  polya = ggplot(data, aes(x=BIN, y = VALUE)) + geom_bar(stat = 'identity') + labs(title=paste('Length of polyA trimmed in\n', sample_name), x='Length', y='Counts') + theme_pubr() +  geom_smooth() + scale_x_continuous(breaks = seq(0,data$BIN[length(data$BIN)], 10), labels = seq(6,data$BIN[length(data$BIN)]+6, 10))
-  ggsave(plot = polya, paste0(sample_name, '_polya_trimmed.pdf'), path = paste0(path,'/plots/'), height = 6, width = 8)
+  p = ggplot(data, aes(x=BIN, y = VALUE))
+  p = p + geom_bar(stat = 'identity')
+  p = p + labs(title=paste('Length of polyA trimmed in\n', sample_name), x='Length', y='Counts')
+  p = p + theme_pubr()
+  p = p +  geom_smooth()
+  p = p + scale_x_continuous(breaks = seq(0,data$BIN[length(data$BIN)], 10), labels = seq(6,data$BIN[length(data$BIN)]+6, 10))
+  ggsave(plot = p, paste0(sample_name, '_polya_trimmed.pdf'), path = paste0(path,'/plots/'), height = 6, width = 8)
 }
 
 plotStartTrim = function(file_path, sample_name, path){
   data = read.table(file = file_path, header=T, stringsAsFactors=F, skip = 4)
-  polya = ggplot(data, aes(x=BIN, y = VALUE)) + geom_bar(stat = 'identity') + labs(title=paste('Length of SMART adapter trimmed in\n', sample_name), x='Length', y='Counts') + theme_pubr() + scale_x_continuous(breaks = c(data$BIN), labels = factor(data$BIN))
-  ggsave(plot = polya, paste0(sample_name, '_start_trimmed.pdf'), path = paste0(path,'/plots/'), height = 6, width = 8)
+  p = ggplot(data, aes(x=BIN, y = VALUE))
+  p = p + geom_bar(stat = 'identity')
+  p = p + labs(title=paste('Length of SMART adapter trimmed in\n', sample_name), x='Length', y='Counts') 
+  p = p + theme_pubr()
+  p = p + scale_x_continuous(breaks = c(data$BIN), labels = factor(data$BIN))
+  ggsave(plot = p, paste0(sample_name, '_SMART_trimmed.pdf'), path = paste0(path,'/plots/'), height = 6, width = 8)
 }
 
-plotBCQuality = function(file_path, sample_name, path, config_file_data){
+plotBarcodeQuality = function(file_path, sample_name, path, min_num_below_quality, type){
   data = read.table(file = file_path, header=T, stringsAsFactors=F)
-  polya = ggplot(data[-1,], aes(x=num_failed_bases, y=num_barcodes)) + geom_bar(stat = 'identity') + labs(title=paste('Number of Cell barcode bases under',config_file_data$GLOBAL$Cell_barcode$min_quality,'quality in\n', sample_name), x='Num of failed bases', y='Counts') + theme_pubr()
-  ggsave(plot = polya, paste0(sample_name, '_BC_qual.pdf'), path = paste0(path,'/plots/'), height = 4, width = 6)
-}
-
-plotUMIQuality = function(file_path, sample_name, path, config_file_data){
-  data = read.table(file = file_path, header=T, stringsAsFactors=F)
-  polya = ggplot(data[-1,], aes(x=num_failed_bases, y=num_barcodes)) + geom_bar(stat = 'identity') + labs(title=paste('Number of UMI barcode bases under', config_file_data$GLOBAL$UMI$min_quality,'quality in\n', sample_name), x='Num of failed bases', y='Counts') + theme_pubr()
-  ggsave(plot = polya, paste0(sample_name, '_UMI_qual.pdf'), path = paste0(path,'/plots/'), height = 4, width = 6)
+  data = data[-1,]#take 0 low quality out
+  data$presence=rep('kept', nrow(data))
+  ids = which(min_num_below_quality < data$num_failed_bases)
+  data$presence[ids] = 'dropped'
+  dropped = sum(data$num_barcodes[ids])
+  p = ggplot(data, aes(x=num_failed_bases, y=num_barcodes, fill = presence))
+  p = p + geom_bar(stat = 'identity')
+  p = p + ggtitle(paste('Number of',type,'barcode bases under', min_num_below_quality,'quality in\n', sample_name,'\nDropped', format(dropped, big.mark = '\''),'Reads'))
+  p = p + labs(x='Num of failed bases', y='Counts')
+  p = p + theme_pubr(legend = 'bottom')
+  p = p + scale_x_continuous(breaks = c(data$num_failed_bases), labels = factor(data$num_failed_bases))
+  p = p + geom_vline(aes(xintercept = min_num_below_quality + 0.5), color = 'red')
+  ggsave(plot = p, paste0(sample_name, '_',type,'_qual.pdf'), path = paste0(path,'/plots/'), height = 4, width = 6)
 }
 
 for(i in 1:length(samples)){
   top_barcodes = config_file_data$Samples[[i]]$expected_cells
-  print('RNAmetrics')
   plotRNAMetrics(file_path = paste0(path,"logs/",samples[i],"_rna_metrics.txt"), sample_name = samples[i], top_barcodes = top_barcodes, path = path)
   plotPolyATrim(file_path = paste0(path,"logs/",samples[i],"_polyA_trim.txt"), sample_name = samples[i], path = path)
   plotStartTrim(file_path = paste0(path,"logs/",samples[i],"_start_trim.txt"), sample_name = samples[i], path = path)
-  plotBCQuality(file_path = paste0(path,"logs/",samples[i],"_CELL_barcode.txt"), sample_name = samples[i], path = path,  config_file_data)
-  plotUMIQuality(file_path = paste0(path,"logs/",samples[i],"_UMI_barcode.txt"), sample_name = samples[i], path = path, config_file_data)
+  plotBarcodeQuality(file_path = paste0(path,"logs/",samples[i],"_CELL_barcode.txt"), sample_name = samples[i], path = path,  config_file_data$GLOBAL$Cell_barcode$num_below_quality, type = 'Cell')
+  plotBarcodeQuality(file_path = paste0(path,"logs/",samples[i],"_UMI_barcode.txt"), sample_name = samples[i], path = path,  config_file_data$GLOBAL$UMI$num_below_quality, type = 'UMI')
+  
 }
 plotBCDrop(path, samples, config_file_data)

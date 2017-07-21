@@ -8,7 +8,6 @@ class PostInstallCommand(install):
 
     def run(self):
         """Command to run after installation is complete."""
-        install.run(self)
         import rpy2.robjects.packages as rpackages
         from rpy2.robjects.packages import importr
         utils = rpackages.importr('utils')
@@ -30,6 +29,7 @@ class PostInstallCommand(install):
             except:
                 print('installing {}'.format(package))
                 utils.install_packages(package)
+        install.run(self)
 
 setup(name='dropSeqPipe',
       version='0.23',
