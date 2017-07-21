@@ -17,7 +17,7 @@ plotCumulativePlot = function(file_path, title, fraction, x_scale, path, sample_
   x = 1:length(y)
   data = data.frame(cbind(x,y))
   id = length(subset(diff(y)[seq(x_scale)],diff(y)[seq(x_scale)] > fraction))
-  knee_plot = ggplot(data, aes(x=x, y=y)) + geom_point(size = 0.1) +xlim(0,x_scale) + theme_minimal() + geom_vline(xintercept=id, linetype="dashed", color = "red") + geom_hline(yintercept=y[id], linetype="dashed", color = "red")+ ggtitle(paste0(title, '\nTotal reads: ', prettyNum(total_reads))) + theme(plot.title = element_text(size=10)) + labs(x='STAMPS', y='Cumulative fraction of reads')
+  knee_plot = ggplot(data, aes(x=x, y=y)) + geom_point(size = 0.1) +xlim(0,x_scale) + geom_vline(xintercept=id, linetype="dashed", color = "red") + geom_hline(yintercept=y[id], linetype="dashed", color = "red")+ ggtitle(paste0(title, '\nTotal reads: ', prettyNum(total_reads))) + theme(plot.title = element_text(size=10)) + labs(x='STAMPS', y='Cumulative fraction of reads')
   ggsave(plot=knee_plot, paste0(sample_name, '_knee_plot.pdf'), path = paste0(path,'/plots/'), width = 4, height = 3)
   return(barcodes[seq(id)])
 }
