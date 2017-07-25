@@ -1,5 +1,6 @@
 [![Snakemake](https://img.shields.io/badge/snakemake-≥3.5.2-brightgreen.svg?style=flat-square)](https://snakemake.bitbucket.io)
 
+
 Description
 ------------------
 This pipeline is based on [snakemake](https://snakemake.readthedocs.io/en/stable/) and the dropseq tools provided by the [McCarroll Lab](http://mccarrolllab.com/dropseq/). It allows to go from raw data of your dropSeq/scrbSeq experiment until the final count matrix with QC plots along the way.

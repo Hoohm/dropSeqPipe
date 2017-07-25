@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.24]
+### Changed
+- Will now allow you to run `generate-meta` without having a `config.yaml` file in the reference foder.
+
+### Added
+- You have now an option in `GLOBAL` called `read_length`. This will generate on the fly a new overhang for your reference in case it's not the same than the one you used for the original indexing for STAR. This should improve mapping of smaller reads. Anything bellow 100bp.
+
 ## [0.23a]
 ### Changed
 - Changed the code for Cell and UMI barcode quality drop (per sample and overall). There was an error in the code not givint the right amount of dropped reads. Updated the images on the wiki accordingly.

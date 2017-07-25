@@ -71,13 +71,15 @@ def main():
                 samples_yaml = yaml.load(samples_config)
         except:
             sys.exit('Samples configuratin file not found or not formatted properly. Exiting')
-            sub_folders = ['summary', 'logs', 'plots']
-            package_dir = os.path.dirname(__file__)
+        sub_folders = ['summary', 'logs', 'plots']
+        package_dir = os.path.dirname(__file__)
         for folder in sub_folders:
             joined = os.path.join(args.folder_path, folder)
             if(not os.path.isdir(joined)):
                 os.mkdir(joined)
+    
     # Select step and run
+    # First step is fastqc
     if("fastqc" in args.mode):
         print("Mode is fastqc.")
         fastqc = 'snakemake -s {}/Snakefiles/{}/fastqc.snake --cores {} -pT -d {} --configfile {} {}'.format(
@@ -93,6 +95,7 @@ def main():
         print('Running fastqc')
         shell(fastqc)
         shell(fastqc_summary)
+    # Second step is pre-processing which also does aligning and post processing
     if("pre-process" in args.mode):
         print("Mode is pre-processing.")
         pre_align = 'snakemake -s {}/Snakefiles/{}/pre_align.snake --cores {} -pT -d {} --configfile {} {}'.format(
@@ -136,7 +139,7 @@ def main():
                 args.folder_path)
             shell(merge_expression)
     if("test" in args.mode):
-        test = 'snakemake -s {0}/Snakefiles/{1}/pre_align.snake --cores {2} -pT -d {3} --configfile {4} {5} --dag | dot -Tpdf > {3}pre_align.pdf'.format(
+        test = 'snakemake -s {0}/Snakefiles/{1}/other_star_align.temp.snake --cores {2} -pT -d {3} --configfile {4} {5} --dag | dot -Tpdf > {3}pre_align.pdf'.format(
             scripts_dir,
             samples_yaml['GLOBAL']['data_type'],
             yaml_data['CORES'],
