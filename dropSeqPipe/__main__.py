@@ -58,12 +58,6 @@ def main():
     # Load config files
     with open(args.config_file_path) as config_yaml:
         yaml_data = yaml.load(config_yaml)
-    try:
-        with open(os.path.join(args.folder_path, 'config.yaml')) as samples_config:
-            samples_yaml = yaml.load(samples_config)
-    except:
-        print('Samples configuratin file not found or not formatted properly. Exiting')
-        os.exit()
     if("generate-meta" in args.mode):
         shell('snakemake -s {}/Snakefiles/generate_meta.snake --cores {} -pT -d {} --configfile {} {}'.format(
             scripts_dir,
@@ -72,8 +66,13 @@ def main():
             args.config_file_path,
             complementory_args))
     else:
-        sub_folders = ['summary', 'logs', 'plots']
-        package_dir = os.path.dirname(__file__)
+        try:
+            with open(os.path.join(args.folder_path, 'config.yaml')) as samples_config:
+                samples_yaml = yaml.load(samples_config)
+        except:
+            sys.exit('Samples configuratin file not found or not formatted properly. Exiting')
+            sub_folders = ['summary', 'logs', 'plots']
+            package_dir = os.path.dirname(__file__)
         for folder in sub_folders:
             joined = os.path.join(args.folder_path, folder)
             if(not os.path.isdir(joined)):
