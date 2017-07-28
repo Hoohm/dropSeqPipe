@@ -8,8 +8,10 @@ class PostInstallCommand(install):
 
     def run(self):
         """Command to run after installation is complete."""
+        print('before import')
         import rpy2.robjects.packages as rpackages
         from rpy2.robjects.packages import importr
+        print('after import')
         utils = rpackages.importr('utils')
         utils.chooseCRANmirror(ind=1)
         packnames = ['ggplot2',
@@ -45,7 +47,8 @@ setup(name='dropSeqPipe',
       package_data={'dropSeqPipe': ['Rscripts/*.R',
                                     'Snakefiles/singleCell/*.snake',
                                     'Python/*.py',
-                                    'Snakefiles/bulk/*.snake']},
+                                    'Snakefiles/bulk/*.snake',
+                                    'Snakefiles/*.snake']},
       zip_safe=False,
       install_requires=['snakemake', 'pyyaml', 'rpy2', 'multiqc'],
       entry_points={

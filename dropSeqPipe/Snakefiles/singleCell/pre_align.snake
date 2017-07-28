@@ -9,11 +9,6 @@ TMPDIR = config['TMPDIR']
 PICARD = config['PICARD']
 DROPSEQ = config['DROPSEQ']
 
-# Reference files
-GENOMEREF = config['GENOMEREF']
-REFFLAT = config['REFFLAT']
-METAREF = config['METAREF']
-
 starttrim_length = round(max((config['GLOBAL']['Cell_barcode']['end'] - config['GLOBAL']['Cell_barcode']['start'] + 1)/2,5))
 
 
