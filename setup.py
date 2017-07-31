@@ -1,11 +1,10 @@
 """Setup file."""
-from setuptools import setup
+from setuptools import setup, find_packages
 from setuptools.command.install import install
 
 
 class PostInstallCommand(install):
     """Post-installation for installation mode."""
-
     def run(self):
         """Command to run after installation is complete."""
         print('before import')
@@ -32,6 +31,7 @@ class PostInstallCommand(install):
                 print('installing {}'.format(package))
                 utils.install_packages(package)
         install.run(self)
+    
 
 setup(name='dropSeqPipe',
       version='0.23a',
@@ -43,12 +43,10 @@ setup(name='dropSeqPipe',
       author='Roelli Patrick',
       author_email='patrick.roelli@gmail.com',
       license='GNU GPL3',
-      packages=['dropSeqPipe'],
-      package_data={'dropSeqPipe': ['Rscripts/*.R',
-                                    'Snakefiles/singleCell/*.snake',
-                                    'Python/*.py',
-                                    'Snakefiles/bulk/*.snake',
-                                    'Snakefiles/*.snake']},
+      packages=find_packages(),
+      package_data={'': ['*.R',
+                        '*.snake'
+                        '*.py']},
       zip_safe=False,
       install_requires=['snakemake', 'pyyaml', 'rpy2', 'multiqc'],
       entry_points={
