@@ -42,6 +42,15 @@ def get_args():
                         action='store_true',
                         help='Keeps the temp files',
                         default=False)
+    parser.add_argument('--cluster',
+                        action='store_true',
+                        help='Runs the pipeline with cluster jobs instead of local commands',
+                        default=False)
+    parser.add_argument('--dryrun',
+                        action='store_true',
+                        help='Runs only as dryrun. For testing purposes',
+                        default=False)
+
     args = parser.parse_args()
     return args
 
@@ -55,6 +64,10 @@ def main():
         complementory_args += '--forceall '
     if(args.notemp):
         complementory_args += '--notemp '
+    if(args.cluster):
+        complementory_args += '--cluster qsub '
+    if(args.dryrun):
+        complementory_args += '-n '
     # Load config files
     with open(args.config_file_path) as config_yaml:
         yaml_data = yaml.load(config_yaml)

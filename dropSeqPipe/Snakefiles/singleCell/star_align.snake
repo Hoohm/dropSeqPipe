@@ -6,6 +6,7 @@ configfile: 'config.yaml'
 STAREXEC = config['STAREXEC']
 METAREF = config['METAREF']
 CORES = config['CORES']
+GTF = config['GTF']
 
 MISMATCH = config['GLOBAL']['allowed_aligner_mismatch']
 
@@ -22,17 +23,21 @@ rule STAR_align:
 	output: sam = 'logs/{sample}.Aligned.out.sam'
 	params:
 		prefix = '{sample}.',
-		mismatch = MISMATCH
+		mismatch = MISMATCH,
+		read_length = config['GLOBAL']['read_length'] - 1
 	threads: CORES
 	shell:"""{STAREXEC}\
 			--genomeDir {METAREF}\
+			--sjdbGTFfile {GTF}\
 			--readFilesCommand zcat\
 			--runThreadN {CORES}\
-			--outFilterMismatchNmax={params.mismatch}\
 			--readFilesIn {input}\
-			--genomeLoad LoadAndKeep\
 			--outFileNamePrefix logs/{params.prefix}\
-			--outSAMunmapped Within"""
+			--sjdbOverhang {params.read_length}\
+			--twopassMode Basic\
+			--outFilterScoreMinOverLread 0.3\
+			--outFilterMatchNminOverLread 0\
+			--outFilterMismatchNoverLmax 0.3"""
 
 rule mv_sam:
 	input: 'logs/{sample}.Aligned.out.sam'
