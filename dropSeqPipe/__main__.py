@@ -42,10 +42,6 @@ def get_args():
                         action='store_true',
                         help='Keeps the temp files',
                         default=False)
-    parser.add_argument('--cluster',
-                        action='store_true',
-                        help='Run for cluster',
-                        default=False)
     args = parser.parse_args()
     return args
 
@@ -59,8 +55,6 @@ def main():
         complementory_args += '--forceall '
     if(args.notemp):
         complementory_args += '--notemp '
-    if(args.notemp):
-        complementory_args += '--cluster '
     # Load config files
     with open(args.config_file_path) as config_yaml:
         yaml_data = yaml.load(config_yaml)
