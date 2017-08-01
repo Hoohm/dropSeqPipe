@@ -45,7 +45,7 @@ setup(name='dropSeqPipe',
       license='GNU GPL3',
       packages=find_packages(),
       package_data={'': ['*.R',
-                        '*.snake'
+                        '*.snake',
                         '*.py']},
       zip_safe=False,
       install_requires=['snakemake', 'pyyaml', 'rpy2', 'multiqc'],
