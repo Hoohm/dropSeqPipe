@@ -24,7 +24,7 @@ CORES = config['CORES']
 rule all:
 	input:
 		GENOME_rRNA_intervals,
-		'STAR_INDEX/SA'
+		'STAR_INDEX_NO_GTF/SA'
 
 rule create_dict:
 	input:GENOME_fa
@@ -80,15 +80,15 @@ rule create_intervals:
 		PREFIX={GENOME}
 		"""
 
-rule create_star_index:
+rule create_star_index_no_gtf:
 	input: GENOME_fa
-	output: 'STAR_INDEX/SA'
-	threads: CORES
+	output: 'STAR_INDEX_NO_GTF/SA'
+	threads: 4
 	shell:
 		"""{STAREXEC}\
-		--runThreadN {CORES}\
+		--runThreadN 4\
 		--runMode genomeGenerate\
-		--genomeDir STAR_INDEX\
+		--genomeDir STAR_INDEX_NO_GTF\
 		--genomeFastaFiles {input}\
-		--sjdbGTFfile {ANNOTATION_gtf}
+		--limitGenomeGenerateRAM 30000000000
 		"""

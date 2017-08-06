@@ -1,4 +1,16 @@
+import gzip
+from itertools import islice
 """Align the data with STAR."""
+
+def get_mean_read_length(wildcards):
+	total_length = 0
+	n = 1000000
+	with gzip.open(wildcards + '_tagged_unmapped.fastq.gz' , 'r') as reads:
+		fourthlines = islice(reads, 1, n, 4)
+		for line in fourthlines:
+			read = line.strip()
+			total_length += len(read)
+	return(int(total_length/(n/4)))
 
 # Configfile
 configfile: 'config.yaml'
@@ -12,10 +24,6 @@ MISMATCH = config['GLOBAL']['allowed_aligner_mismatch']
 
 rule all:
 	input: expand('{sample}.Aligned.sam', sample=config['Samples'])
-	shell:"""{STAREXEC}\
-		--genomeDir {METAREF}\
-		--genomeLoad Remove;\
-		rm -rf Aligned.out.sam Log.out Log.progress.out _STARtmp"""
 
 
 rule STAR_align:
@@ -24,7 +32,7 @@ rule STAR_align:
 	params:
 		prefix = '{sample}.',
 		mismatch = MISMATCH,
-		read_length = config['GLOBAL']['read_length'] - 1
+		mean_read_length = lambda wildcards: get_mean_read_length(wildcards.sample)
 	threads: CORES
 	shell:"""{STAREXEC}\
 			--genomeDir {METAREF}\
@@ -33,7 +41,7 @@ rule STAR_align:
 			--runThreadN {CORES}\
 			--readFilesIn {input}\
 			--outFileNamePrefix logs/{params.prefix}\
-			--sjdbOverhang {params.read_length}\
+			--sjdbOverhang {params.mean_read_length}\
 			--twopassMode Basic\
 			--outFilterScoreMinOverLread 0.3\
 			--outFilterMatchNminOverLread 0\
