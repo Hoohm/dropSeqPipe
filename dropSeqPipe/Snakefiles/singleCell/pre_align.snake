@@ -8,7 +8,6 @@ configfile: 'config.yaml'
 TMPDIR = config['TMPDIR']
 PICARD = config['PICARD']
 DROPSEQ = config['DROPSEQ']
-JAVA = config['JAVA']
 
 starttrim_length = round(max((config['GLOBAL']['Cell_barcode']['end'] - config['GLOBAL']['Cell_barcode']['start'] + 1)/2,5))
 
@@ -25,7 +24,7 @@ rule fastq_to_sam:
 		temp('{sample}_unaligned.bam')
 	threads: 1
 	shell:
-		"""{JAVA} -Djava.io.tmpdir={TMPDIR} -Xmx512m -jar {PICARD} FastqToSam\
+		"""java -Djava.io.tmpdir={TMPDIR} -Xmx512m -jar {PICARD} FastqToSam\
 		F1={input.r1}\
 		F2={input.r2}\
 		SM=DS O={output}"""

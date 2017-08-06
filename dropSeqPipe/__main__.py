@@ -131,7 +131,7 @@ def main():
         star_summary = 'Rscript {}/Rscripts/STAR_log_plot.R {}'.format(
             package_dir,
             args.folder_path)
-        post_align = 'snakemake -s {0}/Snakefiles/{1}/post_align.snake --cores {2} -pT -d {3} --configfile {} {}'.format(
+        post_align = 'snakemake -s {0}/Snakefiles/{1}/post_align.snake --cores {2} -pT -d {3} --configfile {4} {5}'.format(
             scripts_dir,
             samples_yaml['GLOBAL']['data_type'],
             yaml_data['CORES'],
