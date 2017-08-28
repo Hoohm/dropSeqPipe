@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Changed the code for Cell and UMI barcode quality drop (per sample and overall). There was an error in the code not givint the right amount of dropped reads. Updated the images on the wiki accordingly.
 - Fixed the setup where r2py was called before getting installed.
 
+### Added
+- `min_count_per_umi` in the `config.yaml` to decide how many times a Gene - UMI has to be found to be counted as one.
+
 
 ## [0.23]
 ### Changed
