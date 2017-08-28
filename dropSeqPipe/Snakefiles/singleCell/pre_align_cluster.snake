@@ -15,6 +15,7 @@ starttrim_length = round(max((config['GLOBAL']['Cell_barcode']['end'] - config['
 rule all:
 	input: expand('{sample}_tagged_unmapped.fastq.gz', sample=config['Samples'])
 
+
 rule fastq_to_sam:
 	"""Create an empty bam file linking cell/UMI barcodes to reads"""
 	input:
@@ -24,29 +25,22 @@ rule fastq_to_sam:
 		temp('{sample}_unaligned.bam')
 	threads: 1
 	shell:
-		"""java -Djava.io.tmpdir={TMPDIR} -Xmx512m -jar {PICARD} FastqToSam\
+		"""java -Djava.io.tmpdir={TMPDIR} -Xmx500m -jar {PICARD} FastqToSam\
 		F1={input.r1}\
 		F2={input.r2}\
 		SM=DS O={output}"""
 
-rule stage1:
+
+rule barcode_qual:
 	input: '{sample}_unaligned.bam'
-	output: '{sample}_tagged_unmapped.bam'
+	output: temp('{sample}_bc.bam')
 	params:
 		BC_summary = 'logs/{sample}_CELL_barcode.txt',
-		UMI_summary = 'logs/{sample}_UMI_barcode.txt',
-		start_trim = 'logs/{sample}_start_trim.txt',
-		polyA_trim = 'logs/{sample}_polyA_trim.txt',
 		BC_start = config['GLOBAL']['Cell_barcode']['start'],
 		BC_end = config['GLOBAL']['Cell_barcode']['end'],
 		BC_min_quality = config['GLOBAL']['Cell_barcode']['min_quality'],
 		BC_min_quality_num = config['GLOBAL']['Cell_barcode']['num_below_quality'],
-		UMI_start = config['GLOBAL']['UMI']['start'],
-		UMI_end = config['GLOBAL']['UMI']['end'],
-		UMI_min_quality = config['GLOBAL']['UMI']['min_quality'],
-		UMI_min_quality_num = config['GLOBAL']['Cell_barcode']['num_below_quality'],
-		SmartAdapter = config['GLOBAL']['5PrimeSmartAdapter']
-	threads: 4
+	threads: 1
 	shell:
 		"""{DROPSEQ}/TagBamWithReadSequenceExtended\
 		SUMMARY={params.BC_summary}\
@@ -57,8 +51,20 @@ rule stage1:
 		TAG_NAME=XC\
 		NUM_BASES_BELOW_QUALITY={params.BC_min_quality_num}\
 		INPUT={input}\
-		OUTPUT=/dev/stdout COMPRESSION_LEVEL=0 |\
-		\
+		OUTPUT={output}"""
+
+rule UMI_qual:
+	input: '{sample}_bc.bam'
+	output: temp('{sample}_umi.bam')
+	params:
+		UMI_summary = 'logs/{sample}_UMI_barcode.txt',
+		UMI_start = config['GLOBAL']['UMI']['start'],
+		UMI_end = config['GLOBAL']['UMI']['end'],
+		UMI_min_quality = config['GLOBAL']['UMI']['min_quality'],
+		UMI_min_quality_num = config['GLOBAL']['Cell_barcode']['num_below_quality'],
+	threads: 1
+	shell:
+		"""
 		{DROPSEQ}/TagBamWithReadSequenceExtended\
 		SUMMARY={params.UMI_summary}\
 		BASE_RANGE={params.UMI_start}-{params.UMI_end}\
@@ -67,33 +73,59 @@ rule stage1:
 		DISCARD_READ=true\
 		TAG_NAME=XM\
 		NUM_BASES_BELOW_QUALITY={params.UMI_min_quality_num}\
-		INPUT=/dev/stdin\
-		OUTPUT=/dev/stdout COMPRESSION_LEVEL=0 |\
-		\
-		{DROPSEQ}/FilterBAM TAG_REJECT=XQ\
-		INPUT=/dev/stdin\
-		OUTPUT=/dev/stdout COMPRESSION_LEVEL=0 |\
-		\
-		{DROPSEQ}/TrimStartingSequence\
+		INPUT={input}\
+		OUTPUT={output}"""
+rule filter_out:
+	input: '{sample}_umi.bam'
+	output: temp('{sample}_filtered.bam')
+	threads: 1
+	shell:
+		"""{DROPSEQ}/FilterBAM TAG_REJECT=XQ\
+		INPUT={input}\
+		OUTPUT={output}"""
+
+rule trim_start:
+	input: '{sample}_filtered.bam'
+	output: temp('{sample}_filtered_start_trim.bam')
+	threads: 1
+	params:
+			start_trim = 'logs/{sample}_start_trim.txt',
+			SmartAdapter = config['GLOBAL']['5PrimeSmartAdapter'],
+	shell:
+		"""{DROPSEQ}/TrimStartingSequence\
 		OUTPUT_SUMMARY={params.start_trim}\
 		SEQUENCE={params.SmartAdapter}\
 		MISMATCHES=0\
 		NUM_BASES={starttrim_length}\
-		INPUT=/dev/stdin\
-		OUTPUT=/dev/stdout COMPRESSION_LEVEL=0 |\
-		\
-		{DROPSEQ}/PolyATrimmer\
+		INPUT={input}\
+		OUTPUT={output}"""
+
+rule trim_poly:
+	input: '{sample}_filtered_start_trim.bam'
+	output: temp('{sample}_tagged_unmapped.bam')
+	threads: 1
+	params:
+			polyA_trim = 'logs/{sample}_polyA_trim.txt',
+	shell:
+		"""{DROPSEQ}/PolyATrimmer\
 		OUTPUT_SUMMARY={params.polyA_trim}\
 		MISMATCHES=0\
 		NUM_BASES=6\
 		OUTPUT={output}\
-		INPUT=/dev/stdin"""
+		INPUT={input}"""
 
 rule sam_to_fastq:
 	input: '{sample}_tagged_unmapped.bam'
-	output: '{sample}_tagged_unmapped.fastq.gz'
+	output: '{sample}_tagged_unmapped.fastq'
+	threads: 1
 	shell:
 		"""java -Xmx500m -jar -Djava.io.tmpdir={TMPDIR}	{PICARD} SamToFastq\
 		INPUT={input}\
-		FASTQ=/dev/stdout COMPRESSION_LEVEL=0|\
-		gzip > {output}"""
+		FASTQ={output}"""
+
+rule gzip:
+	input: '{sample}_tagged_unmapped.fastq'
+	output: '{sample}_tagged_unmapped.fastq.gz'
+	threads: 1
+	shell:
+		"""gzip {input}"""

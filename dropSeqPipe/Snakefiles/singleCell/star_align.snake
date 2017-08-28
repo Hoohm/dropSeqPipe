@@ -1,4 +1,16 @@
+import gzip
+from itertools import islice
 """Align the data with STAR."""
+
+def get_mean_read_length(wildcards):
+	total_length = 0
+	n = 1000000
+	with gzip.open(wildcards + '_tagged_unmapped.fastq.gz' , 'r') as reads:
+		fourthlines = islice(reads, 1, n, 4)
+		for line in fourthlines:
+			read = line.strip()
+			total_length += len(read)
+	return(int(total_length/(n/4)))
 
 # Configfile
 configfile: 'config.yaml'
@@ -6,15 +18,12 @@ configfile: 'config.yaml'
 STAREXEC = config['STAREXEC']
 METAREF = config['METAREF']
 CORES = config['CORES']
+GTF = config['GTF']
 
 MISMATCH = config['GLOBAL']['allowed_aligner_mismatch']
 
 rule all:
 	input: expand('{sample}.Aligned.sam', sample=config['Samples'])
-	shell:"""{STAREXEC}\
-		--genomeDir {METAREF}\
-		--genomeLoad Remove;\
-		rm -rf Aligned.out.sam Log.out Log.progress.out _STARtmp"""
 
 
 rule STAR_align:
@@ -22,17 +31,21 @@ rule STAR_align:
 	output: sam = 'logs/{sample}.Aligned.out.sam'
 	params:
 		prefix = '{sample}.',
-		mismatch = MISMATCH
+		mismatch = MISMATCH,
+		mean_read_length = lambda wildcards: get_mean_read_length(wildcards.sample)
 	threads: CORES
 	shell:"""{STAREXEC}\
 			--genomeDir {METAREF}\
+			--sjdbGTFfile {GTF}\
 			--readFilesCommand zcat\
 			--runThreadN {CORES}\
-			--outFilterMismatchNmax={params.mismatch}\
 			--readFilesIn {input}\
-			--genomeLoad LoadAndKeep\
 			--outFileNamePrefix logs/{params.prefix}\
-			--outSAMunmapped Within"""
+			--sjdbOverhang {params.mean_read_length}\
+			--twopassMode Basic\
+			--outFilterScoreMinOverLread 0.3\
+			--outFilterMatchNminOverLread 0\
+			--outFilterMismatchNoverLmax 0.3"""
 
 rule mv_sam:
 	input: 'logs/{sample}.Aligned.out.sam'

@@ -42,6 +42,15 @@ def get_args():
                         action='store_true',
                         help='Keeps the temp files',
                         default=False)
+    parser.add_argument('-cc','--cluster_config',
+                        action='store',
+                        dest='cluster_config_file',
+                        help='Runs the pipeline with cluster jobs instead of local commands')
+    parser.add_argument('--dryrun',
+                        action='store_true',
+                        help='Runs only as dryrun. For testing purposes',
+                        default=False)
+
     args = parser.parse_args()
     return args
 
@@ -55,11 +64,16 @@ def main():
         complementory_args += '--forceall '
     if(args.notemp):
         complementory_args += '--notemp '
+    if(args.dryrun):
+        complementory_args += '-n '
+    if(args.cluster_config_file):
+        complementory_args += '--cluster-config {0} '.format(args.cluster_config_file)
+        complementory_args += '--cluster "qsub -v PATH={{cluster.PATH}} -l mem={{cluster.mem}} -e {{cluster.error}} -o {{cluster.output}}" '
     # Load config files
     with open(args.config_file_path) as config_yaml:
         yaml_data = yaml.load(config_yaml)
     if("generate-meta" in args.mode):
-        shell('snakemake -s {}/Snakefiles/generate_meta.snake --cores {} -pT -d {} --configfile {} {}'.format(
+        shell('snakemake -s {0}/Snakefiles/generate_meta.snake --cores {1} -pT -d {2} --configfile {3} {4}'.format(
             scripts_dir,
             yaml_data['CORES'],
             args.folder_path,
@@ -70,8 +84,10 @@ def main():
             with open(os.path.join(args.folder_path, 'config.yaml')) as samples_config:
                 samples_yaml = yaml.load(samples_config)
         except:
-            sys.exit('Samples configuratin file not found or not formatted properly. Exiting')
+            sys.exit('Samples configuration file not found or not formatted properly. Exiting')
         sub_folders = ['summary', 'logs', 'plots']
+        if(args.cluster_config_file):
+            sub_folders.append('logs/cluster')
         package_dir = os.path.dirname(__file__)
         for folder in sub_folders:
             joined = os.path.join(args.folder_path, folder)
@@ -115,7 +131,7 @@ def main():
         star_summary = 'Rscript {}/Rscripts/STAR_log_plot.R {}'.format(
             package_dir,
             args.folder_path)
-        post_align = 'snakemake -s {}/Snakefiles/{}/post_align.snake --cores {} -pT -d {} --configfile {} {}'.format(
+        post_align = 'snakemake -s {0}/Snakefiles/{1}/post_align.snake --cores {2} -pT -d {3} --configfile {4} {5}'.format(
             scripts_dir,
             samples_yaml['GLOBAL']['data_type'],
             yaml_data['CORES'],
@@ -139,13 +155,14 @@ def main():
                 args.folder_path)
             shell(merge_expression)
     if("test" in args.mode):
-        test = 'snakemake -s {0}/Snakefiles/{1}/other_star_align.temp.snake --cores {2} -pT -d {3} --configfile {4} {5} --dag | dot -Tpdf > {3}pre_align.pdf'.format(
+        test = 'snakemake -s {0}/Snakefiles/{1}/star_align.snake --cores {2} -pT -d {3} --configfile {4} --cluster-config {3}cluster.yaml {5}'.format(
             scripts_dir,
             samples_yaml['GLOBAL']['data_type'],
             yaml_data['CORES'],
             args.folder_path,
             args.config_file_path,
             complementory_args)
+        print(test)
         shell(test)
     if("generate-plots" in args.mode):
         print('Mode is generate-plots')
