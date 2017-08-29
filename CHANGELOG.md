@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Will now allow you to run `generate-meta` without having a `config.yaml` file in the reference foder.
 - Changed the code for Cell and UMI barcode quality drop (per sample and overall). There was an error in the code not givint the right amount of dropped reads. Updated the images on the wiki accordingly.
 - Fixed the setup where r2py was called before getting installed.
+- Big change in the mapping. From now on the STAR index will be done without a GTF file. This allows to change the overhang option on the fly for each sample based on the mean read length. This also opens up 2-pass mapping. You will have to regenerate your index for it to work.
+- Changed `generate_meta` in order to fit the new STAR index without a GTF. You now have to give the path to the GTF file in the config.yaml
 
 ### Added
 - `min_count_per_umi` in the `config.yaml` to decide how many times a Gene - UMI has to be found to be counted as one.
