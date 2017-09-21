@@ -93,8 +93,8 @@ def main():
             joined = os.path.join(args.folder_path, folder)
             if(not os.path.isdir(joined)):
                 os.mkdir(joined)
-    if(samples_yaml['GLOBAL']['data_type'] not in ['singleCell', 'bulk']):
-        exit('Data_type value not valid. Please use singleCell or bulk.\nData_type is case sensitive!')
+        if(samples_yaml['GLOBAL']['data_type'] not in ['singleCell', 'bulk']):
+            exit('Data_type value not valid. Please use singleCell or bulk.\nData_type is case sensitive!')
     # Select step and run
     # First step is fastqc
     if("fastqc" in args.mode):
