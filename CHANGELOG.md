@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Changed `generate_meta` in order to fit the new STAR index without a GTF. You now have to give the path to the GTF file in the config.yaml
 
 ### Added
-- `min_count_per_umi` in the `config.yaml` to decide how many times a Gene - UMI has to be found to be counted as one.
+- `min_count_per_umi` in the `config.yaml` to decide how many times a Gene - UMI pair has to be found to be counted as one.
 
 
 ## [0.23]
