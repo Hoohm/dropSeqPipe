@@ -20,7 +20,6 @@ SPECIES = config["SPECIES"]
 
 rule all:
 	input: expand('logs/{sample}_hist_out_cell.txt', sample=config['Samples'])
-	log: 'logs/Dropseq_post_align.log'
 
 rule sort:
 	input:
