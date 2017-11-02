@@ -31,7 +31,7 @@ plotRNAMetrics = function(file_path, sample_name, top_barcodes, path){
   gp2 <- ggplotGrob(p2)
   pdf(file = file.path(path,'plots',paste0(sample_name, '_rna_metrics.pdf')), width = 16, height = 13)
   grid::grid.newpage()
-  grid::grid.draw(rbind(gp1, gp2))
+  grid::grid.draw(rbind(gp1, gp2, size = "last"))
   dev.off()
 }
 
@@ -72,7 +72,7 @@ plotBCDrop = function(path, samples, config_file_data){
   gp2 <- ggplotGrob(p2)
   pdf(file = file.path(path,'plots','BCDrop.pdf'), width = 8, height = 7)
   grid::grid.newpage()
-  grid::grid.draw(rbind(gp1, gp2))
+  grid::grid.draw(rbind(gp1, gp2, size = "last"))
   dev.off()
 }
 
