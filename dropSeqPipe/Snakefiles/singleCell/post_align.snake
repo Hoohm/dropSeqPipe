@@ -8,6 +8,7 @@ configfile: 'config.yaml'
 TMPDIR = config['TMPDIR']
 PICARD = config['PICARD']
 DROPSEQ = config['DROPSEQ']
+CORES = config['CORES']
 
 # References files
 GENOMEREF = config['GENOMEREF']
@@ -25,9 +26,9 @@ rule sort:
 	input:
 		samples = '{sample}.Aligned.sam'
 	output: temp('{sample}_Aligned_sorted.sam')
-	threads:1
+	threads: CORES
 	shell:
-		"""java	-Djava.io.tmpdir={TMPDIR} -Dsamjdk.buffer_size=131072 -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10 -Xmx4000m -jar {PICARD} SortSam\
+		"""java	-Djava.io.tmpdir={TMPDIR} -Dsamjdk.buffer_size=131072 -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10 -XX:ParallelGCThreads={CORES} -Xmx8g -Xms4096m -jar {PICARD} SortSam\
 		INPUT={input}\
 		OUTPUT={output}\
 		SORT_ORDER=queryname\
@@ -37,9 +38,9 @@ rule stage3:
 	input:	unmapped = '{sample}_tagged_unmapped.bam',
 			mapped = '{sample}_Aligned_sorted.sam'
 	output: temp('{sample}_gene_exon_tagged.bam')
-	threads: 2
+	threads: CORES
 	shell:
-		"""java -Djava.io.tmpdir={TMPDIR} -Xmx4000m -jar {PICARD} MergeBamAlignment\
+		"""java -Djava.io.tmpdir={TMPDIR} -Xmx8g -Xms4096m -XX:ParallelGCThreads={CORES} -jar {PICARD} MergeBamAlignment\
 		REFERENCE_SEQUENCE={GENOMEREF}\
 		UNMAPPED_BAM={input.unmapped}\
 		ALIGNED_BAM={input.mapped}\
@@ -58,12 +59,14 @@ rule stage3:
 rule bead_errors_metrics:
 	input: '{sample}_gene_exon_tagged.bam'
 	output: '{sample}_final.bam'
+	threads: CORES
 	params:
 		out_stats = 'logs/{sample}_synthesis_stats.txt',
 		summary = 'logs/{sample}_synthesis_stats_summary.txt',
 		barcodes = lambda wildcards: config['Samples'][wildcards.sample]['expected_cells'] * 2,
 		cells = lambda wildcards: config['Samples'][wildcards.sample]['expected_cells'],
-		metrics = 'logs/{sample}_rna_metrics.txt'
+		metrics = 'logs/{sample}_rna_metrics.txt',
+		umis_per_cell = config['GLOBAL']['min_umis_per_cell']
 	shell:
 		"""{DROPSEQ}/DetectBeadSynthesisErrors\
 		INPUT={input}\
@@ -71,6 +74,7 @@ rule bead_errors_metrics:
 		OUTPUT_STATS={params.out_stats}\
 		SUMMARY={params.summary}\
 		NUM_BARCODES={params.barcodes}\
+		NUM_UMIS_PER_CELL={params.umis_per_cell}\
 		PRIMER_SEQUENCE=AAGCAGTGGTATCAACGCAGAGTAC;
 		{DROPSEQ}/SingleCellRnaSeqMetricsCollector\
 		INPUT={input}\

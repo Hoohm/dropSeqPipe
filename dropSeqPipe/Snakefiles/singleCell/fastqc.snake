@@ -6,7 +6,7 @@ configfile:'config.yaml'
 
 # Executables
 FASTQC = config['FASTQCEXEC']
-
+CORES = config['CORES']
 
 
 rule all:
@@ -18,6 +18,6 @@ rule fastqc:
 		r1='{sample}_R1.fastq.gz',
 		r2='{sample}_R2.fastq.gz'
 	output: 'logs/{sample}_R1_fastqc.html'
-	threads: 2
+	threads: CORES
 	shell:
 		"""{FASTQC} {input.r1} {input.r2} -t 2 -o logs --extract"""

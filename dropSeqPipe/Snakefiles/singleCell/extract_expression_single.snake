@@ -9,21 +9,24 @@ rule all:
 		expand('summary/{sample}_expression_matrix.txt', sample=config['Samples']),
 		expand('logs/{sample}_umi_per_gene.tsv', sample=config['Samples']),
 		
-
-
 rule extract_expression:
 	input: '{sample}_final.bam'
 	output: 'summary/{sample}_expression_matrix.txt.gz'
 	params:
 		sample = '{sample}',
-		count_per_umi = config['GLOBAL']['min_count_per_umi']
+		cells = lambda wildcards: config['Samples'][wildcards.sample]['expected_cells'],
+		count_per_umi = config['GLOBAL']['min_count_per_umi'],
+		genes_per_cell = config['GLOBAL']['min_genes_per_cell'],
+		reads_per_cell = config['GLOBAL']['min_reads_per_cell']
 	shell:
 		"""{DROPSEQ}/DigitalExpression\
 		I={input}\
 		O={output}\
 		SUMMARY=summary/{params.sample}_dge.summary.txt \
-		CELL_BC_FILE=summary/{params.sample}_barcodes.csv\
-		MIN_BC_READ_THRESHOLD={params.count_per_umi}"""
+		MIN_BC_READ_THRESHOLD={params.count_per_umi} \
+		MIN_NUM_GENES_PER_CELL={params.genes_per_cell} \
+		MIN_NUM_READS_PER_CELL={params.reads_per_cell} \
+		NUM_CORE_BARCODES={params.cells}"""
 
 rule extract_umi_per_gene:
 	input: '{sample}_final.bam'

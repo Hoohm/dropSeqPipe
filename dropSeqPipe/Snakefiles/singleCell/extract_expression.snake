@@ -22,8 +22,8 @@ rule extract_expression:
 		SUMMARY=summary/{params.sample}_{params.species}_dge.summary.txt \
 		CELL_BC_FILE=summary/{params.sample}_{params.species}_barcodes.csv"""
 
-rule gunzip:
-	input: 'summary/{sample}_{species}_expression_matrix.txt.gz'
-	output: 'summary/{sample}_{species}_expression_matrix.txt'
-	shell:
-		"""gunzip -qf {input}"""
+# rule gunzip:
+	# input: 'summary/{sample}_{species}_expression_matrix.txt.gz'
+	# output: 'summary/{sample}_{species}_expression_matrix.txt'
+	# shell:
+		# """gunzip -qf {input}"""
