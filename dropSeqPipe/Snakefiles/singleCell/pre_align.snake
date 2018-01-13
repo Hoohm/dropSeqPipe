@@ -8,6 +8,7 @@ configfile: 'config.yaml'
 TMPDIR = config['TMPDIR']
 PICARD = config['PICARD']
 DROPSEQ = config['DROPSEQ']
+CORES = config['CORES']
 
 starttrim_length = round(max((config['GLOBAL']['Cell_barcode']['end'] - config['GLOBAL']['Cell_barcode']['start'] + 1)/2,5))
 
@@ -15,19 +16,19 @@ starttrim_length = round(max((config['GLOBAL']['Cell_barcode']['end'] - config['
 rule all:
 	input: expand('{sample}_tagged_unmapped.fastq.gz', sample=config['Samples'])
 
-rule fastq_to_sam:
-	"""Create an empty bam file linking cell/UMI barcodes to reads"""
-	input:
-		r1='{sample}_R1.fastq.gz',
-		r2='{sample}_R2.fastq.gz'
-	output:
-		temp('{sample}_unaligned.bam')
-	threads: 1
-	shell:
-		"""java -Djava.io.tmpdir={TMPDIR} -Xmx512m -jar {PICARD} FastqToSam\
-		F1={input.r1}\
-		F2={input.r2}\
-		SM=DS O={output}"""
+# rule fastq_to_sam:
+	# """Create an empty bam file linking cell/UMI barcodes to reads"""
+	# input:
+		# r1='{sample}_R1.fastq.gz',
+		# r2='{sample}_R2.fastq.gz'
+	# output:
+		# temp('{sample}_unaligned.bam')
+	# threads: CORES
+	# shell:
+		# """java -Djava.io.tmpdir={TMPDIR} -Xmx8g -Xms4096m -XX:ParallelGCThreads={CORES} -jar {PICARD} FastqToSam\
+		# F1={input.r1}\
+		# F2={input.r2}\
+		# SM=DS O={output}"""
 
 rule stage1:
 	input: '{sample}_unaligned.bam'
@@ -46,7 +47,7 @@ rule stage1:
 		UMI_min_quality = config['GLOBAL']['UMI']['min_quality'],
 		UMI_min_quality_num = config['GLOBAL']['Cell_barcode']['num_below_quality'],
 		SmartAdapter = config['GLOBAL']['5PrimeSmartAdapter']
-	threads: 4
+	threads: CORES
 	shell:
 		"""{DROPSEQ}/TagBamWithReadSequenceExtended\
 		SUMMARY={params.BC_summary}\
@@ -92,8 +93,9 @@ rule stage1:
 rule sam_to_fastq:
 	input: '{sample}_tagged_unmapped.bam'
 	output: '{sample}_tagged_unmapped.fastq.gz'
+	threads: CORES
 	shell:
-		"""java -Xmx500m -jar -Djava.io.tmpdir={TMPDIR}	{PICARD} SamToFastq\
+		"""java -Xmx8g -Xms4096m -XX:ParallelGCThreads={CORES} -jar -Djava.io.tmpdir={TMPDIR}	{PICARD} SamToFastq\
 		INPUT={input}\
 		FASTQ=/dev/stdout COMPRESSION_LEVEL=0|\
 		gzip > {output}"""

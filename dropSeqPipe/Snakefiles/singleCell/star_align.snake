@@ -21,6 +21,7 @@ CORES = config['CORES']
 GTF = config['GTF']
 
 MISMATCH = config['GLOBAL']['allowed_aligner_mismatch']
+READ_LENGTH = 50
 
 rule all:
 	input: expand('{sample}.Aligned.sam', sample=config['Samples'])
@@ -32,7 +33,8 @@ rule STAR_align:
 	params:
 		prefix = '{sample}.',
 		mismatch = MISMATCH,
-		mean_read_length = lambda wildcards: get_mean_read_length(wildcards.sample)
+		mean_read_length = READ_LENGTH
+		#mean_read_length = lambda wildcards: get_mean_read_length(wildcards.sample)
 	threads: CORES
 	shell:"""{STAREXEC}\
 			--genomeDir {METAREF}\
