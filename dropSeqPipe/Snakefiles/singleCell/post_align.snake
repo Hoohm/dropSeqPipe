@@ -74,7 +74,7 @@ rule bead_errors_metrics:
 		OUTPUT_STATS={params.out_stats}\
 		SUMMARY={params.summary}\
 		NUM_BARCODES={params.barcodes}\
-		NUM_UMIS_PER_CELL={params.umis_per_cell}\
+		MIN_UMIS_PER_CELL={params.umis_per_cell}\
 		PRIMER_SEQUENCE=AAGCAGTGGTATCAACGCAGAGTAC;
 		{DROPSEQ}/SingleCellRnaSeqMetricsCollector\
 		INPUT={input}\
