@@ -18,7 +18,8 @@ rule fastq_to_sam:
 		SM=DS O={output}"""
 
 rule BC_tags:
-	input: 'data/{sample}_unaligned.bam'
+	input:
+		'data/{sample}_unaligned.bam'
 	output: 
 		bam = temp('data/{sample}_BC_tagged_unmapped.bam'),
 		BC_summary = 'logs/{sample}_CELL_barcode.txt'
