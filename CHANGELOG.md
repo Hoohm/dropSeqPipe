@@ -4,6 +4,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.3]
+### Changed
+- Complete overhaul of how the pipeline is organized to follow the structure proposed for snakemake-workflows. This will allow ease of deployement on any platform having conda installed. It will also help to run on clusters.
+- The way to call the pipeline is now simplified. Changes are shown in the [WIKI](https://github.com/Hoohm/dropSeqPipe/wiki/)
+- Dependency to Drop-seq-tools to version 1.13 from 1.12
+- Full compatibility with barcode whitelist. Makes it easier to use for SCRBseq protocols or whitelist from other source (UMI-tools).
+- Modified cell and UMI drop plots in order to reflect the option chosen. See [plots](https://github.com/Hoohm/dropSeqPipe/wiki/Plots)
+
+### Removed
+- Bulk sequencing compatiblity.
+- Fastqc and STAR logs plots are removed and replaced by multiqc.
+
+### Added
+- Wrapper for Drop-seq tools. Makes it easier to switch temp folder and choose maximum memory heap.
+- More parameters for STAR exposed. See [WIKI](https://github.com/Hoohm/dropSeqPipe/wiki/
+
+## [0.24]
+### Changed
+- All the QCplots are now generated inside the snakefiles. No more `generate-plots` mode.
+
 
 ## [0.23a]
 ### Changed
@@ -14,7 +34,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Changed `generate_meta` in order to fit the new STAR index without a GTF. You now have to give the path to the GTF file in the config.yaml
 
 ### Added
-- `min_count_per_umi` in the `config.yaml` to decide how many times a Gene - UMI pair has to be found to be counted as one.
+- `min_count_per_umi` in the `config.yaml` to decide how many times a Gene - UMI has to be found to be counted as one.
 
 
 ## [0.23]
