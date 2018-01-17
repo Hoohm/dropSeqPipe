@@ -36,6 +36,7 @@ rule all:
         expand('plots/{sample}_UMI_dropped.pdf', sample=samples.index),
         'reports/filter.html',
         'plots/BC_drop.pdf',
+        'plots/png/BC_drop.png',
         #mapping
         expand('data/{sample}_final.bam', sample=samples.index),
         'reports/star.html',
@@ -43,7 +44,9 @@ rule all:
         #extract
         expand('logs/{sample}_umi_per_gene.tsv', sample=samples.index),
         expand('plots/{sample}_rna_metrics.pdf', sample=samples.index),
+        expand('plots/png/{sample}_rna_metrics.png', sample=samples.index),
         expand('plots/{sample}_knee_plot.pdf', sample=samples.index),
+        expand('plots/png/{sample}_knee_plot.png', sample=samples.index),
         'summary/umi_expression_matrix.tsv',
         'summary/counts_expression_matrix.tsv',
         'reports/combined.html'
@@ -70,13 +73,15 @@ rule filter:
         expand('plots/{sample}_CELL_dropped.pdf', sample=samples.index),
         expand('plots/{sample}_UMI_dropped.pdf', sample=samples.index),
         'reports/filter.html',
-        'plots/BC_drop.pdf'
+        'plots/BC_drop.pdf',
+        'plots/png/BC_drop.png'
 
 rule map:
     input:  
         expand('data/{sample}_final.bam', sample=samples.index),
         expand('logs/{sample}_hist_out_cell.txt', sample=samples.index),
         expand('plots/{sample}_knee_plot.pdf', sample=samples.index),
+        expand('plots/png/{sample}_knee_plot.png', sample=samples.index),
         'reports/star.html'
 
 rule extract:
@@ -84,14 +89,18 @@ rule extract:
         expand('logs/{sample}_umi_per_gene.tsv', sample=samples.index),
         'summary/umi_expression_matrix.tsv',
         'summary/counts_expression_matrix.tsv',
-        expand('plots/{sample}_rna_metrics.pdf', sample=samples.index)
+        expand('plots/{sample}_rna_metrics.pdf', sample=samples.index),
+        expand('plots/png/{sample}_rna_metrics.png', sample=samples.index)
         
 
 rule split_species:
     input:
         expand('summary/{sample}_{species}_barcodes.csv', sample=samples.index, species=config['META']['species']),
         expand('plots/{sample}_species_plot_genes.pdf', sample=samples.index),
-        expand('plots/{sample}_species_plot_transcripts.pdf', sample=samples.index)
+        expand('plots/{sample}_species_plot_transcripts.pdf', sample=samples.index),
+        expand('plots/png/{sample}_species_plot_genes.png', sample=samples.index),
+        expand('plots/png/{sample}_species_plot_transcripts.png', sample=samples.index)
+        
         
 
 rule extract_species:
@@ -101,7 +110,8 @@ rule extract_species:
         expand('logs/{sample}_{species}_umi_per_gene.tsv', sample=samples.index, species=config['META']['species']),
         expand('summary/Experiment_{species}_counts_expression_matrix.tsv', species=config['META']['species']),
         expand('summary/Experiment_{species}_umi_expression_matrix.tsv', species=config['META']['species']),
-        expand('plots/species_{sample}_{species}_rna_metrics.pdf', sample=samples.index, species=config['META']['species'])
+        expand('plots/species_{sample}_{species}_rna_metrics.pdf', sample=samples.index, species=config['META']['species']),
+        expand('plots/png/species_{sample}_{species}_rna_metrics.png', sample=samples.index, species=config['META']['species'])
 
 
 rule multiqc_all:

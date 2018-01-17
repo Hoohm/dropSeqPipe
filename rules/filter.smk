@@ -204,7 +204,9 @@ rule plot_BC_drop:
 		BC_tagged = expand('logs/{sample}_CELL_barcode.txt', sample=samples.index),
 		UMI_tagged = expand('logs/{sample}_UMI_barcode.txt', sample=samples.index),
 		reads_left = expand('logs/{sample}_reads_left.txt', sample=samples.index)
-	output: 'plots/BC_drop.pdf'
+	output:
+		pdf = 'plots/BC_drop.pdf',
+		png = 'plots/png/BC_drop.png'
 	params:
 		BC_length = config['FILTER']['Cell_barcode']['end'] - config['FILTER']['Cell_barcode']['start']+1,
 		UMI_length = config['FILTER']['UMI']['end'] - config['FILTER']['UMI']['start']+1,

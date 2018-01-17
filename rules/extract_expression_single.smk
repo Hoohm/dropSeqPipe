@@ -168,7 +168,9 @@ rule SingleCellRnaSeqMetricsCollector_whitelist:
 
 rule plot_rna_metrics:
 	input: 'logs/{sample}_rna_metrics.txt'
-	output: 'plots/{sample}_rna_metrics.pdf'
+	output:
+		pdf = 'plots/{sample}_rna_metrics.pdf',
+		png = 'plots/png/{sample}_rna_metrics.png'
 	params: 
 		cells = lambda wildcards: samples.loc[wildcards.sample,'expected_cells']
 	script:
@@ -178,7 +180,9 @@ rule plot_rna_metrics_whitelist:
 	input:
 		rna_metrics = 'logs/{sample}_rna_metrics.txt',
 		barcodes = 'barcodes.csv'
-	output: 'plots/{sample}_rna_metrics.pdf'
+	output:
+		pdf = 'plots/{sample}_rna_metrics.pdf',
+		png = 'plots/png/{sample}_rna_metrics.png'
 	script:
 		'../scripts/plot_rna_metrics.R'
 

@@ -74,7 +74,9 @@ rule plot_rna_metrics_species:
 	input:
 		rna_metrics = 'logs/{sample}_{species}_rna_metrics.txt',
 		barcode = 'summary/{sample}_{species}_barcodes.csv'
-	output: 'plots/species_{sample}_{species}_rna_metrics.pdf'
+	output:
+		pdf = 'plots/species_{sample}_{species}_rna_metrics.pdf',
+		png = 'plots/png/species_{sample}_{species}_rna_metrics.png'
 	script:
 		'../scripts/plot_rna_metrics.R'
 

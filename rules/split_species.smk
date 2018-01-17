@@ -68,18 +68,11 @@ rule plot_barnyard:
 		expand('summary/{{sample}}_{species}_dge.summary.txt',species=config['META']['species'])
 	output: 
 		barcodes_species = expand('summary/{{sample}}_{species}_barcodes.csv', species=config['META']['species']),
-		barnyard_plot_genes = 'plots/{sample}_species_plot_genes.pdf',
-		barnyard_plot_transcripts = 'plots/{sample}_species_plot_transcripts.pdf'
+		genes_pdf = 'plots/{sample}_species_plot_genes.pdf',
+		genes_png = 'plots/png/{sample}_species_plot_genes.png',
+		transcripts_pdf = 'plots/{sample}_species_plot_transcripts.pdf',
+		transcripts_png = 'plots/png/{sample}_species_plot_transcripts.png'
 	params:
 		expected_cells = lambda wildcards: int(samples.loc[wildcards.sample,'expected_cells'])
 	script: 
 		'../scripts/plot_species_plot.R'
-
-# rule species_plot:
-# 	input: expand('summary/{{sample}}_{species}_dge.summary.txt',species=config['META']['species'])
-# 	output:
-# 		plot = 'plots/{sample}_species_plot.pdf'
-# 	params:
-# 		sample_names = lambda wildcards: samples.index
-# 	script: 
-# 		'../scripts/plot_species_plot.R'

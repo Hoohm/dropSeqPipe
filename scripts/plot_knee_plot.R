@@ -21,4 +21,5 @@ if(!is.null(snakemake@input$barcodes))
 	barcodes_whitelist = read.csv(snakemake@input$barcodes, header=FALSE, stringsAsFactors=FALSE)
 	knee_plot = knee_plot + geom_point(data = plot_data[plot_data$Barcode %in% barcodes_whitelist$V1,], aes(x=rank, y=cum_sum, color='Whitelisted'), size=0.1) + scale_color_manual(values=c('Whitelisted'='green'))
  }
-ggsave(file=snakemake@output$plot, width = 4, height = 3)
+ggsave(file=snakemake@output$pdf, width = 4, height = 3)
+ggsave(file=snakemake@output$png, width = 4, height = 3)

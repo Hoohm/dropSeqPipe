@@ -133,7 +133,8 @@ rule bam_hist:
 rule plot_knee_plot:
 	input: 'logs/{sample}_hist_out_cell.txt'
 	output:
-		plot = 'plots/{sample}_knee_plot.pdf'
+		pdf = 'plots/{sample}_knee_plot.pdf',
+		png = 'plots/png/{sample}_knee_plot.png'
 	params: 
 		cells = lambda wildcards: samples.loc[wildcards.sample,'expected_cells']
 	script:

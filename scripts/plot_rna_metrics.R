@@ -31,7 +31,12 @@ p2 = p2 + scale_y_continuous(labels = scales::percent)
 # This allows to align the main plots so that we can relate both directly with the label from the bottom one.
 gp1 <- ggplotGrob(p1)
 gp2 <- ggplotGrob(p2)
-pdf(file = snakemake@output[[1]], width = 16, height = 13)
+pdf(file = snakemake@output$pdf, width = 16, height = 13)
+grid::grid.newpage()
+grid::grid.draw(rbind(gp1, gp2, size = "last"))
+dev.off()
+
+png(file = snakemake@output$png,units='in', res=300, width = 16, height = 13)
 grid::grid.newpage()
 grid::grid.draw(rbind(gp1, gp2, size = "last"))
 dev.off()

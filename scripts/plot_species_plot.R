@@ -91,7 +91,8 @@ digitalExpressionFileO2 = snakemake@input[[2]][1]
 
 num_cells = snakemake@params$expected_cells
 par(mar=c(5,4,4,2)+0.5)
-pdf(snakemake@output$barnyard_plot_genes, height=8, width=8)
+
+pdf(snakemake@output$genes_pdf, height=8, width=8)
 df_temp=categorizeCellsUsingKneeKnownNumCellsPaper(digitalExpressionFileO1,
                                            digitalExpressionFileO2,
                                            snakemake@config$META$species[1],
@@ -102,7 +103,21 @@ df_temp=categorizeCellsUsingKneeKnownNumCellsPaper(digitalExpressionFileO1,
                                            point.cex= 1,
                                            category = 'genes')
 dev.off()
-pdf(snakemake@output$barnyard_plot_transcripts, height=8, width=8)
+
+png(snakemake@output$genes_png, height=8, width=8, units='in', res=300)
+df_temp=categorizeCellsUsingKneeKnownNumCellsPaper(digitalExpressionFileO1,
+                                           digitalExpressionFileO2,
+                                           snakemake@config$META$species[1],
+                                           snakemake@config$META$species[2],
+                                           pureRatio = snakemake@config$META$species_ratio,
+                                           numCells = num_cells,
+                                           numBeads = num_cells * 2,
+                                           point.cex= 1,
+                                           category = 'genes')
+dev.off()
+
+
+pdf(snakemake@output$transcripts_pdf, height=8, width=8)
 df=categorizeCellsUsingKneeKnownNumCellsPaper(digitalExpressionFileO1,
                                               digitalExpressionFileO2,
                                               snakemake@config$META$species[1],
@@ -113,6 +128,20 @@ df=categorizeCellsUsingKneeKnownNumCellsPaper(digitalExpressionFileO1,
                                               point.cex= 1,
                                               category = 'transcripts')
 dev.off()
+
+png(snakemake@output$transcripts_png, height=8, width=8, units='in', res=300)
+df=categorizeCellsUsingKneeKnownNumCellsPaper(digitalExpressionFileO1,
+                                              digitalExpressionFileO2,
+                                              snakemake@config$META$species[1],
+                                              snakemake@config$META$species[2],
+                                              pureRatio = snakemake@config$META$species_ratio,
+                                              numCells = num_cells,
+                                              numBeads = num_cells * 2,
+                                              point.cex= 1,
+                                              category = 'transcripts')
+dev.off()
+
+
 organism1 = subset(df, df$organism == snakemake@config$META$species[1])
 organism2 = subset(df, df$organism == snakemake@config$META$species[2])
 write.table(organism1$tag, snakemake@output$barcodes_species[1], row.names=F, col.names=F, quote=F)
