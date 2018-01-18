@@ -1,0 +1,31 @@
+LOCAL:
+    TMPDIR: 
+    DROPSEQ-wrapper:
+    MEMORY: 4g
+META:
+    species:
+    species_ratio: 0.20
+    reference_file:  
+    annotation_file:
+    reference_folder:
+FILTER:
+    IllumiaClip: 
+    5PrimeSmartAdapter:
+    Cell_barcode:
+        start:
+        end:
+        min_quality:
+        num_below_quality:
+    UMI:
+        start:
+        end:
+        min_quality:
+        num_below_quality:
+EXTRACTION:
+    bc_edit_distance:
+    min_count_per_umi:
+STAR_PARAMETERS:
+    outFilterMismatchNmax: 10
+    outFilterMismatchNoverLmax: 0.3
+    outFilterMismatchNoverReadLmax: 1
+    outFilterMatchNmin: 0

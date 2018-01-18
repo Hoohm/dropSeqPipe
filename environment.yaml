@@ -1,0 +1,19 @@
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+  - anaconda
+dependencies:
+  - picard=2.14.1.0
+  - graphviz
+  - python
+  - snakemake
+  - r=3.4.1
+  - r-ggplot2
+  - pytz
+  - pandas
+  - trimmomatic
+  - STAR
+  - fastqc
+  - multiqc
+  - samtools
