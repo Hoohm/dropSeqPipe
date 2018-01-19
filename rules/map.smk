@@ -145,7 +145,8 @@ rule plot_knee_plot_whitelist:
 		data = 'logs/{sample}_hist_out_cell.txt',
 		barcodes = 'barcodes.csv'
 	output:
-		plot = 'plots/{sample}_knee_plot.pdf'
+		plot = 'plots/{sample}_knee_plot.pdf',
+		png = 'plots/png/{sample}_knee_plot.png'
 	params: 
 		cells = lambda wildcards: samples.loc[wildcards.sample,'expected_cells']
 	script:
