@@ -49,7 +49,9 @@ rule all:
         expand('plots/png/{sample}_knee_plot.png', sample=samples.index),
         'summary/umi_expression_matrix.tsv',
         'summary/counts_expression_matrix.tsv',
-        'reports/combined.html'
+        'reports/combined.html',
+        'plots/umi_per_gene_distribution.pdf',
+        'plots/png/umi_per_gene_distribution.png'
 
 rule meta:
     input:
@@ -90,7 +92,9 @@ rule extract:
         'summary/umi_expression_matrix.tsv',
         'summary/counts_expression_matrix.tsv',
         expand('plots/{sample}_rna_metrics.pdf', sample=samples.index),
-        expand('plots/png/{sample}_rna_metrics.png', sample=samples.index)
+        expand('plots/png/{sample}_rna_metrics.png', sample=samples.index),
+        'plots/umi_per_gene_distribution.pdf',
+        'plots/png/umi_per_gene_distribution.png'
         
 
 rule split_species:

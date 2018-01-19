@@ -165,6 +165,15 @@ rule SingleCellRnaSeqMetricsCollector_whitelist:
 		RIBOSOMAL_INTERVALS={params.rRNA_intervals}
 		"""
 
+rule plot_umi_per_gene:
+	input: expand('logs/{sample}_umi_per_gene.tsv',sample=samples.index)
+	output:
+		pdf = 'plots/umi_per_gene_distribution.pdf',
+		png = 'plots/png/umi_per_gene_distribution.png'
+	params:
+		sample_names = lambda wildcards: samples.index	
+	script:
+		"../scripts/plot_umi_distribution.R"
 
 rule plot_rna_metrics:
 	input: 'logs/{sample}_rna_metrics.txt'
