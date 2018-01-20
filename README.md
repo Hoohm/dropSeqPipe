@@ -21,11 +21,9 @@ Latest changes
 Version 0.3 is out. The python package got changed to a snakemake-workflow. Main differences listed bellow
 
 * It now uses [conda](https://conda.io/docs/) for packages/installation. This makes the installation process easier and will allow to use the pipeline in any cluster even if you don't have admin rights.
-* All of the [snakemake](http://snakemake.readthedocs.io/en/latest/) features are now fully exposed whereas before they had to be exposed manually.
+* All of the [snakemake](http://snakemake.readthedocs.io/en/latest/) features are now fully exposed whereas before they had to be exposed manually before.
 * [Multiqc](http://multiqc.info/) is now properly integrated in the pipeline.
-* Local and app configurations and sample specific information are now separated in two different files, `config.yaml` and `samples.csv`
-
-
+* Local, software configurations and sample specific informations are now separated in two different files, `config.yaml` and `samples.csv`
 
 
 
