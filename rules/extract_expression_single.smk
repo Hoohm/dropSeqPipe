@@ -115,6 +115,7 @@ rule extract_umi_per_gene_whitelist:
 	params:
 		bc_edit_distance = config['EXTRACTION']['bc_edit_distance'],
 		DROPSEQ_wrapper=config['LOCAL']['DROPSEQ-wrapper'],
+		TMPDIR = config['LOCAL']['TMPDIR'],
 		memory=config['LOCAL']['MEMORY']
 	shell:
 		"""{params.DROPSEQ_wrapper} -t {params.TMPDIR} -m {params.memory} -p GatherMolecularBarcodeDistributionByGene\
