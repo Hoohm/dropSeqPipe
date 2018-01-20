@@ -1,7 +1,5 @@
 library(ggplot2)
 library(ggpubr)
-library(ggplot2)
-library(ggpubr)
 data = read.table(file = snakemake@input[[1]], header=T, stringsAsFactors=F)
 data$presence=rep('kept', nrow(data))
 ids = which(snakemake@params$num_below_quality < data$num_failed_bases)
