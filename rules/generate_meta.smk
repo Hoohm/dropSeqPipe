@@ -75,7 +75,8 @@ rule create_star_index:
 		reference_file = reference_file,
 		annotation_file = annotation_file
 	params:
-		sjdbOverhang = lambda wildcards: get_sjdbOverhang(wildcards)
+		sjdbOverhang = lambda wildcards: get_sjdbOverhang(wildcards),
+		genomeDir = '{star_index_prefix}_{read_length}'
 	output:
 		'{star_index_prefix}_{read_length}/SA'
 	threads: 4
@@ -83,7 +84,7 @@ rule create_star_index:
 		"""STAR\
 		--runThreadN 4\
 		--runMode genomeGenerate\
-		--genomeDir {output}\
+		--genomeDir {params.genomeDir}\
 		--genomeFastaFiles {input.reference_file}\
 		--sjdbGTFfile {input.annotation_file}\
 		--limitGenomeGenerateRAM 30000000000\

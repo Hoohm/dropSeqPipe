@@ -3,9 +3,9 @@
 ruleorder: plot_knee_plot_whitelist > plot_knee_plot
 
 rule STAR_align:
-	input: 
-		data="data/{sample}_filtered.fastq.gz",
-		index = expand('{star_index_prefix}_{read_length}/SA', star_index_prefix=star_index_prefix, read_length=read_lengths)
+	input:
+		data = "data/{sample}_filtered.fastq.gz",
+		index = lambda wildcards: star_index_prefix + '_' + str(samples.loc[wildcards.sample,'read_length']) + '/SA'
 	output:
 		sam = temp('logs/{sample}.Aligned.out.bam'),
 		log_out = 'logs/{sample}.Log.final.out'
@@ -15,10 +15,10 @@ rule STAR_align:
 		outFilterMismatchNoverLmax = config['STAR_PARAMETERS']['outFilterMismatchNoverLmax'],
 		outFilterMismatchNoverReadLmax = config['STAR_PARAMETERS']['outFilterMismatchNoverReadLmax'],
 		outFilterMatchNmin = config['STAR_PARAMETERS']['outFilterMatchNmin'],
-		index = expand('{star_index_prefix}_{read_length}/', star_index_prefix=star_index_prefix, read_length=read_lengths)
+		read_length = lambda wildcards: int(samples.loc[wildcards.sample,'read_length'])
 	threads: 24
 	shell:"""STAR\
-			--genomeDir {params.index}\
+			--genomeDir {star_index_prefix}_{params.read_length}/\
 			--readFilesCommand zcat\
 			--runThreadN {threads}\
 			--readFilesIn {input.data}\

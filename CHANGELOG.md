@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+
+## [0.31]
+### Changed
+- Fixed error for STAR index generation. It crashed saying it couldn't write in folder.
+- Fixed a missing plot for plot_knee_plot_whitelist
+- Input files for the STAR_align rule have been changed. If adding samples in an already aligned experiment with a different R2 length, it will only align the new data and not realign the old one.
+
+### Added
+- ggpubr in environment.yaml file.
+
 ## [0.3]
 ### Changed
 - Complete overhaul of how the pipeline is organized to follow the structure proposed for snakemake-workflows. This will allow ease of deployement on any platform having conda installed. It will also help to run on clusters.
