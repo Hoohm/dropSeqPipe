@@ -1,6 +1,5 @@
 library(ggplot2)
 library(ggpubr)
-options(warn=-1)
 data = read.table(file = snakemake@input[[1]], header=T, stringsAsFactors=F, skip = 4)
 p = ggplot(data, aes(x=BIN, y = VALUE))
 p = p + geom_bar(stat = 'identity')

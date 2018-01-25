@@ -9,7 +9,7 @@ META:
     annotation_file:
     reference_folder:
 FILTER:
-    IllumiaClip: 
+    IllumiaClip: #NexteraPE-PE.fa | TruSeq2-PE.fa | TruSeq2-SE.fa | TruSeq3-PE-2.fa | TruSeq3-PE.fa | TruSeq3-SE.fa
     5PrimeSmartAdapter:
     Cell_barcode:
         start:

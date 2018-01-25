@@ -1,16 +1,18 @@
 """Filter data"""
 
+ruleorder: trim_single_custom > trim_single
+
 rule fastq_to_sam:
 	"""Create an empty bam file linking cell/UMI barcodes to reads"""
 	input:
-		R1 = 'data/{sample}_R1.fastq.gz',
-		R2 = 'data/{sample}_R2.fastq.gz'
+		R1='data/{sample}_R1.fastq.gz',
+		R2='data/{sample}_R2.fastq.gz'
 	output:
 		temp('data/{sample}_unaligned.bam')
 	params:
-		TMPDIR = config['LOCAL']['TMPDIR'],
-		memory = config['LOCAL']['MEMORY'],
-		picard = "$CONDA_PREFIX/share/picard-2.14.1-0/picard.jar"
+		TMPDIR=config['LOCAL']['TMPDIR'],
+		memory=config['LOCAL']['MEMORY'],
+		picard="$CONDA_PREFIX/share/picard-2.14.1-0/picard.jar"
 	shell:
 		"""java -Djava.io.tmpdir={params.TMPDIR} -Xmx{params.memory} -jar {params.picard} FastqToSam\
 		F1={input[0]}\
@@ -21,16 +23,16 @@ rule BC_tags:
 	input:
 		'data/{sample}_unaligned.bam'
 	output: 
-		bam = temp('data/{sample}_BC_tagged_unmapped.bam'),
-		BC_summary = 'logs/{sample}_CELL_barcode.txt'
+		bam=temp('data/{sample}_BC_tagged_unmapped.bam'),
+		BC_summary='logs/{sample}_CELL_barcode.txt'
 	params:
-		BC_start = config['FILTER']['Cell_barcode']['start'],
-		BC_end = config['FILTER']['Cell_barcode']['end'],
-		BC_min_quality = config['FILTER']['Cell_barcode']['min_quality'],
-		BC_min_quality_num = config['FILTER']['Cell_barcode']['num_below_quality']+1,
+		BC_start=config['FILTER']['Cell_barcode']['start'],
+		BC_end=config['FILTER']['Cell_barcode']['end'],
+		BC_min_quality=config['FILTER']['Cell_barcode']['min_quality'],
+		BC_min_quality_num=config['FILTER']['Cell_barcode']['num_below_quality']+1,
 		DROPSEQ_wrapper=config['LOCAL']['DROPSEQ-wrapper'],
-		memory = config['LOCAL']['MEMORY'],
-		TMPDIR = config['LOCAL']['TMPDIR']
+		memory=config['LOCAL']['MEMORY'],
+		TMPDIR=config['LOCAL']['TMPDIR']
 	shell:
 		"""{params.DROPSEQ_wrapper} -m {params.memory} -t {params.TMPDIR} -p TagBamWithReadSequenceExtended\
 		SUMMARY={output.BC_summary}\
@@ -45,18 +47,19 @@ rule BC_tags:
 		"""
 
 rule UMI_tags:
-	input: 'data/{sample}_BC_tagged_unmapped.bam'
+	input:
+		'data/{sample}_BC_tagged_unmapped.bam'
 	output:
-		bam = temp('data/{sample}_BC_UMI_tagged_unmapped.bam'),
-		UMI_summary = 'logs/{sample}_UMI_barcode.txt'
+		bam=temp('data/{sample}_BC_UMI_tagged_unmapped.bam'),
+		UMI_summary='logs/{sample}_UMI_barcode.txt'
 	params:
-		UMI_start = config['FILTER']['UMI']['start'],
-		UMI_end = config['FILTER']['UMI']['end'],
-		UMI_min_quality = config['FILTER']['UMI']['min_quality'],
-		UMI_min_quality_num = config['FILTER']['UMI']['num_below_quality']+1,
+		UMI_start=config['FILTER']['UMI']['start'],
+		UMI_end=config['FILTER']['UMI']['end'],
+		UMI_min_quality=config['FILTER']['UMI']['min_quality'],
+		UMI_min_quality_num=config['FILTER']['UMI']['num_below_quality']+1,
 		DROPSEQ_wrapper=config['LOCAL']['DROPSEQ-wrapper'],
-		memory = config['LOCAL']['MEMORY'],
-		TMPDIR = config['LOCAL']['TMPDIR']
+		memory=config['LOCAL']['MEMORY'],
+		TMPDIR=config['LOCAL']['TMPDIR']
 	shell:
 		"""{params.DROPSEQ_wrapper} -m {params.memory} -t {params.TMPDIR} -p TagBamWithReadSequenceExtended\
 		SUMMARY={output.UMI_summary}\
@@ -70,13 +73,14 @@ rule UMI_tags:
 		OUTPUT={output.bam}
 		"""
 rule filter_tags:
-	input: 'data/{sample}_BC_UMI_tagged_unmapped.bam'
+	input:
+		'data/{sample}_BC_UMI_tagged_unmapped.bam'
 	output: 
 		temp('data/{sample}_tags_filtered_unmapped.bam')
 	params:
 		DROPSEQ_wrapper=config['LOCAL']['DROPSEQ-wrapper'],
-		memory = config['LOCAL']['MEMORY'],
-		TMPDIR = config['LOCAL']['TMPDIR']
+		memory=config['LOCAL']['MEMORY'],
+		TMPDIR=config['LOCAL']['TMPDIR']
 	shell:
 		"""{params.DROPSEQ_wrapper} -m {params.memory} -t {params.TMPDIR} -p FilterBAM\
 		TAG_REJECT=XQ\
@@ -85,22 +89,25 @@ rule filter_tags:
 		"""
 
 rule count_reads:
-	input: 'data/{sample}_tags_filtered_unmapped.bam'
-	output: 'logs/{sample}_reads_left.txt'
+	input:
+		'data/{sample}_tags_filtered_unmapped.bam'
+	output:
+		'logs/{sample}_reads_left.txt'
 	shell:
 		"""samtools view {input} | wc -l > {output}"""
 
 
 rule start_trim:
-	input: 'data/{sample}_tags_filtered_unmapped.bam'
+	input:
+		'data/{sample}_tags_filtered_unmapped.bam'
 	output:
-		bam = temp('data/{sample}_tags_start_filtered_unmapped.bam'),
-		trim_summary = 'logs/{sample}_start_trim.txt'
+		bam=temp('data/{sample}_tags_start_filtered_unmapped.bam'),
+		trim_summary='logs/{sample}_start_trim.txt'
 	params:
-		SmartAdapter = config['FILTER']['5PrimeSmartAdapter'],
+		SmartAdapter=config['FILTER']['5PrimeSmartAdapter'],
 		DROPSEQ_wrapper=config['LOCAL']['DROPSEQ-wrapper'],
-		memory = config['LOCAL']['MEMORY'],
-		TMPDIR = config['LOCAL']['TMPDIR']
+		memory=config['LOCAL']['MEMORY'],
+		TMPDIR=config['LOCAL']['TMPDIR']
 	shell:
 		"""{params.DROPSEQ_wrapper} -m {params.memory} -t {params.TMPDIR} -p TrimStartingSequence\
 		OUTPUT_SUMMARY={output.trim_summary}\
@@ -111,14 +118,15 @@ rule start_trim:
 		OUTPUT={output.bam}
 		"""
 rule polya_trim:
-	input: 'data/{sample}_tags_start_filtered_unmapped.bam'
+	input:
+		'data/{sample}_tags_start_filtered_unmapped.bam'
 	output:
 		bam ='data/{sample}_trimmed_unmapped.bam',
-		trim_summary = 'logs/{sample}_polyA_trim.txt'
+		trim_summary='logs/{sample}_polyA_trim.txt'
 	params:
 		DROPSEQ_wrapper=config['LOCAL']['DROPSEQ-wrapper'],
-		memory = config['LOCAL']['MEMORY'],
-		TMPDIR = config['LOCAL']['TMPDIR']
+		memory=config['LOCAL']['MEMORY'],
+		TMPDIR=config['LOCAL']['TMPDIR']
 	shell:
 		"""{params.DROPSEQ_wrapper} -m {params.memory} -t {params.TMPDIR} -p PolyATrimmer\
 		OUTPUT_SUMMARY={output.trim_summary}\
@@ -129,12 +137,14 @@ rule polya_trim:
 		"""
 
 rule sam_to_fastq:
-	input: 'data/{sample}_trimmed_unmapped.bam'
-	output: temp('data/{sample}_trimmed_unmapped.fastq.gz')
+	input:
+		'data/{sample}_trimmed_unmapped.bam'
+	output:
+		temp('data/{sample}_trimmed_unmapped.fastq.gz')
 	params:
-		TMPDIR = config['LOCAL']['TMPDIR'],
-		memory = config['LOCAL']['MEMORY'],
-		picard = "$CONDA_PREFIX/share/picard-2.14.1-0/picard.jar"
+		TMPDIR=config['LOCAL']['TMPDIR'],
+		memory=config['LOCAL']['MEMORY'],
+		picard="$CONDA_PREFIX/share/picard-2.14.1-0/picard.jar"
 	shell:
 		"""java -Xmx{params.memory} -jar -Djava.io.tmpdir={params.TMPDIR}	{params.picard} SamToFastq\
 		INPUT={input}\
@@ -142,12 +152,13 @@ rule sam_to_fastq:
 		gzip > {output}"""
 
 rule trim_single:
-	input: 'data/{sample}_trimmed_unmapped.fastq.gz'
+	input:
+		'data/{sample}_trimmed_unmapped.fastq.gz'
 	output:
-		data = 'data/{sample}_filtered.fastq.gz',
-		log = 'logs/{sample}_trimlog.txt'
+		data='data/{sample}_filtered.fastq.gz',
+		log='logs/{sample}_trimlog.txt'
 	params:
-		ILLUMINACLIP = config['FILTER']['IlluminaClip']
+		ILLUMINACLIP=config['FILTER']['IlluminaClip']
 	threads: 2
 	shell:
 		"""trimmomatic\
@@ -159,67 +170,94 @@ rule trim_single:
 		SLIDINGWINDOW:4:20\
 		MINLEN:15 > {output.log} 2>&1"""
 
-rule plot_polyA_trim:
-	input: 'logs/{sample}_polyA_trim.txt'
+rule trim_single_custom:
+	input:
+		data='data/{sample}_trimmed_unmapped.fastq.gz',
+		adapters_fasta='data/custom_adapters.fa'
 	output:
-		pdf = 'plots/{sample}_polya_trimmed.pdf',
-		png = 'plots/png/{sample}_polya_trimmed.png'
+		data='data/{sample}_filtered.fastq.gz',
+		log='logs/{sample}_trimlog.txt'
+	params:
+		ILLUMINACLIP=config['FILTER']['IlluminaClip']
+	threads: 2
+	shell:
+		"""trimmomatic\
+		SE {input.data} {output.data}\
+		-threads {threads}\
+		ILLUMINACLIP:{input.adapters_fasta}:2:30:10\
+		LEADING:3\
+		TRAILING:3\
+		SLIDINGWINDOW:4:20\
+		MINLEN:15 > {output.log} 2>&1"""
+
+
+rule plot_polyA_trim:
+	input:
+		'logs/{sample}_polyA_trim.txt'
+	output:
+		pdf='plots/{sample}_polya_trimmed.pdf',
+		png='plots/png/{sample}_polya_trimmed.png'
 	script:
 		'../scripts/plot_polyA_trim.R'
 
 rule plot_barcode_start_trim:
-	input: 'logs/{sample}_start_trim.txt'
+	input:
+		'logs/{sample}_start_trim.txt'
 	output:
-		pdf = 'plots/{sample}_start_trim.pdf',
-		png = 'plots/png/{sample}_start_trim.png'
+		pdf='plots/{sample}_start_trim.pdf',
+		png='plots/png/{sample}_start_trim.png'
 	script:
 		'../scripts/plot_start_trim.R'
 
 
 rule plot_UMI_filtering:
-	input: 'logs/{sample}_UMI_barcode.txt'
+	input:
+		'logs/{sample}_UMI_barcode.txt'
 	output:
-		pdf = 'plots/{sample}_UMI_dropped.pdf',
-		png = 'plots/png/{sample}_UMI_dropped.png'
+		pdf='plots/{sample}_UMI_dropped.pdf',
+		png='plots/png/{sample}_UMI_dropped.png'
 	params: 
-		min_quality = config['FILTER']['UMI']['min_quality'],
-		num_below_quality = config['FILTER']['UMI']['num_below_quality']
+		min_quality=config['FILTER']['UMI']['min_quality'],
+		num_below_quality=config['FILTER']['UMI']['num_below_quality']
 	script:
 		'../scripts/plot_umi_drop.R'
 
 rule plot_CELL_filtering:
-	input: 'logs/{sample}_CELL_barcode.txt'
+	input:
+		'logs/{sample}_CELL_barcode.txt'
 	output:
-		pdf = 'plots/{sample}_CELL_dropped.pdf',
-		png = 'plots/png/{sample}_CELL_dropped.png'
+		pdf='plots/{sample}_CELL_dropped.pdf',
+		png='plots/png/{sample}_CELL_dropped.png'
 	params:
-		min_quality = config['FILTER']['Cell_barcode']['min_quality'],
-		num_below_quality = config['FILTER']['Cell_barcode']['num_below_quality']
+		min_quality=config['FILTER']['Cell_barcode']['min_quality'],
+		num_below_quality=config['FILTER']['Cell_barcode']['num_below_quality']
 
 	script:
 		'../scripts/plot_cell_drop.R'
 
 rule plot_BC_drop:
 	input:
-		BC_tagged = expand('logs/{sample}_CELL_barcode.txt', sample=samples.index),
-		UMI_tagged = expand('logs/{sample}_UMI_barcode.txt', sample=samples.index),
-		reads_left = expand('logs/{sample}_reads_left.txt', sample=samples.index)
+		BC_tagged=expand('logs/{sample}_CELL_barcode.txt', sample=samples.index),
+		UMI_tagged=expand('logs/{sample}_UMI_barcode.txt', sample=samples.index),
+		reads_left=expand('logs/{sample}_reads_left.txt', sample=samples.index)
 	output:
-		pdf = 'plots/BC_drop.pdf',
-		png = 'plots/png/BC_drop.png'
+		pdf='plots/BC_drop.pdf',
+		png='plots/png/BC_drop.png'
 	params:
-		BC_length = config['FILTER']['Cell_barcode']['end'] - config['FILTER']['Cell_barcode']['start']+1,
-		UMI_length = config['FILTER']['UMI']['end'] - config['FILTER']['UMI']['start']+1,
-		min_num_below_BC = config['FILTER']['Cell_barcode']['num_below_quality'],
-		min_num_below_UMI = config['FILTER']['UMI']['num_below_quality'],
-		min_BC_quality = config['FILTER']['Cell_barcode']['min_quality'],
-		min_UMI_quality = config['FILTER']['UMI']['min_quality'],
-		sample_names = lambda wildcards: samples.index
+		BC_length=config['FILTER']['Cell_barcode']['end'] - config['FILTER']['Cell_barcode']['start']+1,
+		UMI_length=config['FILTER']['UMI']['end'] - config['FILTER']['UMI']['start']+1,
+		min_num_below_BC=config['FILTER']['Cell_barcode']['num_below_quality'],
+		min_num_below_UMI=config['FILTER']['UMI']['num_below_quality'],
+		min_BC_quality=config['FILTER']['Cell_barcode']['min_quality'],
+		min_UMI_quality=config['FILTER']['UMI']['min_quality'],
+		sample_names=lambda wildcards: samples.index
 	script:
 		'../scripts/plot_BC_drop.R'
 
 rule multiqc_trimmomatic:
-	input: expand('logs/{sample}_trimlog.txt', sample=samples.index)
-	output: 'reports/filter.html'
+	input:
+		expand('logs/{sample}_trimlog.txt', sample=samples.index)
+	output:
+		'reports/filter.html'
 	shell:
 		"""multiqc logs/ -m trimmomatic -o reports/ -n filter.html -f"""
