@@ -9,7 +9,7 @@ META:
     annotation_file:
     reference_folder:
 FILTER:
-    IllumiaClip: 
+    IlluminaClip: 
     5PrimeSmartAdapter:
     Cell_barcode:
         start:
