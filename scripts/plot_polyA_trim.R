@@ -7,5 +7,5 @@ p = p + labs(title=paste('Length of polyA trimmed in\n', snakemake@wildcards$sam
 p = p + theme_pubr()
 p = p +  geom_smooth()
 p = p + scale_x_continuous(breaks = seq(0,data$BIN[length(data$BIN)], 10), labels = seq(6,data$BIN[length(data$BIN)]+6, 10))
+p = p + scale_y_continuous(labels = scales::scientific)
 ggsave(plot = p, snakemake@output$pdf, height = 6, width = 8)
-ggsave(plot = p, snakemake@output$png, height = 6, width = 8)

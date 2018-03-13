@@ -1,5 +1,6 @@
 library(ggplot2)
 library(plyr)
+library(stringdist)
 # Create the cumulative plot
 data=read.table(file = snakemake@input[[1]][1], header=FALSE, stringsAsFactors=FALSE)
 barcodes = data$V2
@@ -16,6 +17,8 @@ knee_plot = knee_plot + geom_vline(xintercept=snakemake@params$cells, linetype="
 knee_plot = knee_plot + ggtitle(paste0(snakemake@wildcards$sample, '\nTotal reads: ', prettyNum(total_reads)))
 knee_plot = knee_plot + theme(plot.title = element_text(size=10))
 knee_plot = knee_plot + labs(x='STAMPS', y='Cumulative fraction of reads')
+knee_plot = knee_plot + scale_y_continuous(labels = scales::percent)
+
 if(!is.null(snakemake@input$barcodes))
 {
 	barcodes_whitelist = read.csv(snakemake@input$barcodes, header=FALSE, stringsAsFactors=FALSE)
@@ -23,4 +26,3 @@ if(!is.null(snakemake@input$barcodes))
 	knee_plot = knee_plot + scale_color_manual(values=c('Whitelisted'='green'))
  }
 ggsave(knee_plot, file=snakemake@output$pdf, width = 4, height = 3)
-ggsave(knee_plot, file=snakemake@output$png, width = 4, height = 3)

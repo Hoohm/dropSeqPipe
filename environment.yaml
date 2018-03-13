@@ -1,13 +1,15 @@
+name: dropSeqPipe
 channels:
-  - bioconda
-  - conda-forge
-  - defaults
   - anaconda
+  - conda-forge
+  - bioconda
+
 dependencies:
+  - cairo
   - picard=2.14.1.0
   - graphviz
   - python
-  - snakemake
+  - snakemake=4.7.0
   - r=3.4.1
   - r-ggplot2
   - pytz
@@ -18,3 +20,4 @@ dependencies:
   - multiqc
   - samtools
   - r-ggpubr
+  - readline=6.2

@@ -1,0 +1,6 @@
+channels:
+  - r
+  - conda-forge
+dependencies:
+  - r=3.4.1
+  - readline=6.2

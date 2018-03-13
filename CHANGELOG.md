@@ -8,23 +8,43 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [0.31]
 ### Changed
 - Fixed error for STAR index generation. It crashed saying it couldn't write in folder.
-- Fixed a missing plot for plot_knee_plot_whitelist
+- Fixed a missing plot for plot_knee_plot_whitelist.
 - Input files for the STAR_align rule have been changed. If adding samples in an already aligned experiment with a different R2 length, it will only align the new data and not realign the old one.
+- Split reads and barcodes multiqc reports for qc step.
+- Modified a few rules to follow the guidelines for [snakemake workflows](https://github.com/snakemake-workflows/docs)
+- Fixed an issue where snakemake would crash on clusters if using `expand()` on fixed variables such as `annotation_prefix`. Now using normal python formatting.
+- Changed the config.yaml parameters names to lowercase and hyphens! You will have to either copy the config.yaml from the templates or modify your own accordingly.
+- cell-barcode-edit-distance changed to what it actually is, UMI-edit-distance.
+- Updated all the envs to fix bugs.
 
 ### Added
 - ggpubr in environment.yaml file.
+- Added a `templates` folder which will hold `config.yaml`, `samples.csv`, `cluster.yaml` as well as `custom_adapters.fa`. This will also help cloning the repository without overwritting your own config.yaml file when updating the pipeline.
+- Added the possibility of using your own adapters fasta file for trimmomatic. To use it, please refer to the [WIKI](https://github.com/Hoohm/dropSeqPipe/wiki/Create-config-files#filter)
+- Added fastqc, multiqc, STAR wrappers. You have now to use the `--use-conda` option to run the pipeline.
+- Added cluster recommendations on the wiki.
+- Localrules. This allows to run low ressource rules on the host computer instead of nodes when using clusters.
+- genomeChrBinNbits will be claculated automacially for STAR.
+- Exposed all variables for trimmomatic in config.yaml under trimming.
+
+### Removed
+- png plots have been removed. It was causing some issues on clusters with cairo. Usability is more important than png plots to me.
+
 
 ## [0.3]
 ### Changed
 - Complete overhaul of how the pipeline is organized to follow the structure proposed for snakemake-workflows. This will allow ease of deployement on any platform having conda installed. It will also help to run on clusters.
 - The way to call the pipeline is now simplified. Changes are shown in the [WIKI](https://github.com/Hoohm/dropSeqPipe/wiki/)
-- Dependency to Drop-seq-tools to version 1.13 from 1.12
+- Dependency to Drop-seq-tools updated from version 1.12 to 1.13
 - Full compatibility with barcode whitelist. Makes it easier to use for SCRBseq protocols or whitelist from other source (UMI-tools).
 - Modified cell and UMI drop plots in order to reflect the option chosen. See [plots](https://github.com/Hoohm/dropSeqPipe/wiki/Plots)
 
 ### Removed
 - Bulk sequencing compatiblity.
 - Fastqc and STAR logs plots are removed and replaced by multiqc.
+- Automatic determination of STAMPS via knee_plot. Please use an estimated number of cells as the main threshold and filter in downstream analysis for other parameters such as high number of mitochondrial genes.
+- `MinCellFraction` entry in config.yaml. This parameter wasn't adding much value and was confusing.
+- Base frequency plot has been removed. This will come back with autodetermination of the STAMPS.
 
 ### Added
 - Wrapper for Drop-seq tools. Makes it easier to switch temp folder and choose maximum memory heap.

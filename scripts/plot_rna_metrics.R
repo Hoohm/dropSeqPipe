@@ -20,6 +20,7 @@ p1 = p1 + labs(title=paste('Top',snakemake@params$cells, 'barcodes for', snakema
   
 }
 p1 = p1 + theme(axis.title.x=element_blank(),axis.text.x=element_blank(),axis.ticks.x=element_blank()) 
+p1 = p1 + scale_y_continuous(labels = scales::scientific)
 
 data_long_pct = melt(data_pct, id.var = "READ_GROUP")
 data_long_pct$READ_GROUP <- factor(data_long_pct$READ_GROUP, levels = my_sequences)
@@ -32,11 +33,6 @@ p2 = p2 + scale_y_continuous(labels = scales::percent)
 gp1 <- ggplotGrob(p1)
 gp2 <- ggplotGrob(p2)
 pdf(file = snakemake@output$pdf, width = 16, height = 13)
-grid::grid.newpage()
-grid::grid.draw(rbind(gp1, gp2, size = "last"))
-dev.off()
-
-png(file = snakemake@output$png,units='in', res=300, width = 16, height = 13)
 grid::grid.newpage()
 grid::grid.draw(rbind(gp1, gp2, size = "last"))
 dev.off()

@@ -1,18 +1,21 @@
 """Extract expression fof mixed species"""
 
+#Which rules will be run on the host computer and not sent to nodes
+localrules: plot_rna_metrics_species, merge_umi_species, merge_counts_species
+
 rule extract_umi_expression_species:
 	input:
-		data='data/{sample}_{species}_unfiltered.bam',
-		barcode_whitelist='summary/{sample}_{species}_barcodes.csv'
+		data='data/{species}/{sample}_unfiltered.bam',
+		barcode_whitelist='summary/{species}/{sample}_barcodes.csv'
 	output:
-		'summary/{sample}_{species}_umi_expression_matrix.txt'
+		'summary/{species}/{sample}_umi_expression_matrix.txt'
 	params:
-		count_per_umi=config['EXTRACTION']['min_count_per_umi'],
-		DROPSEQ_wrapper=config['LOCAL']['DROPSEQ-wrapper'],
-		memory=config['LOCAL']['MEMORY'],
-		TMPDIR=config['LOCAL']['TMPDIR']
+		count_per_umi=config['EXTRACTION']['minimum-counts-per-UMI'],
+		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
+		memory=config['LOCAL']['memory'],
+		temp_directory=config['LOCAL']['temp-directory']
 	shell:
-		"""{params.DROPSEQ_wrapper} -t {params.TMPDIR} -m {params.memory} -p DigitalExpression\
+		"""{params.dropseq_wrapper} -t {params.temp_directory} -m {params.memory} -p DigitalExpression\
 		I={input.data}\
 		O={output}\
 		MIN_BC_READ_THRESHOLD={params.count_per_umi}\
@@ -20,16 +23,16 @@ rule extract_umi_expression_species:
 
 rule extract_reads_expression_species:
 	input:
-		data='data/{sample}_{species}_unfiltered.bam',
-		barcode_whitelist='summary/{sample}_{species}_barcodes.csv'
+		data='data/{species}/{sample}_unfiltered.bam',
+		barcode_whitelist='summary/{species}/{sample}_barcodes.csv'
 	params:
-		DROPSEQ_wrapper=config['LOCAL']['DROPSEQ-wrapper'],
-		memory=config['LOCAL']['MEMORY'],
-		TMPDIR=config['LOCAL']['TMPDIR']
+		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
+		memory=config['LOCAL']['memory'],
+		temp_directory=config['LOCAL']['temp-directory']
 	output:
-		'summary/{sample}_{species}_counts_expression_matrix.txt'
+		'summary/{species}/{sample}_counts_expression_matrix.txt'
 	shell:
-		"""{params.DROPSEQ_wrapper} -t {params.TMPDIR} -m {params.memory} -p DigitalExpression\
+		"""{params.dropseq_wrapper} -t {params.temp_directory} -m {params.memory} -p DigitalExpression\
 		I={input.data}\
 		O={output}\
 		CELL_BC_FILE={input.barcode_whitelist}\
@@ -38,68 +41,70 @@ rule extract_reads_expression_species:
 
 rule extract_umi_per_gene_species:
 	input:
-		data='data/{sample}_{species}_unfiltered.bam',
-		barcode_whitelist='summary/{sample}_{species}_barcodes.csv'
+		data='data/{species}/{sample}_unfiltered.bam',
+		barcode_whitelist='summary/{species}/{sample}_barcodes.csv'
 	params:	
-		DROPSEQ_wrapper=config['LOCAL']['DROPSEQ-wrapper'],
-		memory=config['LOCAL']['MEMORY'],
-		TMPDIR=config['LOCAL']['TMPDIR']
+		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
+		memory=config['LOCAL']['memory'],
+		temp_directory=config['LOCAL']['temp-directory']
 	output:
-		'logs/{sample}_{species}_umi_per_gene.tsv'
+		'logs/{species}/{sample}_umi_per_gene.tsv'
 	shell:
-		"""{params.DROPSEQ_wrapper} -t {params.TMPDIR} -m {params.memory} -p GatherMolecularBarcodeDistributionByGene\
+		"""{params.dropseq_wrapper} -t {params.temp_directory} -m {params.memory} -p GatherMolecularBarcodeDistributionByGene\
 		I={input.data}\
 		O={output}\
 		CELL_BC_FILE={input.barcode_whitelist}"""
 
 rule SingleCellRnaSeqMetricsCollector_whitelist_species:
 	input:
-		sample='data/{sample}_{species}_unfiltered.bam',
-		barcode_whitelist='summary/{sample}_{species}_barcodes.csv'
+		data='data/{species}/{sample}_unfiltered.bam',
+		barcode_whitelist='summary/{species}/{sample}_barcodes.csv',
+		refFlat='{}.refFlat'.format(annotation_prefix),
+		rRNA_intervals='{}.rRNA.intervals'.format(reference_prefix)
 	params:
 		cells=lambda wildcards: samples.loc[wildcards.sample,'expected_cells'],
-		refFlat=expand('{annotation_prefix}.refFlat', annotation_prefix=annotation_prefix),
-		rRNA_intervals=expand('{reference_prefix}.rRNA.intervals', reference_prefix=reference_prefix),
-		DROPSEQ_wrapper=config['LOCAL']['DROPSEQ-wrapper'],
-		memory=config['LOCAL']['MEMORY'],
-		TMPDIR=config['LOCAL']['TMPDIR']
+		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
+		memory=config['LOCAL']['memory'],
+		temp_directory=config['LOCAL']['temp-directory']
 	output:
-		'logs/{sample}_{species}_rna_metrics.txt'
+		'logs/{species}/{sample}_rna_metrics.txt'
 	shell:
-		"""{params.DROPSEQ_wrapper} -t {params.TMPDIR} -m {params.memory} -p SingleCellRnaSeqMetricsCollector\
-		INPUT={input.sample}\
+		"""{params.dropseq_wrapper} -t {params.temp_directory} -m {params.memory} -p SingleCellRnaSeqMetricsCollector\
+		INPUT={input.data}\
 		OUTPUT={output}\
-		ANNOTATIONS_FILE={params.refFlat}\
+		ANNOTATIONS_FILE={input.refFlat}\
 		CELL_BC_FILE={input.barcode_whitelist}\
-		RIBOSOMAL_INTERVALS={params.rRNA_intervals}
+		RIBOSOMAL_INTERVALS={input.rRNA_intervals}
 		"""
 rule plot_rna_metrics_species:
 	input:
-		rna_metrics='logs/{sample}_{species}_rna_metrics.txt',
-		barcode='summary/{sample}_{species}_barcodes.csv'
+		rna_metrics='logs/{species}/{sample}_rna_metrics.txt',
+		barcode='summary/{species}/{sample}_barcodes.csv'
+	conda: '../envs/plots.yaml'
 	output:
-		pdf='plots/species_{sample}_{species}_rna_metrics.pdf',
-		png='plots/png/species_{sample}_{species}_rna_metrics.png'
+		pdf='plots/{species}/{sample}_rna_metrics.pdf'
 	script:
 		'../scripts/plot_rna_metrics.R'
 
 
 rule merge_umi_species:
 	input:
-		expand('summary/{sample}_{{species}}_umi_expression_matrix.txt', sample=samples.index)
-	params:
-		sample_names=lambda wildcards: samples.index
+		expand('summary/{{species}}/{sample}_umi_expression_matrix.txt', sample=samples.index)
+	conda: '../envs/merge.yaml'
 	output:
 		'summary/Experiment_{species}_umi_expression_matrix.tsv'
+	params:
+		sample_names=lambda wildcards: samples.index
 	script:
 		"../scripts/merge_counts.R"
 
 rule merge_counts_species:
 	input:
-		expand('summary/{sample}_{{species}}_counts_expression_matrix.txt', sample=samples.index)
-	params:
-		sample_names=lambda wildcards: samples.index
+		expand('summary/{{species}}/{sample}_counts_expression_matrix.txt', sample=samples.index)
+	conda: '../envs/merge.yaml'
 	output:
 		'summary/Experiment_{species}_counts_expression_matrix.tsv'
+	params:
+		sample_names=lambda wildcards: samples.index
 	script:
 		"../scripts/merge_counts.R"

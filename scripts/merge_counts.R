@@ -1,6 +1,6 @@
 samples = snakemake@params$sample_names
 read_list = c()
-for (i in 1:length(samples)){
+for (i in 1:length(snakemake@input)){
   temp_matrix = read.table(snakemake@input[[i]][1], header=T, stringsAsFactors = F)
   old_names = colnames(temp_matrix)[-1]
   colnames(temp_matrix) = c("GENE",paste(samples[i], old_names, sep = "_"))

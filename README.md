@@ -27,7 +27,7 @@ Version 0.3 is out. The python package got changed to a snakemake-workflow. Main
 
 
 
-Installation
+installation
 ------------
 
 The installation process can be found in the [Installation](https://github.com/Hoohm/dropSeqPipe/wiki/Installation) section of the wiki.
@@ -41,6 +41,7 @@ I'm actively seeking help to implement the points listed bellow. Don't hesitate 
 * Conda package for drop-seq-tools
 * Multithreading for java tasks
 * RData object of all the summary data and plots so that you can create your own report.
+* Implement an elegant "preview" mode where the pipeline would only run on a couple of millions of reads and allow you to have an approximated view before running all of the data.
 
 I hope it can help you out in your drop-seq experiment!
 

@@ -2,19 +2,21 @@
 
 ruleorder: extract_all_umi_expression_whitelist_species > extract_all_umi_expression_species
 
+#Which rules will be run on the host computer and not sent to nodes
+localrules: plot_barnyard
 
 rule split_bam_species:
 	input:
 		'data/{sample}_final.bam'
 	output:
-		'data/{sample}_{species}_unfiltered.bam'
+		'data/{species}/{sample}_unfiltered.bam'
 	params:
 		species=lambda wildcards: wildcards.species,
-		DROPSEQ_wrapper=config['LOCAL']['DROPSEQ-wrapper'],
-		memory=config['LOCAL']['MEMORY'],
-		TMPDIR=config['LOCAL']['TMPDIR']
+		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
+		memory=config['LOCAL']['memory'],
+		temp_directory=config['LOCAL']['temp-directory']
 	shell:
-		"""{params.DROPSEQ_wrapper} -t {params.TMPDIR} -m {params.memory} -p FilterBAM\
+		"""{params.dropseq_wrapper} -t {params.temp_directory} -m {params.memory} -p FilterBAM\
 		REF_SOFT_MATCHED_RETAINED={params.species}\
 		INPUT={input}\
 		OUTPUT={output}"""
@@ -22,59 +24,57 @@ rule split_bam_species:
 
 rule extract_all_umi_expression_species:
 	input:
-		'data/{sample}_{species}_unfiltered.bam'
+		'data/{species}/{sample}_unfiltered.bam'
 	output:
-		umi_matrix=temp('summary/{sample}_{species}_unfiltered_umi_expression_matrix.tsv'),
-		summary='summary/{sample}_{species}_dge.summary.txt'
+		umi_matrix=temp('summary/{species}/{sample}_unfiltered_umi_expression_matrix.tsv'),
+		summary='summary/{species}/{sample}_dge.summary.txt'
 
 	params:
-		count_per_umi=config['EXTRACTION']['min_count_per_umi'],
+		count_per_umi=config['EXTRACTION']['minimum-counts-per-UMI'],
 		num_cells=lambda wildcards: samples.loc[wildcards.sample,'expected_cells'],
-		bc_edit_distance=config['EXTRACTION']['bc_edit_distance'],
-		DROPSEQ_wrapper=config['LOCAL']['DROPSEQ-wrapper'],
-		memory=config['LOCAL']['MEMORY'],
-		TMPDIR=config['LOCAL']['TMPDIR']
+		cellBarcodeEditDistance=config['EXTRACTION']['cell-barcode-edit-distance'],
+		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
+		memory=config['LOCAL']['memory'],
+		temp_directory=config['LOCAL']['temp-directory']
 	shell:
-		"""{params.DROPSEQ_wrapper} -t {params.TMPDIR} -m {params.memory} -p DigitalExpression\
+		"""{params.dropseq_wrapper} -t {params.temp_directory} -m {params.memory} -p DigitalExpression\
 		I={input}\
 		O={output.umi_matrix}\
 		SUMMARY={output.summary}\
-		EDIT_DISTANCE={params.bc_edit_distance}\
+		EDIT_DISTANCE={params.cellBarcodeEditDistance}\
 		NUM_CORE_BARCODES={params.num_cells}\
 		MIN_BC_READ_THRESHOLD={params.count_per_umi}"""
 
 rule extract_all_umi_expression_whitelist_species:
 	input: 
-		sample='data/{sample}_{species}_unfiltered.bam',
+		data='data/{species}/{sample}_unfiltered.bam',
 		barcode_whitelist='barcodes.csv'
 	output:
-		umi_matrix=temp('summary/{sample}_{species}_unfiltered_umi_expression_matrix.tsv'),
-		summary='summary/{sample}_{species}_dge.summary.txt'
+		umi_matrix=temp('summary/{species}/{sample}_unfiltered_umi_expression_matrix.tsv'),
+		summary='summary/{species}/{sample}_dge.summary.txt'
 	params:
-		count_per_umi=config['EXTRACTION']['min_count_per_umi'],
-		bc_edit_distance=config['EXTRACTION']['bc_edit_distance'],
-		DROPSEQ_wrapper=config['LOCAL']['DROPSEQ-wrapper'],
-		memory=config['LOCAL']['MEMORY'],
-		TMPDIR=config['LOCAL']['TMPDIR']
+		count_per_umi=config['EXTRACTION']['minimum-counts-per-UMI'],
+		cellBarcodeEditDistance=config['EXTRACTION']['cell-barcode-edit-distance'],
+		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
+		memory=config['LOCAL']['memory'],
+		temp_directory=config['LOCAL']['temp-directory']
 	shell:
-		"""{params.DROPSEQ_wrapper} -t {params.TMPDIR} -m {params.memory} -p DigitalExpression\
-		I={input.sample}\
+		"""{params.dropseq_wrapper} -t {params.temp_directory} -m {params.memory} -p DigitalExpression\
+		I={input.data}\
 		O={output.umi_matrix}\
 		SUMMARY={output.summary}\
-		EDIT_DISTANCE={params.bc_edit_distance}\
+		EDIT_DISTANCE={params.cellBarcodeEditDistance}\
 		CELL_BC_FILE={input.barcode_whitelist}\
 		MIN_BC_READ_THRESHOLD={params.count_per_umi}"""
 
 
 rule plot_barnyard:
 	input:
-		expand('summary/{{sample}}_{species}_dge.summary.txt',species=config['META']['species'])
+		expand('summary/{species}/{{sample}}_dge.summary.txt',species=config['META']['species'])
 	output: 
-		barcodes_species=expand('summary/{{sample}}_{species}_barcodes.csv', species=config['META']['species']),
+		barcodes_species=expand('summary/{species}/{{sample}}_barcodes.csv', species=config['META']['species']),
 		genes_pdf='plots/{sample}_species_plot_genes.pdf',
-		genes_png='plots/png/{sample}_species_plot_genes.png',
-		transcripts_pdf='plots/{sample}_species_plot_transcripts.pdf',
-		transcripts_png='plots/png/{sample}_species_plot_transcripts.png'
+		transcripts_pdf='plots/{sample}_species_plot_transcripts.pdf'
 	params:
 		expected_cells=lambda wildcards: int(samples.loc[wildcards.sample,'expected_cells'])
 	script: 
