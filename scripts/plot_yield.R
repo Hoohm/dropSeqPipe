@@ -7,7 +7,7 @@ library(viridis)
 samples = snakemake@params$sample_names
 batches = snakemake@params$batches
 data = data.frame(matrix(nrow=length(samples), ncol=10))
-colnames(data) = c('Sample','Batch','BC_dropped','UMI_dropped','BC_and_UMI_dropped','Trimmomatic_filtered','Unmapped','Uniquely_mapped','Multi_mapped','Total_reads')
+colnames(data) = c('Sample','Batch','BC_dropped','UMI_dropped','BC_and_UMI_dropped','Trimmomatic_filtered','Unmapped','Multi_mapped','Uniquely_mapped','Total_reads')
 data[,'Sample'] = samples
 data[,'Batch'] = batches
 for(i in 1:length(samples)){
@@ -39,8 +39,6 @@ for(i in 1:length(samples)){
   #Since we don't know how much of cell and UMI barcodes intersect in terms of tagging, we assume linear proportions and substract them.
   num_reads_BC_dropped = num_reads_BC_tagged - intersection
   num_reads_UMI_dropped = num_reads_UMI_tagged - intersection
-  #num_reads_BC_dropped = round(num_reads_BC_tagged - (intersection/total_tags_filtered)*num_reads_BC_tagged)
-  #num_reads_UMI_dropped = total_tags_filtered - num_reads_BC_dropped
 
   data[i,'BC_and_UMI_dropped'] = intersection
   data[i,'BC_dropped'] = num_reads_BC_dropped
@@ -72,8 +70,8 @@ p2 = ggplot(subset(data_long, data_long$variable != 'Total_reads'), aes(x=Sample
                                                                                       'Cell and UMI filtered',
                                                                                       'Trimmomatic filtered',
                                                                                       'Unmapped',
-                                                                                      'Uniquely mapped',
-                                                                                      'Multiply mapped')))) + labs(fill = "Filters")
+                                                                                      'Multiply mapped',
+                                                                                      'Uniquely mapped')))) + labs(fill = "Filters")
 p2 = p2 + geom_histogram(stat = 'identity', binwidth = 1/length(samples))
 p2 = p2 + theme(axis.text.x=element_text(angle = 90, hjust = 0))
 p2 = p2 + labs(x='Samples', y='Percentage of reads')

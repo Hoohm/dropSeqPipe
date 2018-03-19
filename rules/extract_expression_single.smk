@@ -18,7 +18,7 @@ rule extract_umi_expression:
 		summary='summary/{sample}_dge.summary.txt',
 		count_per_umi=config['EXTRACTION']['minimum-counts-per-UMI'],
 		num_cells=lambda wildcards: samples.loc[wildcards.sample,'expected_cells'],
-		cellBarcodeEditDistance=config['EXTRACTION']['cell-barcode-edit-distance'],
+		cellBarcodeEditDistance=config['EXTRACTION']['UMI-edit-distance'],
 		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
 		temp_directory=config['LOCAL']['temp-directory'],
 		memory=config['LOCAL']['memory']
@@ -41,7 +41,7 @@ rule extract_umi_expression_whitelist:
 	params:
 		summary='summary/{sample}_dge.summary.txt',
 		count_per_umi=config['EXTRACTION']['minimum-counts-per-UMI'],
-		cellBarcodeEditDistance=config['EXTRACTION']['cell-barcode-edit-distance'],
+		cellBarcodeEditDistance=config['EXTRACTION']['UMI-edit-distance'],
 		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
 		temp_directory=config['LOCAL']['temp-directory'],
 		memory=config['LOCAL']['memory']
@@ -63,7 +63,7 @@ rule extract_reads_expression_whitelist:
 	params:
 		summary='summary/{sample}_dge.summary.txt',
 		count_per_umi=config['EXTRACTION']['minimum-counts-per-UMI'],
-		cellBarcodeEditDistance=config['EXTRACTION']['cell-barcode-edit-distance'],
+		cellBarcodeEditDistance=config['EXTRACTION']['UMI-edit-distance'],
 		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
 		temp_directory=config['LOCAL']['temp-directory'],
 		memory=config['LOCAL']['memory']		
@@ -85,7 +85,7 @@ rule extract_reads_expression:
 	params:
 		count_per_umi=config['EXTRACTION']['minimum-counts-per-UMI'],
 		num_cells=lambda wildcards: samples.loc[wildcards.sample,'expected_cells'],
-		cellBarcodeEditDistance=config['EXTRACTION']['cell-barcode-edit-distance'],
+		cellBarcodeEditDistance=config['EXTRACTION']['UMI-edit-distance'],
 		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
 		temp_directory=config['LOCAL']['temp-directory'],
 		memory=config['LOCAL']['memory']		
@@ -106,7 +106,7 @@ rule extract_umi_per_gene:
 		'logs/{sample}_umi_per_gene.tsv'
 	params:
 		num_cells=lambda wildcards: samples.loc[wildcards.sample,'expected_cells'],
-		cellBarcodeEditDistance=config['EXTRACTION']['cell-barcode-edit-distance'],
+		cellBarcodeEditDistance=config['EXTRACTION']['UMI-edit-distance'],
 		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
 		temp_directory=config['LOCAL']['temp-directory'],
 		memory=config['LOCAL']['memory']		
@@ -124,7 +124,7 @@ rule extract_umi_per_gene_whitelist:
 	output:
 		'logs/{sample}_umi_per_gene.tsv'
 	params:
-		cellBarcodeEditDistance=config['EXTRACTION']['cell-barcode-edit-distance'],
+		cellBarcodeEditDistance=config['EXTRACTION']['UMI-edit-distance'],
 		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
 		temp_directory=config['LOCAL']['temp-directory'],
 		memory=config['LOCAL']['memory']

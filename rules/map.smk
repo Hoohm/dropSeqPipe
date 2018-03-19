@@ -23,12 +23,12 @@ rule STAR_align:
 			 	--outFilterMatchNmin {}\
 			 	--outFilterScoreMinOverLread {}\
 			 	--outFilterMatchNminOverLread {}""".format(
-				config['STAR_PARAMETERS']['out-filter-mismatch-nmax'],
-				config['STAR_PARAMETERS']['out-filter-mismatch-nover-lmax'],
-				config['STAR_PARAMETERS']['out-filter-mismatch-nover-read-lmax'],
-				config['STAR_PARAMETERS']['out-filter-match-nmin'],
-				config['STAR_PARAMETERS']['out-filter-score-min-over-lread'],
-				config['STAR_PARAMETERS']['out-filter-match-nmin-over-lread'],),
+				config['MAPPING']['STAR']['outFilterMismatchNmax'],
+				config['MAPPING']['STAR']['outFilterMismatchNoverLmax'],
+				config['MAPPING']['STAR']['outFilterMismatchNoverReadLmax'],
+				config['MAPPING']['STAR']['outFilterMatchNmin'],
+				config['MAPPING']['STAR']['outFilterMatchNminOverLread'],
+				config['MAPPING']['STAR']['outFilterScoreMinOverLread'],),
 		index=lambda wildcards: star_index_prefix + '_' + str(samples.loc[wildcards.sample,'read_length']) + '/'	
 	threads: 24
 	wrapper:
@@ -167,7 +167,7 @@ rule plot_knee_plot:
 		'logs/{sample}_hist_out_cell.txt'
 	params: 
 		cells=lambda wildcards: samples.loc[wildcards.sample,'expected_cells'],
-		edit_distance=config['EXTRACTION']['cell-barcode-edit-distance']
+		edit_distance=config['EXTRACTION']['UMI-edit-distance']
 	conda: '../envs/plots.yaml'
 	output:
 		pdf='plots/{sample}_knee_plot.pdf'

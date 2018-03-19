@@ -167,17 +167,17 @@ rule trim_single:
 		'logs/{sample}_trimlog.txt'
 	params:
 		trimmer=['LEADING:{} TRAILING:{} SLIDINGWINDOW:{}:{} MINLEN:{} ILLUMINACLIP:{}:{}:{}:{}'.format(
-			config['FILTER']['trimming']['leading'],
-			config['FILTER']['trimming']['trailing'],
-			config['FILTER']['trimming']['sliding-window']['size'],
-			config['FILTER']['trimming']['sliding-window']['average-quality'],
-			config['FILTER']['trimming']['min-len'],
-			config['FILTER']['trimming']['adapters-file'],
-			config['FILTER']['trimming']['illumina-clip']['seed-mismatches'],
-			config['FILTER']['trimming']['illumina-clip']['palindrome-clip-threshold'],
-			config['FILTER']['trimming']['illumina-clip']['simple-clip-threshold'])],
-		extra='-threads 2'
-	threads: 2
+			config['FILTER']['trimmomatic']['LEADING'],
+			config['FILTER']['trimmomatic']['TRAILING'],
+			config['FILTER']['trimmomatic']['SLIDINGWINDOW']['windowSize'],
+			config['FILTER']['trimmomatic']['SLIDINGWINDOW']['requiredQuality'],
+			config['FILTER']['trimmomatic']['MINLEN'],
+			config['FILTER']['trimmomatic']['adapters-file'],
+			config['FILTER']['trimmomatic']['ILLUMINACLIP']['seedMismatches'],
+			config['FILTER']['trimmomatic']['ILLUMINACLIP']['palindromeClipThreshold'],
+			config['FILTER']['trimmomatic']['ILLUMINACLIP']['simpleClipThreshold'])],
+		extra='-threads 10'
+	threads: 10
 	wrapper:
 		'0.21.0/bio/trimmomatic/se'
 

@@ -32,7 +32,7 @@ rule extract_all_umi_expression_species:
 	params:
 		count_per_umi=config['EXTRACTION']['minimum-counts-per-UMI'],
 		num_cells=lambda wildcards: samples.loc[wildcards.sample,'expected_cells'],
-		cellBarcodeEditDistance=config['EXTRACTION']['cell-barcode-edit-distance'],
+		cellBarcodeEditDistance=config['EXTRACTION']['UMI-edit-distance'],
 		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
 		memory=config['LOCAL']['memory'],
 		temp_directory=config['LOCAL']['temp-directory']
@@ -54,7 +54,7 @@ rule extract_all_umi_expression_whitelist_species:
 		summary='summary/{species}/{sample}_dge.summary.txt'
 	params:
 		count_per_umi=config['EXTRACTION']['minimum-counts-per-UMI'],
-		cellBarcodeEditDistance=config['EXTRACTION']['cell-barcode-edit-distance'],
+		cellBarcodeEditDistance=config['EXTRACTION']['UMI-edit-distance'],
 		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
 		memory=config['LOCAL']['memory'],
 		temp_directory=config['LOCAL']['temp-directory']

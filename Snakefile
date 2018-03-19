@@ -1,13 +1,20 @@
 import pandas as pd
 import os
 
+# Load configuration file
 configfile: "config.yaml"
+
+# Get sample names from samples.csv
 samples = pd.read_table("samples.csv", header=0, sep=',', index_col=0)
 
+# Get read_lengths from samples.csv
+read_lengths = list(samples.loc[:,'read_length'])
+
+# Constraint sample names wildcards
 wildcard_constraints:
     sample="({})".format("|".join(samples.index))
 
-
+# Create reference files prefixes
 reference_prefix = os.path.join(config['META']['reference-directory'], config['META']['reference-file'].split('.fasta')[0])
 annotation_prefix = os.path.join(config['META']['reference-directory'],config['META']['annotation-file'].split('.gtf')[0])
 reference_file = os.path.join(config['META']['reference-directory'], config['META']['reference-file'])
@@ -15,10 +22,9 @@ annotation_file = os.path.join(config['META']['reference-directory'], config['ME
 annotation_reduced_file = os.path.join(config['META']['reference-directory'],'.'.join([config['META']['annotation-file'].split('.gtf')[0],'reduced','gtf']))
 star_index_prefix = os.path.join(config['META']['reference-directory'],'STAR_INDEX/SA')
 
-
+# Get barcode length
 starttrim_length = config['FILTER']['cell-barcode']['end'] - config['FILTER']['cell-barcode']['start'] + 1
 
-read_lengths = list(samples.loc[:,'read_length'])
 
 
 rule all:
@@ -53,8 +59,7 @@ rule all:
         expand('logs/{sample}_umi_per_gene.tsv', sample=samples.index),
         expand('plots/{sample}_rna_metrics.pdf', sample=samples.index),
         'summary/umi_expression_matrix.tsv',
-        'summary/counts_expression_matrix.tsv',
-        'reports/combined.html'
+        'summary/counts_expression_matrix.tsv'
         
 rule meta:
     input:
@@ -116,14 +121,6 @@ rule extract_species:
         expand('plots/{species}/{sample}_rna_metrics.pdf', sample=samples.index, species=config['META']['species'])
         
 
-rule multiqc_all:
-    input: 
-        fastqc = expand('logs/{sample}_R1_fastqc.html',sample=samples.index),
-        trimmomatic=expand('logs/{sample}_trimlog.txt',sample=samples.index),
-        star=expand('data/{sample}/Log.final.out',sample=samples.index)
-    output: 'reports/combined.html'
-    shell:
-        """multiqc logs/ -m fastqc -m trimmomatic -m star -o reports/ -n combined.html -f"""
 
 include: "rules/generate_meta.smk"
 include: "rules/fastqc.smk"
