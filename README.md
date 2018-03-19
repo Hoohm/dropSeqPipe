@@ -19,9 +19,31 @@ This package is trying to be as user friendly as possible. One of the hopes is t
 Latest changes
 -----------------
 
-Version 0.31
+## [0.31]
+### Changed
+- Fixed error for STAR index generation. It crashed saying it couldn't write in folder.
+- Fixed a missing plot for plot_knee_plot_whitelist.
+- Input files for the STAR_align rule have been changed. Adding samples in an already aligned experiment with a different R2 length, will only align the new data and not realign the old one.
+- Split reads and barcodes multiqc reports for qc step.
+- Modified a few rules to follow the guidelines for [snakemake workflows](https://github.com/snakemake-workflows/docs)
+- Fixed an issue where snakemake would crash on clusters if using `expand()` on fixed variables such as `annotation_prefix`. Now using normal python formatting.
+- Changed the config.yaml parameters names to lowercase and hyphens! Software specific variables have their original style making it easier to search in manuals. You will have to either copy the new config.yaml from the templates or modify your own accordingly.
+- cell-barcode-edit-distance changed to what it actually is, UMI-edit-distance.
+- Updated all the envs to fix bugs.
+- Fixed a bug where the mixed species would not run properly.
 
+### Added
+- Added ggpubr in environment.yaml file.
+- Added a `templates` folder which will hold `config.yaml`, `samples.csv`, `cluster.yaml` as well as adapters files. This will also help cloning the repository without overwritting your own config.yaml file when updating the pipeline.
+- Added the possibility of using your own adapters fasta file for trimmomatic. To use it, please refer to the [WIKI](https://github.com/Hoohm/dropSeqPipe/wiki/Create-config-files#filter)
+- Added fastqc, multiqc, STAR wrappers. You have now to use the `--use-conda` option to run the pipeline.
+- Added cluster recommendations on the wiki.
+- Added Localrules for certain rules. This allows to run low ressource rules on the host computer instead of nodes when using clusters.
+- genomeChrBinNbits will be calculated automacially for STAR.
+- Exposed all variables for trimmomatic in config.yaml under trimming.
 
+### Removed
+- png plots have been removed. It was causing some issues on clusters with cairo. Usability is more important than png plots to me.
 
 
 installation
