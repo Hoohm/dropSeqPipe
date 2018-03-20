@@ -1,0 +1,47 @@
+LOCAL:
+    temp-directory:
+    dropseq-wrapper:
+    memory: 4g
+META:
+    species:
+        - SPECIES_ONE
+        - SPECIES_TWO
+    ratio: 0.2
+    reference-file:
+    annotation-file:
+    reference-directory:
+FILTER:
+    5-prime-smart-adapter:
+    cell-barcode:
+        start:
+        end:
+        min-quality:
+        num-below-quality:
+    UMI-barcode:
+        start:
+        end:
+        min-quality:
+        num-below-quality:
+    trimmomatic:
+        adapters-file: 
+        LEADING: 3
+        TRAILING: 3
+        SLIDINGWINDOW:
+            windowSize: 4
+            requiredQuality: 20
+        MINLEN: 20
+        ILLUMINACLIP:
+            seedMismatches: 2
+            palindromeClipThreshold: 30
+            simpleClipThreshold: 10
+MAPPING:
+    STAR:
+        outFilterMismatchNmax: 10
+        outFilterMismatchNoverLmax: 0.3
+        outFilterMismatchNoverReadLmax: 1
+        outFilterMatchNmin: 0
+        outFilterMatchNminOverLread: 0.66
+        outFilterScoreMinOverLread: 0.66
+EXTRACTION:
+    UMI-edit-distance:
+    minimum-counts-per-UMI:
