@@ -1,23 +1,9 @@
 name: dropSeqPipe
 channels:
-  - anaconda
-  - conda-forge
   - bioconda
+  - r
 
 dependencies:
-  - cairo
-  - picard=2.14.1.0
-  - graphviz
   - python
-  - snakemake=4.7.0
-  - r=3.4.1
-  - r-ggplot2
-  - pytz
-  - pandas
-  - trimmomatic
-  - STAR
-  - fastqc
-  - multiqc
-  - samtools
-  - r-ggpubr
-  - readline=6.2
+  - r
+  - snakemake=4.8.0
