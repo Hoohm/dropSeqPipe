@@ -43,6 +43,7 @@ rule sort_sam:
 		memory=config['LOCAL']['memory']
 	output:
 		temp('data/{sample}.Aligned.sorted.bam')
+	conda: '../envs/picard.yaml'
 	shell:
 		"""java -Xmx{params.memory} -jar -Djava.io.tmpdir={params.temp_directory} {params.picard} SortSam\
 		INPUT={input}\
@@ -72,6 +73,7 @@ rule MergeBamAlignment:
 		reference_file=reference_file,
 		temp_directory=config['LOCAL']['temp-directory'],
 		memory=config['LOCAL']['memory']
+	conda: '../envs/picard.yaml'
 	shell:
 		"""java -Djava.io.tmpdir={params.temp_directory} -Xmx{params.memory} -jar {params.picard} MergeBamAlignment\
 		REFERENCE_SEQUENCE={params.reference_file}\
