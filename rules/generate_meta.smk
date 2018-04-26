@@ -62,7 +62,8 @@ rule create_intervals:
 		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
 		memory=config['LOCAL']['memory'],
 		reference_directory=config['META']['reference-directory'],
-		reference_prefix=config['META']['reference-file'].split('.fasta')[0]
+		reference_prefix=re.split(".fasta|.fa"config['META']['reference-file'])[0]
+		
 	output:
 		'{}.rRNA.intervals'.format(reference_prefix)
 	shell:
