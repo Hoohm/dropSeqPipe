@@ -1,4 +1,5 @@
-[![Snakemake](https://img.shields.io/badge/snakemake-≥3.5.2-brightgreen.svg?style=flat-square)](https://snakemake.bitbucket.io)
+[![Snakemake](https://img.shields.io/badge/snakemake-≥4.1.0-brightgreen.svg)](https://snakemake.bitbucket.io)
+[![Build Status](https://travis-ci.org/Hoohm/dropSeqPipe.svg?branch=master)](https://travis-ci.org/Hoohm/dropSeqPipe)
 
 Description
 ------------------
