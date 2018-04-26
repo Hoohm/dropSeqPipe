@@ -1,7 +1,7 @@
 #Functions used to plot the species plot for drop-seq mixed protocol
 #Authors: James Nemesh, Roelli Patrick
 
-categorizeCellsUsingKneeKnownNumCellsPaper<-function (digitalExpressionFileO1, digitalExpressionFileO2, organismOne, organismTwo, pureRatio=0.2, numCells, numBeads, point.cex=1.5, xlim_range=NULL,ylim_range=NULL) {
+categorizeCellsUsingKneeKnownNumCellsPaper<-function (digitalExpressionFileO1, digitalExpressionFileO2, organismOne, organismTwo, pureRatio=0.2, numCells, numBeads, point.cex=1.5, xlim_range=NULL,ylim_range=NULL, category='transcripts') {
   dfFull=getNumTranscriptsPerCellBarcodeByOrganismPair(digitalExpressionFileO1, digitalExpressionFileO2, organismOne, organismTwo, category)
   dfFull=dfFull[order(dfFull$total, decreasing=T),]
   dfFull$ratio_one=dfFull[,2]/dfFull[,4]
@@ -94,7 +94,7 @@ df_temp=categorizeCellsUsingKneeKnownNumCellsPaper(digitalExpressionFileO1,
                                            digitalExpressionFileO2,
                                            snakemake@config$META$species[1],
                                            snakemake@config$META$species[2],
-                                           pureRatio = snakemake@config$META$species$ratio,
+                                           pureRatio = snakemake@config$META$ratio,
                                            numCells = num_cells,
                                            numBeads = num_cells * 2,
                                            point.cex= 1,
@@ -108,7 +108,7 @@ df=categorizeCellsUsingKneeKnownNumCellsPaper(digitalExpressionFileO1,
                                               digitalExpressionFileO2,
                                               snakemake@config$META$species[1],
                                               snakemake@config$META$species[2],
-                                              pureRatio = snakemake@config$META$species$ratio,
+                                              pureRatio = snakemake@config$META$ratio,
                                               numCells = num_cells,
                                               numBeads = num_cells * 2,
                                               point.cex= 1,
