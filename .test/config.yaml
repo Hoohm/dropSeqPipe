@@ -12,7 +12,7 @@ META:
     reference-directory: .test/data/ref
 FILTER:
     5-prime-smart-adapter: CCTACACGACGCTCTTCCGATCT
-cell-barcode:
+    cell-barcode:
         start: 2
         end: 6
         min-quality: 20
@@ -23,7 +23,7 @@ cell-barcode:
         min-quality: 20
         num-below-quality: 2
     trimmomatic:
-        adapters-file:
+        adapters-file: NexteraPE-PE.fa
         LEADING: 3
         TRAILING: 3
         SLIDINGWINDOW:
