@@ -5,4 +5,26 @@ python:
 branches:
   only:
     - master
-    - travis_integration
+
+install:
+  - sudo apt-get update
+  - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
+  - bash miniconda.sh -b -p $HOME/miniconda
+  - export PATH="$HOME/miniconda/bin:$PATH"
+  - hash -r
+  - conda config --set always_yes yes --set changeps1 no
+  - conda update -q conda
+  # Useful for debugging any issues with conda
+  - conda info -a
+  - conda config --add channels defaults
+  - conda config --add channels conda-forge
+  - conda config --add channels bioconda
+  - conda env create --file environment.yaml
+  - mv .test/data/*.gz data
+  - mv .test/config.yaml .
+  - mv .test/NexteraPE-PE.fa .
+  - mv .test/samples.csv .
+script:
+  - source activate dropSeqPipe
+  # run the workflow
+  - snakemake --use-conda

@@ -1,5 +1,6 @@
 import pandas as pd
 import os
+import re
 
 # Load configuration file
 configfile: "config.yaml"
@@ -15,7 +16,7 @@ wildcard_constraints:
     sample="({})".format("|".join(samples.index))
 
 # Create reference files prefixes
-reference_prefix = os.path.join(config['META']['reference-directory'], config['META']['reference-file'].split('.fasta')[0])
+reference_prefix = os.path.join(config['META']['reference-directory'], re.split(".fasta|.fa",config['META']['reference-file'])[0])
 annotation_prefix = os.path.join(config['META']['reference-directory'],config['META']['annotation-file'].split('.gtf')[0])
 reference_file = os.path.join(config['META']['reference-directory'], config['META']['reference-file'])
 annotation_file = os.path.join(config['META']['reference-directory'], config['META']['annotation-file'])

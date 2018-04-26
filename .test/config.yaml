@@ -1,0 +1,47 @@
+LOCAL:
+    temp-directory: /tmp
+    dropseq-wrapper: .test/data/Drop-seq_tools-1.13/drop-seq-tools-wrapper.sh
+    memory: 4g
+META:
+    species:
+        - SPECIES_ONE
+        - SPECIES_TWO
+    ratio: 0.2
+    reference-file: genome.chr19.fa
+    annotation-file: annotation.chr19.gtf
+    reference-directory: .test/data/ref
+FILTER:
+    5-prime-smart-adapter: CCTACACGACGCTCTTCCGATCT
+    cell-barcode:
+        start: 2
+        end: 6
+        min-quality: 20
+        num-below-quality: 1
+    UMI-barcode:
+        start: 7
+        end: 16
+        min-quality: 20
+        num-below-quality: 2
+    trimmomatic:
+        adapters-file: NexteraPE-PE.fa
+        LEADING: 3
+        TRAILING: 3
+        SLIDINGWINDOW:
+            windowSize: 4
+            requiredQuality: 20
+        MINLEN: 20
+        ILLUMINACLIP:
+            seedMismatches: 2
+            palindromeClipThreshold: 30
+            simpleClipThreshold: 10
+EXTRACTION:
+    UMI-edit-distance: 1
+    minimum-counts-per-UMI: 0
+MAPPING:
+    STAR:
+        outFilterMismatchNmax: 10
+        outFilterMismatchNoverLmax: 0.3
+        outFilterMismatchNoverReadLmax: 1
+        outFilterMatchNmin: 0
+        outFilterMatchNminOverLread: 0
+        outFilterScoreMinOverLread: 0

@@ -1,0 +1,3 @@
+samples,expected_cells,read_length,batch
+sample1,100,75,Batch1
+sample2,100,75,Batch2
