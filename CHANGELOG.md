@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.31a]
+### Changed
+- small fix on species plot
+
+### Added
+- Added travis integration. The pipeline is now automatically getting tested when updated and when pull requests are proposed.
+- There is now a small git submodule in .test which will provide a sampled file for testing the pipeline on travis-ci.
+
+### Removed
+- `environment.yaml` has been removed. Youjust have to install snakemake now instead of activating the env.
 
 ## [0.31]
 ### Changed

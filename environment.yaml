@@ -1,9 +1,0 @@
-name: dropSeqPipe
-channels:
-  - bioconda
-  - r
-
-dependencies:
-  - python
-  - r
-  - snakemake=4.8.0
