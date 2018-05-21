@@ -25,6 +25,6 @@ install:
   - mv .test/NexteraPE-PE.fa .
   - mv .test/samples.csv .
 script:
-  - source activate dropSeqPipe
+  - conda install -c bioconda snakemake
   # run the workflow
   - snakemake --use-conda
