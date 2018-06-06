@@ -1,4 +1,5 @@
 import math
+import platform
 """Generate all the meta data files"""
 
 #Which rules will be run on the host computer and not sent to nodes
@@ -77,7 +78,10 @@ def get_sjdbOverhang(wildcards):
 	return(int(wildcards.read_length)-1)
 
 def get_genomeChrBinNbits(file):
-	genomeLength = shell("wc -c {} | cut -d' ' -f1".format(file), iterable=True)
+	if (platform.system() == 'Darwin'):
+		genomeLength = shell("wc -c {} | cut -d' ' -f2".format(file), iterable=True)
+	else:
+		genomeLength = shell("wc -c {} | cut -d' ' -f1".format(file), iterable=True)
 	genomeLength = int(next(genomeLength))
 	referenceNumber = shell('grep "^>" {} | wc -l'.format(file), iterable=True)
 	referenceNumber = int(next(referenceNumber))
