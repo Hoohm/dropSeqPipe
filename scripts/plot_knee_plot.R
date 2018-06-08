@@ -1,6 +1,5 @@
 library(ggplot2)
 library(plyr)
-library(stringdist)
 # Create the cumulative plot
 data=read.table(file = snakemake@input[[1]][1], header=FALSE, stringsAsFactors=FALSE)
 barcodes = data$V2

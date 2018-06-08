@@ -5,7 +5,6 @@ python:
 branches:
   only:
     - master
-    - travis_integration
 
 install:
   - sudo apt-get update
