@@ -22,8 +22,6 @@ install:
   - conda config --add channels bioconda
   - conda install -c bioconda -c conda-forge snakemake
   - conda create -q -n snakemake snakemake>=5.1.2 python=$TRAVIS_PYTHON_VERSION
-  - ls .test/
-  - ls .test/data
 script:
   # run the workflow
   - snakemake --use-conda --directory .test
