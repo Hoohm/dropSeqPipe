@@ -5,6 +5,7 @@ python:
 branches:
   only:
     - master
+    - travis_integration
 
 install:
   - sudo apt-get update
@@ -19,12 +20,8 @@ install:
   - conda config --add channels defaults
   - conda config --add channels conda-forge
   - conda config --add channels bioconda
-  - conda env create --file environment.yaml
-  - mv .test/data/*.gz data
-  - mv .test/config.yaml .
-  - mv .test/NexteraPE-PE.fa .
-  - mv .test/samples.csv .
+  - conda install -c bioconda -c conda-forge snakemake
+  - conda create -q -n snakemake snakemake>=5.1.2 python=$TRAVIS_PYTHON_VERSION
 script:
-  - source activate dropSeqPipe
   # run the workflow
-  - snakemake --use-conda
+  - snakemake --use-conda --directory .test
