@@ -1,6 +1,6 @@
 LOCAL:
     temp-directory: /tmp
-    dropseq-wrapper: .test/data/Drop-seq_tools-1.13/drop-seq-tools-wrapper.sh
+    dropseq-wrapper: data/Drop-seq_tools-1.13/drop-seq-tools-wrapper.sh
     memory: 4g
 META:
     species:
@@ -9,7 +9,7 @@ META:
     ratio: 0.2
     reference-file: genome.chr19.fa
     annotation-file: annotation.chr19.gtf
-    reference-directory: .test/data/ref
+    reference-directory: data/ref
 FILTER:
     5-prime-smart-adapter: CCTACACGACGCTCTTCCGATCT
     cell-barcode:
