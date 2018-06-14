@@ -16,7 +16,7 @@ rule STAR_align:
 	log:
 		'data/{sample}/Log.final.out'
 	params:
-		extra="""--outReadsUnmapped Fatsx\
+		extra="""--outReadsUnmapped Fastx\
 			 	--outFilterMismatchNmax {}\
 			 	--outFilterMismatchNoverLmax {}\
 			 	--outFilterMismatchNoverReadLmax {}\
