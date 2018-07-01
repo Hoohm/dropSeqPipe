@@ -16,9 +16,14 @@ categorizeCellsUsingKneeKnownNumCellsPaper<-function (digitalExpressionFileO1, d
   df$organism="Mixed"
   
   idx=which(df$ratio_one>= (1-pureRatio))
-  df[idx,]$organism=organismOne
+  # checks if the species is actually assigned at all
+  if (length(idx) > 0) {
+    df[idx,]$organism=organismOne
+  }
   idx=which(df$ratio_one<= (pureRatio))
-  df[idx,]$organism=organismTwo
+  if (length(idx) > 0) {
+    df[idx,]$organism=organismTwo
+  }
   
   result=rbind(df, dfNoCall)
   
@@ -79,7 +84,7 @@ getNumTranscriptsPerCellBarcodeByOrganismPair<-function (digitalExpressionFileO1
 
 getGenesAndTranscriptsPerCellBarcode<-function (digitalExpressionFile) {
   a=read.table(digitalExpressionFile, header=T, stringsAsFactors=F)
-  colnames(a)=c("cellBC", "numGenes", "numTranscripts")
+  colnames(a)=c("cellBC", "numGenicReads", "numTranscripts", "numGenes")
   return (a)
 } 
 
