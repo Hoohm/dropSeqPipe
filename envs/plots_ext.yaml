@@ -1,0 +1,17 @@
+channels:
+  - conda-forge
+dependencies:
+  - r=3.4.1
+  - r-ggplot2
+  - r-ggpubr
+  - r-gridextra
+  - r-reshape2
+  - r-viridis
+  - r-stringdist
+  - r-dplyr
+  - r-mvtnorm
+  - r-seurat
+  - r-hmisc
+  - r-tidyverse
+  - r-devtools
+  - r-rcolorbrewer

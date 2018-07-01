@@ -30,7 +30,7 @@ rule STAR_align:
 				config['MAPPING']['STAR']['outFilterMatchNmin'],
 				config['MAPPING']['STAR']['outFilterMatchNminOverLread'],
 				config['MAPPING']['STAR']['outFilterScoreMinOverLread'],),
-		index=lambda wildcards: star_index_prefix + '_' + str(samples.loc[wildcards.sample,'read_length']) + '/'	
+		index=lambda wildcards: star_index_prefix + '_' + str(samples.loc[wildcards.sample,'read_length']) + '/'
 	threads: 24
 	wrapper:
 		"0.22.0/bio/star/align"
@@ -139,7 +139,7 @@ rule plot_yield:
 rule plot_knee_plot:
 	input:
 		'logs/{sample}_hist_out_cell.txt'
-	params: 
+	params:
 		cells=lambda wildcards: samples.loc[wildcards.sample,'expected_cells'],
 		edit_distance=config['EXTRACTION']['UMI-edit-distance']
 	conda: '../envs/plots.yaml'
@@ -152,10 +152,31 @@ rule plot_knee_plot_whitelist:
 	input:
 		data='logs/{sample}_hist_out_cell.txt',
 		barcodes='barcodes.csv'
-	params: 
+	params:
 		cells=lambda wildcards: samples.loc[wildcards.sample,'expected_cells']
 	conda: '../envs/plots.yaml'
 	output:
 		pdf='plots/{sample}_knee_plot.pdf'
 	script:
 		'../scripts/plot_knee_plot.R'
+
+rule violine_plots:
+	input:
+		UMIs='summary/umi_expression_matrix.tsv',
+		counts='summary/counts_expression_matrix.tsv',
+		design='samples.csv'
+#	params:
+#		cells=lambda wildcards: samples.loc[wildcards.sample,'expected_cells'],
+#		edit_distance=config['EXTRACTION']['UMI-edit-distance']
+	conda: '../envs/plots_ext.yaml'
+	output:
+		pdf_violine='plots/violinplots_comparison_UMI.pdf',
+		html_umivscounts='plots/UMI_vs_counts.html',
+#		pdf_umivscounts='plots/UMI_vs_counts.pdf',
+		html_umi_vs_gene='plots/UMI_vs_gene.html',
+#		pdf_umi_vs_gene='plots/UMI_vs_gene.pdf',
+		html_count_vs_gene='plots/Count_vs_gene.html',
+#		pdf_count_vs_gene='plots/Count_vs_gene.pdf',
+		R_objects='summary/R_Seurat_objects.rdata'
+	script:
+		'../scripts/plot_violine.R'
