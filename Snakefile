@@ -94,6 +94,14 @@ rule map:
         expand('logs/{sample}_hist_out_cell.txt', sample=samples.index),
         expand('plots/{sample}_knee_plot.pdf', sample=samples.index),
         'reports/star.html',
+        'plots/violinplots_comparison_UMI.pdf',
+        'plots/UMI_vs_counts.html',
+        # 'plots/UMI_vs_counts.pdf',
+        'plots/UMI_vs_gene.html',
+        # 'plots/UMI_vs_gene.pdf',
+        'plots/Count_vs_gene.html',
+        # 'plots/Count_vs_gene.pdf',
+        'summary/R_Seurat_objects.rdata',
         'plots/yield.pdf'
         
 rule extract:
