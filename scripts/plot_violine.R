@@ -50,11 +50,11 @@ metaData <- data.frame(cellNames = colnames(umi_matrix)) %>%
 rownames(metaData) <- metaData$cellNames
 
 # possible to set is.expr = -1 to avoid filtering whilst creating
-# myumi <- CreateSeuratObject(raw.data = umi_matrix, meta.data = metaData, is.expr = -1)
-myumi <- CreateSeuratObject(raw.data = umi_matrix, meta.data = metaData)
-myumi <- SetAllIdent(object = myumi, id = "samples")
+# seuratobj <- CreateSeuratObject(raw.data = umi_matrix, meta.data = metaData, is.expr = -1)
+seuratobj <- CreateSeuratObject(raw.data = umi_matrix, meta.data = metaData)
+seuratobj <- SetAllIdent(object = seuratobj, id = "samples")
 # relabel cell idenity (https://github.com/satijalab/seurat/issues/380)
-myumi@meta.data$orig.ident <- myumi@meta.data$samples
+seuratobj@meta.data$orig.ident <- seuratobj@meta.data$samples
 
 mycount <- CreateSeuratObject(raw.data = count_matrix, meta.data = metaData)
 mycount <- SetAllIdent(object = mycount, id = "samples")
@@ -69,7 +69,7 @@ mycount@meta.data$orig.ident <- mycount@meta.data$samples
 #                                       origin      origin
 # dropseqLib1_ACTAACATTATT dropseqLib1 dropseqLib1
 # dropseqLib1_GAGTCTGAGGCG dropseqLib1 dropseqLib1
-meta.data         <- myumi@meta.data
+meta.data         <- seuratobj@meta.data
 meta.data$nCounts <- mycount@meta.data$nUMI
 
 
@@ -100,16 +100,16 @@ gg <- ggplot(meta.data, aes(x = nUMI, y=nCounts, color=orig.ident)) +
      y = "Number of Counts per Bead [k]")
 
 htmlwidgets::saveWidget(ggplotly(gg), file.path(getwd(),snakemake@output$html_umivscounts))
-ggsave(gg, file = file.path(getwd(), snakemake@output$pdf_umivscounts), width=12,height=7)
+# ggsave(gg, file = file.path(getwd(), snakemake@output$pdf_umivscounts), width=12,height=7)
 
 # how about unaligned reads/UMI?
 # Note(Seb): raw.data is actually filtered data i.e. nr of genes likely to be smaller than input data!
-mito.gene.names  <- grep("^mt-", rownames(myumi@raw.data), value=TRUE)
-# mito.gene.names2  <- subset(mito.gene.names, mito.gene.names %in% rownames(myumi@raw.data))
-sribo.gene.names <- grep("^Rps", rownames(myumi@raw.data), value=TRUE)
-lribo.gene.names <- grep("^Rpl", rownames(myumi@raw.data), value=TRUE)
+mito.gene.names  <- grep("^mt-", rownames(seuratobj@raw.data), value=TRUE)
+# mito.gene.names2  <- subset(mito.gene.names, mito.gene.names %in% rownames(seuratobj@raw.data))
+sribo.gene.names <- grep("^Rps", rownames(seuratobj@raw.data), value=TRUE)
+lribo.gene.names <- grep("^Rpl", rownames(seuratobj@raw.data), value=TRUE)
 
-col.total.umi            <- Matrix::colSums(myumi@raw.data)
+col.total.umi            <- Matrix::colSums(seuratobj@raw.data)
 col.total.count          <- Matrix::colSums(mycount@raw.data)
 meta.data$col.total.umi   <- col.total.umi
 meta.data$col.total.count <- col.total.count
@@ -118,19 +118,19 @@ meta.data$col.total.count <- col.total.count
 # lribo.pct <- lribo.pct
 # ribo_tot <- ribo_tot
 
-myumi.top_50   <- apply(myumi@raw.data, 2, function(x) sum(x[order(x, decreasing = TRUE)][1:50])/sum(x))
+seuratobj.top_50   <- apply(seuratobj@raw.data, 2, function(x) sum(x[order(x, decreasing = TRUE)][1:50])/sum(x))
 mycount.top_50 <- apply(mycount@raw.data, 2, function(x) sum(x[order(x, decreasing = TRUE)][1:50])/sum(x))
 
-myumi <- AddMetaData(myumi, Matrix::colSums(myumi@raw.data[sribo.gene.names, ])/col.total.umi, "pct.sribo")
-myumi <- AddMetaData(myumi, Matrix::colSums(myumi@raw.data[lribo.gene.names, ])/col.total.umi, "pct.lribo")
-myumi <- AddMetaData(myumi, Matrix::colSums(myumi@raw.data[unique(c(sribo.gene.names, lribo.gene.names)), ])/col.total.umi, "pct.Ribo")
-myumi <- AddMetaData(myumi, Matrix::colSums(myumi@raw.data[mito.gene.names, ])/col.total.umi, "pct.mito")
-myumi <- AddMetaData(myumi, myumi.top_50, "top50")
-tmp <- myumi@meta.data$nUMI/myumi@meta.data$nGene
-names(tmp) <- rownames(myumi@meta.data)
-myumi <- AddMetaData(myumi, tmp, "umi.per.gene")
+seuratobj <- AddMetaData(seuratobj, Matrix::colSums(seuratobj@raw.data[sribo.gene.names, ])/col.total.umi, "pct.sribo")
+seuratobj <- AddMetaData(seuratobj, Matrix::colSums(seuratobj@raw.data[lribo.gene.names, ])/col.total.umi, "pct.lribo")
+seuratobj <- AddMetaData(seuratobj, Matrix::colSums(seuratobj@raw.data[unique(c(sribo.gene.names, lribo.gene.names)), ])/col.total.umi, "pct.Ribo")
+seuratobj <- AddMetaData(seuratobj, Matrix::colSums(seuratobj@raw.data[mito.gene.names, ])/col.total.umi, "pct.mito")
+seuratobj <- AddMetaData(seuratobj, seuratobj.top_50, "top50")
+tmp <- seuratobj@meta.data$nUMI/seuratobj@meta.data$nGene
+names(tmp) <- rownames(seuratobj@meta.data)
+seuratobj <- AddMetaData(seuratobj, tmp, "umi.per.gene")
 
-# tmp=(myumi@meta.data[,"nUMI",drop=F]/myumi@meta.data$nGene)
+# tmp=(seuratobj@meta.data[,"nUMI",drop=F]/seuratobj@meta.data$nGene)
 mycount <- AddMetaData(mycount, Matrix::colSums(mycount@raw.data[sribo.gene.names, ])/col.total.count, "pct.sribo")
 mycount <- AddMetaData(mycount, Matrix::colSums(mycount@raw.data[lribo.gene.names, ])/col.total.count, "pct.lribo")
 mycount <- AddMetaData(mycount, Matrix::colSums(mycount@raw.data[unique(c(sribo.gene.names, lribo.gene.names)), ])/col.total.count, "pct.Ribo")
@@ -142,7 +142,7 @@ mycount <- AddMetaData(mycount, tmp, "umi.per.gene")
 # mycount@meta.data$count.per.gene <- mycount@meta.data$nUMI/mycount@meta.data$nGene
 
 
-gg <- VlnPlot(myumi,
+gg <- VlnPlot(seuratobj,
               c("nUMI", "nGene", "top50", "umi.per.gene", "pct.Ribo", "pct.mito"),
               x.lab.rot = TRUE, do.return = TRUE)
 # ggsave(gg,file=file.path("violinplots_comparison_UMI.pdf"),width=18,height=18)
@@ -150,11 +150,11 @@ ggsave(gg, file  = snakemake@output$pdf_violine, width = 18, height = 18)
 # gg <- VlnPlot(mycount,c("nUMI", "nGene", "top50", "count.per.gene","pct.Ribo", "pct.mito"), x.lab.rot = TRUE, do.return = TRUE)
 # ggsave(gg,file=file.path("violinplots_comparison_count.pdf"),width=18,height=18)
 
-# gg <- GenePlot(object = myumi, gene1 = "nUMI", gene2 = "nGene")
+# gg <- GenePlot(object = seuratobj, gene1 = "nUMI", gene2 = "nGene")
 # ggsave(gg,file=file.path("violinplots_comparison.pdf"),width=18,height=18)
 
 
-gg <- ggplot(myumi@meta.data, aes(x = nUMI, y = nGene, color=orig.ident)) +
+gg <- ggplot(seuratobj@meta.data, aes(x = nUMI, y = nGene, color=orig.ident)) +
   gglayers +
   labs(title = "Genes (pooled mouse and human set) vs UMIs for each bead",
        x = "Number of UMIs per Bead [k]",
@@ -182,5 +182,11 @@ htmlwidgets::saveWidget(ggplotly(gg),
 #        width = 12, height = 7)
 
 
-save(snakemake, myumi, mycount,
+# head(seuratobj@meta.data,2)
+#                              nGene nUMI                    cellNames         samples      barcode expected_cells read_length  batch      orig.ident pct.sribo  pct.lribo  pct.Ribo  pct.mito     top50 umi.per.gene
+# sample1_GAGTCTGAGGCG     6    6 sample1_GAGTCTGAGGCG sample1 GAGTCTGAGGCG            100         100 batch1 sample1 0.0000000 0.00000000 0.0000000 0.0000000 1.0000000     1.000000
+# sample1_CAGCCCTCAGTA   264  437 sample1_CAGCCCTCAGTA sample1 CAGCCCTCAGTA            100         100 batch1 sample1 0.0389016 0.07551487 0.1144165 0.0228833 0.5102975     1.655303
+
+# exporting R Seurat objects into summary/R_Seurat_objects.rdata
+save(snakemake, seuratobj,
      file=file.path(getwd(), snakemake@output$R_objects))
