@@ -70,7 +70,11 @@ mycount@meta.data$orig.ident <- mycount@meta.data$samples
 # dropseqLib1_ACTAACATTATT dropseqLib1 dropseqLib1
 # dropseqLib1_GAGTCTGAGGCG dropseqLib1 dropseqLib1
 meta.data         <- seuratobj@meta.data
+# combining UMIs and Counts in to one Seurat object
 meta.data$nCounts <- mycount@meta.data$nUMI
+seuratobj@meta.data         <- meta.data
+# delete since Counts have been added to seuratobj as nCounts column
+rm(mycount)
 
 
 # mytheme <- theme_bw(base_size = 9) +
@@ -109,37 +113,37 @@ mito.gene.names  <- grep("^mt-", rownames(seuratobj@raw.data), value=TRUE)
 sribo.gene.names <- grep("^Rps", rownames(seuratobj@raw.data), value=TRUE)
 lribo.gene.names <- grep("^Rpl", rownames(seuratobj@raw.data), value=TRUE)
 
-col.total.umi            <- Matrix::colSums(seuratobj@raw.data)
-col.total.count          <- Matrix::colSums(mycount@raw.data)
-meta.data$col.total.umi   <- col.total.umi
-meta.data$col.total.count <- col.total.count
+col.total            <- Matrix::colSums(seuratobj@raw.data)
+# col.total.count          <- Matrix::colSums(mycount@raw.data)
+meta.data$col.total   <- col.total
+# meta.data$col.total.count <- col.total.count
 # mito.percent.counts <- mito.percent.counts
 # sribo.pct <- sribo.pct
 # lribo.pct <- lribo.pct
 # ribo_tot <- ribo_tot
 
 seuratobj.top_50   <- apply(seuratobj@raw.data, 2, function(x) sum(x[order(x, decreasing = TRUE)][1:50])/sum(x))
-mycount.top_50 <- apply(mycount@raw.data, 2, function(x) sum(x[order(x, decreasing = TRUE)][1:50])/sum(x))
+# mycount.top_50 <- apply(mycount@raw.data, 2, function(x) sum(x[order(x, decreasing = TRUE)][1:50])/sum(x))
 
-seuratobj <- AddMetaData(seuratobj, Matrix::colSums(seuratobj@raw.data[sribo.gene.names, ])/col.total.umi, "pct.sribo")
-seuratobj <- AddMetaData(seuratobj, Matrix::colSums(seuratobj@raw.data[lribo.gene.names, ])/col.total.umi, "pct.lribo")
-seuratobj <- AddMetaData(seuratobj, Matrix::colSums(seuratobj@raw.data[unique(c(sribo.gene.names, lribo.gene.names)), ])/col.total.umi, "pct.Ribo")
-seuratobj <- AddMetaData(seuratobj, Matrix::colSums(seuratobj@raw.data[mito.gene.names, ])/col.total.umi, "pct.mito")
+seuratobj <- AddMetaData(seuratobj, Matrix::colSums(seuratobj@raw.data[sribo.gene.names, ])/col.total, "pct.sribo")
+seuratobj <- AddMetaData(seuratobj, Matrix::colSums(seuratobj@raw.data[lribo.gene.names, ])/col.total, "pct.lribo")
+seuratobj <- AddMetaData(seuratobj, Matrix::colSums(seuratobj@raw.data[unique(c(sribo.gene.names, lribo.gene.names)), ])/col.total, "pct.Ribo")
+seuratobj <- AddMetaData(seuratobj, Matrix::colSums(seuratobj@raw.data[mito.gene.names, ])/col.total, "pct.mito")
 seuratobj <- AddMetaData(seuratobj, seuratobj.top_50, "top50")
 tmp <- seuratobj@meta.data$nUMI/seuratobj@meta.data$nGene
 names(tmp) <- rownames(seuratobj@meta.data)
 seuratobj <- AddMetaData(seuratobj, tmp, "umi.per.gene")
 
-# tmp=(seuratobj@meta.data[,"nUMI",drop=F]/seuratobj@meta.data$nGene)
-mycount <- AddMetaData(mycount, Matrix::colSums(mycount@raw.data[sribo.gene.names, ])/col.total.count, "pct.sribo")
-mycount <- AddMetaData(mycount, Matrix::colSums(mycount@raw.data[lribo.gene.names, ])/col.total.count, "pct.lribo")
-mycount <- AddMetaData(mycount, Matrix::colSums(mycount@raw.data[unique(c(sribo.gene.names, lribo.gene.names)), ])/col.total.count, "pct.Ribo")
-mycount <- AddMetaData(mycount, Matrix::colSums(mycount@raw.data[mito.gene.names, ])/col.total.count, "pct.mito")
-mycount <- AddMetaData(mycount, mycount.top_50, "top50")
-tmp <- mycount@meta.data$nUMI/mycount@meta.data$nGene
-names(tmp) <- rownames(mycount@meta.data)
-mycount <- AddMetaData(mycount, tmp, "umi.per.gene")
-# mycount@meta.data$count.per.gene <- mycount@meta.data$nUMI/mycount@meta.data$nGene
+# # tmp=(seuratobj@meta.data[,"nUMI",drop=F]/seuratobj@meta.data$nGene)
+# mycount <- AddMetaData(mycount, Matrix::colSums(mycount@raw.data[sribo.gene.names, ])/col.total.count, "pct.sribo")
+# mycount <- AddMetaData(mycount, Matrix::colSums(mycount@raw.data[lribo.gene.names, ])/col.total.count, "pct.lribo")
+# mycount <- AddMetaData(mycount, Matrix::colSums(mycount@raw.data[unique(c(sribo.gene.names, lribo.gene.names)), ])/col.total.count, "pct.Ribo")
+# mycount <- AddMetaData(mycount, Matrix::colSums(mycount@raw.data[mito.gene.names, ])/col.total.count, "pct.mito")
+# mycount <- AddMetaData(mycount, mycount.top_50, "top50")
+# tmp <- mycount@meta.data$nUMI/mycount@meta.data$nGene
+# names(tmp) <- rownames(mycount@meta.data)
+# mycount <- AddMetaData(mycount, tmp, "umi.per.gene")
+# # mycount@meta.data$count.per.gene <- mycount@meta.data$nUMI/mycount@meta.data$nGene
 
 
 gg <- VlnPlot(seuratobj,
@@ -154,7 +158,7 @@ ggsave(gg, file  = snakemake@output$pdf_violine, width = 18, height = 18)
 # ggsave(gg,file=file.path("violinplots_comparison.pdf"),width=18,height=18)
 
 
-gg <- ggplot(seuratobj@meta.data, aes(x = nUMI, y = nGene, color=orig.ident)) +
+gg <- ggplot(meta.data, aes(x = nUMI, y = nGene, color=orig.ident)) +
   gglayers +
   labs(title = "Genes (pooled mouse and human set) vs UMIs for each bead",
        x = "Number of UMIs per Bead [k]",
@@ -169,7 +173,7 @@ htmlwidgets::saveWidget(ggplotly(gg),
 
 ################################################################################
 ## same for Counts instead UMIs (using mycount object)
-gg <- ggplot(mycount@meta.data, aes(x = nUMI, y = nGene, color=orig.ident)) +
+gg <- ggplot(meta.data, aes(x = nCounts, y = nGene, color=orig.ident)) +
   gglayers +
   labs(title = "Genes (pooled mouse and human set) vs Counts for each bead",
        x = "Number of Counts per Bead [k]",
@@ -182,7 +186,7 @@ htmlwidgets::saveWidget(ggplotly(gg),
 #        width = 12, height = 7)
 
 
-# head(seuratobj@meta.data,2)
+# head(meta.data,2)
 #                              nGene nUMI                    cellNames         samples      barcode expected_cells read_length  batch      orig.ident pct.sribo  pct.lribo  pct.Ribo  pct.mito     top50 umi.per.gene
 # sample1_GAGTCTGAGGCG     6    6 sample1_GAGTCTGAGGCG sample1 GAGTCTGAGGCG            100         100 batch1 sample1 0.0000000 0.00000000 0.0000000 0.0000000 1.0000000     1.000000
 # sample1_CAGCCCTCAGTA   264  437 sample1_CAGCCCTCAGTA sample1 CAGCCCTCAGTA            100         100 batch1 sample1 0.0389016 0.07551487 0.1144165 0.0228833 0.5102975     1.655303
