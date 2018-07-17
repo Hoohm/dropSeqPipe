@@ -8,3 +8,4 @@ dependencies:
   - r-reshape2
   - r-viridis
   - r-stringdist
+  - r-rcpp=0.12.14
