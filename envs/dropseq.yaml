@@ -1,0 +1,4 @@
+channels:
+  - bioconda
+dependencies:
+  - java-jdk=8.0.112

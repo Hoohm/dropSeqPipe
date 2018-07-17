@@ -30,6 +30,7 @@ rule reduce_gtf:
 		memory=config['LOCAL']['memory']
 	output:
 		'{}.reduced.gtf'.format(annotation_prefix)
+	conda: '../envs/dropseq.yaml'
 	shell:
 		"""{params.dropseq_wrapper} -m {params.memory} -p ReduceGTF\
 		GTF={input.annotation}\
@@ -48,6 +49,7 @@ rule create_refFlat:
 		memory=config['LOCAL']['memory']
 	output:
 		'{}.refFlat'.format(annotation_prefix)
+	conda: '../envs/dropseq.yaml'
 	shell:
 		"""{params.dropseq_wrapper} -m {params.memory} -p ConvertToRefFlat\
 		ANNOTATIONS_FILE={input.annotation}\
@@ -67,6 +69,7 @@ rule create_intervals:
 		
 	output:
 		'{}.rRNA.intervals'.format(reference_prefix)
+	conda: '../envs/dropseq.yaml'
 	shell:
 		"""{params.dropseq_wrapper} -m {params.memory} -p CreateIntervalsFiles\
 		REDUCED_GTF={input.annotation_reduced}\

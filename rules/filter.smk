@@ -36,6 +36,7 @@ rule BC_tags:
 		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
 		memory=config['LOCAL']['memory'],
 		temp_directory=config['LOCAL']['temp-directory']
+	conda: '../envs/dropseq.yaml'
 	shell:
 		"""{params.dropseq_wrapper} -m {params.memory} -t {params.temp_directory} -p TagBamWithReadSequenceExtended\
 		SUMMARY={output.BC_summary}\
@@ -63,6 +64,7 @@ rule UMI_tags:
 		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
 		memory=config['LOCAL']['memory'],
 		temp_directory=config['LOCAL']['temp-directory']
+	conda: '../envs/dropseq.yaml'
 	shell:
 		"""{params.dropseq_wrapper} -m {params.memory} -t {params.temp_directory} -p TagBamWithReadSequenceExtended\
 		SUMMARY={output.UMI_summary}\
@@ -84,6 +86,7 @@ rule filter_tags:
 		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
 		memory=config['LOCAL']['memory'],
 		temp_directory=config['LOCAL']['temp-directory']
+	conda: '../envs/dropseq.yaml'
 	shell:
 		"""{params.dropseq_wrapper} -m {params.memory} -t {params.temp_directory} -p FilterBAM\
 		TAG_REJECT=XQ\
@@ -112,6 +115,7 @@ rule start_trim:
 		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
 		memory=config['LOCAL']['memory'],
 		temp_directory=config['LOCAL']['temp-directory']
+	conda: '../envs/dropseq.yaml'
 	shell:
 		"""{params.dropseq_wrapper} -m {params.memory} -t {params.temp_directory} -p TrimStartingSequence\
 		OUTPUT_SUMMARY={output.trim_summary}\
@@ -131,6 +135,7 @@ rule polya_trim:
 		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
 		memory=config['LOCAL']['memory'],
 		temp_directory=config['LOCAL']['temp-directory']
+	conda: '../envs/dropseq.yaml'
 	shell:
 		"""{params.dropseq_wrapper} -m {params.memory} -t {params.temp_directory} -p PolyATrimmer\
 		OUTPUT_SUMMARY={output.trim_summary}\
