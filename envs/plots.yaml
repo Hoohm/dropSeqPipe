@@ -9,3 +9,4 @@ dependencies:
   - r-viridis
   - r-stringdist
   - r-rcpp=0.12.14
+  - libgfortran
