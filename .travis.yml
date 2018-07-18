@@ -9,7 +9,7 @@ os:
 branches:
   only:
     - master
-    - travis_integration
+    - macosx_compatibility
 
 matrix:
   allow_failures:
