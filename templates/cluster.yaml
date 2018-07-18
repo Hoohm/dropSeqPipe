@@ -18,3 +18,4 @@ trim_single_custom:
     n: 2
 STAR_align:
     n: 24
+    mem: 30g
