@@ -189,7 +189,7 @@ rule reads_after_trimming:
 		'logs/{sample}_reads_left_trim.txt'
 	conda: '../envs/samtools.yaml'
 	shell:
-		"""zcat {input} | wc -l > {output}"""
+		"""gunzip -c {input} | wc -l > {output}"""
 
 rule plot_polyA_trim:
 	input:
