@@ -2,9 +2,11 @@ channels:
   - conda-forge
 dependencies:
   - r=3.4.1
-  - r-ggplot2
+  - r-ggplot2=2.2.1
   - r-ggpubr
   - r-gridextra
   - r-reshape2
   - r-viridis
   - r-stringdist
+  - r-rcpp=0.12.14
+  - libgfortran

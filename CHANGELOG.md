@@ -6,7 +6,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [0.31a]
 ### Changed
-- small fix on species plot
+- fix on species plot.
+- fix on rule STAR_align adding now unmapped read to a fastq file.
 
 ### Added
 - Added travis integration. The pipeline is now automatically getting tested when updated and when pull requests are proposed.
@@ -59,7 +60,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - Wrapper for Drop-seq tools. Makes it easier to switch temp folder and choose maximum memory heap.
-- More parameters for STAR exposed. See [WIKI](https://github.com/Hoohm/dropSeqPipe/wiki/
+- More parameters for STAR exposed. See [WIKI](https://github.com/Hoohm/dropSeqPipe/wiki/)
 
 ## [0.24]
 ### Changed
