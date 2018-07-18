@@ -15,3 +15,5 @@ dependencies:
   - r-tidyverse
   - r-devtools
   - r-rcolorbrewer
+  - r-rcpp=0.12.14
+  - libgfortran
