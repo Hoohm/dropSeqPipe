@@ -1,15 +1,15 @@
 __default__:
-    time: "01:00:00"
+    time: "03:00:00"
     n: 1
     mem: 4g
     output: "logs/cluster/{rule}.{wildcards}.out"
 fastqc_barcodes:
     jobname: fastqc_barcodes
-    time: "00:10:00"
+    time: "01:00:00"
     mem: 1g
 fastqc_reads:
     jobname: fastqc_reads
-    time: "00:10:00"
+    time: "01:00:00"
     mem: 1g
 trim_single:
     jobname: trim_single
@@ -18,3 +18,4 @@ trim_single_custom:
     n: 2
 STAR_align:
     n: 24
+    mem: 70g
