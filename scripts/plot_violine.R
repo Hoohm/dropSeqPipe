@@ -15,8 +15,6 @@ library(dplyr) # Dataframe manipulation
 library(Matrix) # Sparse matrices
 library(stringr)
 library(RColorBrewer)
-#library(matrixStats)
-# library(Hmisc) # for cut2 function
 library(devtools)
 library(Seurat)
 library(plotly)
@@ -28,7 +26,6 @@ library(plotly)
 #         ...
 
 # importing UMI
-# umi_matrix             <- read.csv(file.path(path,'summary/umi_expression_matrix.tsv'), sep='\t', header = TRUE, row.names = 1, check.names = FALSE) %>%
 # importing counts ( summary/counts_expression_matrix.tsv )
 count_matrix <- read.csv(snakemake@input$counts, sep = "\t",
                          header = TRUE, row.names = 1,
@@ -103,24 +100,18 @@ gg <- ggplot(meta.data, aes(x = nUMI, y=nCounts, color=orig.ident)) +
      x = "Number of UMIs per Bead [k]",
      y = "Number of Counts per Bead [k]")
 
-htmlwidgets::saveWidget(ggplotly(gg), file.path(getwd(),snakemake@output$html_umivscounts))
-# ggsave(gg, file = file.path(getwd(), snakemake@output$pdf_umivscounts), width=12,height=7)
+  # dev.new()
+# htmlwidgets::saveWidget(ggplotly(gg), file.path(getwd(),snakemake@output$html_umivscounts))
+ ggsave(gg, file = file.path(getwd(), snakemake@output$pdf_umivscounts), width=12,height=7)
 
 # how about unaligned reads/UMI?
 # Note(Seb): raw.data is actually filtered data i.e. nr of genes likely to be smaller than input data!
 mito.gene.names  <- grep("^mt-", rownames(seuratobj@raw.data), value=TRUE)
-# mito.gene.names2  <- subset(mito.gene.names, mito.gene.names %in% rownames(seuratobj@raw.data))
 sribo.gene.names <- grep("^Rps", rownames(seuratobj@raw.data), value=TRUE)
 lribo.gene.names <- grep("^Rpl", rownames(seuratobj@raw.data), value=TRUE)
 
 col.total            <- Matrix::colSums(seuratobj@raw.data)
-# col.total.count          <- Matrix::colSums(mycount@raw.data)
 meta.data$col.total   <- col.total
-# meta.data$col.total.count <- col.total.count
-# mito.percent.counts <- mito.percent.counts
-# sribo.pct <- sribo.pct
-# lribo.pct <- lribo.pct
-# ribo_tot <- ribo_tot
 
 seuratobj.top_50   <- apply(seuratobj@raw.data, 2, function(x) sum(x[order(x, decreasing = TRUE)][1:50])/sum(x))
 # mycount.top_50 <- apply(mycount@raw.data, 2, function(x) sum(x[order(x, decreasing = TRUE)][1:50])/sum(x))
@@ -133,17 +124,6 @@ seuratobj <- AddMetaData(seuratobj, seuratobj.top_50, "top50")
 tmp <- seuratobj@meta.data$nUMI/seuratobj@meta.data$nGene
 names(tmp) <- rownames(seuratobj@meta.data)
 seuratobj <- AddMetaData(seuratobj, tmp, "umi.per.gene")
-
-# # tmp=(seuratobj@meta.data[,"nUMI",drop=F]/seuratobj@meta.data$nGene)
-# mycount <- AddMetaData(mycount, Matrix::colSums(mycount@raw.data[sribo.gene.names, ])/col.total.count, "pct.sribo")
-# mycount <- AddMetaData(mycount, Matrix::colSums(mycount@raw.data[lribo.gene.names, ])/col.total.count, "pct.lribo")
-# mycount <- AddMetaData(mycount, Matrix::colSums(mycount@raw.data[unique(c(sribo.gene.names, lribo.gene.names)), ])/col.total.count, "pct.Ribo")
-# mycount <- AddMetaData(mycount, Matrix::colSums(mycount@raw.data[mito.gene.names, ])/col.total.count, "pct.mito")
-# mycount <- AddMetaData(mycount, mycount.top_50, "top50")
-# tmp <- mycount@meta.data$nUMI/mycount@meta.data$nGene
-# names(tmp) <- rownames(mycount@meta.data)
-# mycount <- AddMetaData(mycount, tmp, "umi.per.gene")
-# # mycount@meta.data$count.per.gene <- mycount@meta.data$nUMI/mycount@meta.data$nGene
 
 
 gg <- VlnPlot(seuratobj,
@@ -164,9 +144,10 @@ gg <- ggplot(meta.data, aes(x = nUMI, y = nGene, color=orig.ident)) +
        x = "Number of UMIs per Bead [k]",
        y = "Number of Genes per Bead [k]")
 
-htmlwidgets::saveWidget(ggplotly(gg),
-                        file.path(getwd(), snakemake@output$html_umi_vs_gene))
-# ggsave(gg, file = file.path(getwd(), snakemake@output$pdf_umi_vs_gene),
+  # dev.new()
+# htmlwidgets::saveWidget(ggplotly(gg),
+                        # file.path(getwd(), snakemake@output$html_umi_vs_gene))
+ggsave(gg, file = file.path(getwd(), snakemake@output$pdf_umi_vs_gene),
 #        width = 12, height = 7)
 
 
@@ -179,11 +160,12 @@ gg <- ggplot(meta.data, aes(x = nCounts, y = nGene, color=orig.ident)) +
        x = "Number of Counts per Bead [k]",
        y = "Number of Genes per Bead [k]")
 
-htmlwidgets::saveWidget(ggplotly(gg),
-                        file.path(getwd(), snakemake@output$html_count_vs_gene))
+  # dev.new()
+# htmlwidgets::saveWidget(ggplotly(gg),
+  #                       file.path(getwd(), snakemake@output$html_count_vs_gene))
 
-# ggsave(gg, file = file.path(getwd(), snakemake@output$pdf_count_vs_gene),
-#        width = 12, height = 7)
+ggsave(gg, file = file.path(getwd(), snakemake@output$pdf_count_vs_gene),
+        width = 12, height = 7)
 
 
 # head(meta.data,2)

@@ -199,12 +199,12 @@ rule violine_plots:
 	conda: '../envs/plots_ext.yaml'
 	output:
 		pdf_violine='plots/violinplots_comparison_UMI.pdf',
-		html_umivscounts='plots/UMI_vs_counts.html',
-#		pdf_umivscounts='plots/UMI_vs_counts.pdf',
-		html_umi_vs_gene='plots/UMI_vs_gene.html',
-#		pdf_umi_vs_gene='plots/UMI_vs_gene.pdf',
-		html_count_vs_gene='plots/Count_vs_gene.html',
-#		pdf_count_vs_gene='plots/Count_vs_gene.pdf',
+#		html_umivscounts='plots/UMI_vs_counts.html',
+		pdf_umivscounts='plots/UMI_vs_counts.pdf',
+#		html_umi_vs_gene='plots/UMI_vs_gene.html',
+		pdf_umi_vs_gene='plots/UMI_vs_gene.pdf',
+#		html_count_vs_gene='plots/Count_vs_gene.html',
+		pdf_count_vs_gene='plots/Count_vs_gene.pdf',
 		R_objects='summary/R_Seurat_objects.rdata'
 	script:
 		'../scripts/plot_violine.R'
