@@ -148,7 +148,7 @@ gg <- ggplot(meta.data, aes(x = nUMI, y = nGene, color=orig.ident)) +
 # htmlwidgets::saveWidget(ggplotly(gg),
                         # file.path(getwd(), snakemake@output$html_umi_vs_gene))
 ggsave(gg, file = file.path(getwd(), snakemake@output$pdf_umi_vs_gene),
-#        width = 12, height = 7)
+       width = 12, height = 7)
 
 
 

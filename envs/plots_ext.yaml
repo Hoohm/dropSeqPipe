@@ -1,14 +1,16 @@
 channels:
   - conda-forge
+  - bioconda
+  - r
 dependencies:
   - r=3.4.1
-  - r-ggplot2
+  - r-ggplot2=2.2.1
   - r-ggpubr
   - r-gridextra
   - r-reshape2
   - r-viridis
   - r-stringdist
-  - r-dplyr
+  - r-dplyr=0.7.4
   - r-mvtnorm
   - r-seurat
   - r-hmisc
