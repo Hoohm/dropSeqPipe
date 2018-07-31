@@ -1,0 +1,21 @@
+channels:
+  - conda-forge
+  - bioconda
+  - r
+dependencies:
+  - r=3.4.1
+  - r-ggplot2=2.2.1
+  - r-ggpubr
+  - r-gridextra
+  - r-reshape2
+  - r-viridis
+  - r-stringdist
+  - r-dplyr=0.7.4
+  - r-mvtnorm
+  - r-seurat
+  - r-hmisc
+  - r-tidyverse
+  - r-devtools
+  - r-rcolorbrewer
+  - r-rcpp=0.12.14
+  - libgfortran
