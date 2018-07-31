@@ -3,7 +3,7 @@ import platform
 """Generate all the meta data files"""
 
 #Which rules will be run on the host computer and not sent to nodes
-localrules: create_dict, reduce_gtf, create_refFlat, create_intervals, create_star_index
+localrules: create_dict, reduce_gtf, create_refFlat, create_intervals
 
 rule create_dict:
 	input:
@@ -119,11 +119,11 @@ rule create_star_index:
 		genomeChrBinNbits=get_genomeChrBinNbits(reference_file)
 	output:
 		'{star_index_prefix}_{read_length}/SA'
-	threads: 4
+	threads: 12
 	conda: '../envs/star.yaml'
 	shell:
 		"""mkdir -p {params.genomeDir}; STAR\
-		--runThreadN 4\
+		--runThreadN {threads}\
 		--runMode genomeGenerate\
 		--genomeDir {params.genomeDir}\
 		--genomeFastaFiles {input.reference_file}\
