@@ -71,6 +71,7 @@ rule TagReadWithGeneExon:
 		temp_directory=config['LOCAL']['temp-directory']
 	output:
 		temp('data/{sample}_gene_exon_tagged.bam')
+	conda: '../envs/dropseq_tools.yaml'
 	shell:
 		"""TagReadWithGeneExon\
 		INPUT={input.data}\
@@ -92,6 +93,7 @@ rule bead_errors_metrics:
 		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
 		memory =config['LOCAL']['memory'],
 		temp_directory=config['LOCAL']['temp-directory']
+	conda: '../envs/dropseq_tools.yaml'
 	shell:
 		"""DetectBeadSynthesisErrors\
 		INPUT={input}\
@@ -111,6 +113,7 @@ rule bam_hist:
 		temp_directory=config['LOCAL']['temp-directory']
 	output:
 		'logs/{sample}_hist_out_cell.txt'
+	conda: '../envs/dropseq_tools.yaml'
 	shell:
 		"""BAMTagHistogram\
 		TAG=XC\
