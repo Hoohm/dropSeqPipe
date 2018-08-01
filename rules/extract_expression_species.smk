@@ -14,6 +14,7 @@ rule extract_umi_expression_species:
 		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
 		memory=config['LOCAL']['memory'],
 		temp_directory=config['LOCAL']['temp-directory']
+	conda: '../envs/dropseq_tools.yaml'
 	shell:
 		"""{params.dropseq_wrapper} -t {params.temp_directory} -m {params.memory} -p DigitalExpression\
 		I={input.data}\
@@ -31,6 +32,7 @@ rule extract_reads_expression_species:
 		temp_directory=config['LOCAL']['temp-directory']
 	output:
 		'summary/{species}/{sample}_counts_expression_matrix.txt'
+	conda: '../envs/dropseq_tools.yaml'
 	shell:
 		"""{params.dropseq_wrapper} -t {params.temp_directory} -m {params.memory} -p DigitalExpression\
 		I={input.data}\
@@ -49,6 +51,7 @@ rule extract_umi_per_gene_species:
 		temp_directory=config['LOCAL']['temp-directory']
 	output:
 		'logs/{species}/{sample}_umi_per_gene.tsv'
+	conda: '../envs/dropseq_tools.yaml'
 	shell:
 		"""{params.dropseq_wrapper} -t {params.temp_directory} -m {params.memory} -p GatherMolecularBarcodeDistributionByGene\
 		I={input.data}\
@@ -68,6 +71,7 @@ rule SingleCellRnaSeqMetricsCollector_whitelist_species:
 		temp_directory=config['LOCAL']['temp-directory']
 	output:
 		'logs/{species}/{sample}_rna_metrics.txt'
+	conda: '../envs/dropseq_tools.yaml'
 	shell:
 		"""{params.dropseq_wrapper} -t {params.temp_directory} -m {params.memory} -p SingleCellRnaSeqMetricsCollector\
 		INPUT={input.data}\
