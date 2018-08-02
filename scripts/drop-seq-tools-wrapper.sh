@@ -70,4 +70,5 @@ done
 [[ ${PROGRAMS[@]} =~ ${PROGRAM} ]] || (echo "Invalid program: ${PROGRAM}" >&2; exit 1)
 
 [[ -d "${TEMP}" ]] || (set -x; mkdir -p "${TEMP}")
-(set -x; export _JAVA_OPTIONS=-Djava.io.tmpdir=${TEMP} && "${PROGRAM}" ${ARGUMENTS[@]})
+
+(set -x; export _JAVA_OPTIONS="-Djava.io.tmpdir=${TEMP} $_JAVA_OPTIONS" && "${PROGRAM}" ${ARGUMENTS[@]})
