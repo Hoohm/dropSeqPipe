@@ -1,6 +1,5 @@
 LOCAL:
     temp-directory:
-    dropseq-wrapper:
     memory: 4g
 META:
     species:
