@@ -11,7 +11,7 @@ rule extract_umi_expression_species:
 		'summary/{species}/{sample}_umi_expression_matrix.txt'
 	params:
 		count_per_umi=config['EXTRACTION']['minimum-counts-per-UMI'],
-		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
+		dropseq_wrapper='../scripts/drop-seq-tools-wrapper.sh',
 		memory=config['LOCAL']['memory'],
 		temp_directory=config['LOCAL']['temp-directory']
 	conda: '../envs/dropseq_tools.yaml'
@@ -27,7 +27,7 @@ rule extract_reads_expression_species:
 		data='data/{species}/{sample}_unfiltered.bam',
 		barcode_whitelist='summary/{species}/{sample}_barcodes.csv'
 	params:
-		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
+		dropseq_wrapper='../scripts/drop-seq-tools-wrapper.sh',
 		memory=config['LOCAL']['memory'],
 		temp_directory=config['LOCAL']['temp-directory']
 	output:
@@ -46,7 +46,7 @@ rule extract_umi_per_gene_species:
 		data='data/{species}/{sample}_unfiltered.bam',
 		barcode_whitelist='summary/{species}/{sample}_barcodes.csv'
 	params:	
-		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
+		dropseq_wrapper='../scripts/drop-seq-tools-wrapper.sh',
 		memory=config['LOCAL']['memory'],
 		temp_directory=config['LOCAL']['temp-directory']
 	output:
@@ -66,7 +66,7 @@ rule SingleCellRnaSeqMetricsCollector_whitelist_species:
 		rRNA_intervals='{}.rRNA.intervals'.format(reference_prefix)
 	params:
 		cells=lambda wildcards: samples.loc[wildcards.sample,'expected_cells'],
-		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
+		dropseq_wrapper='../scripts/drop-seq-tools-wrapper.sh',
 		memory=config['LOCAL']['memory'],
 		temp_directory=config['LOCAL']['temp-directory']
 	output:
