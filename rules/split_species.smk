@@ -12,7 +12,7 @@ rule split_bam_species:
 		'data/{species}/{sample}_unfiltered.bam'
 	params:
 		species=lambda wildcards: wildcards.species,
-		dropseq_wrapper='../scripts/drop-seq-tools-wrapper.sh',
+		dropseq_wrapper='scripts/drop-seq-tools-wrapper.sh',
 		memory=config['LOCAL']['memory'],
 		temp_directory=config['LOCAL']['temp-directory']
 	conda: '../envs/dropseq_tools.yaml'
@@ -34,7 +34,7 @@ rule extract_all_umi_expression_species:
 		count_per_umi=config['EXTRACTION']['minimum-counts-per-UMI'],
 		num_cells=lambda wildcards: samples.loc[wildcards.sample,'expected_cells'],
 		cellBarcodeEditDistance=config['EXTRACTION']['UMI-edit-distance'],
-		dropseq_wrapper='../scripts/drop-seq-tools-wrapper.sh',
+		dropseq_wrapper='scripts/drop-seq-tools-wrapper.sh',
 		memory=config['LOCAL']['memory'],
 		temp_directory=config['LOCAL']['temp-directory']
 	conda: '../envs/dropseq_tools.yaml'
@@ -57,7 +57,7 @@ rule extract_all_umi_expression_whitelist_species:
 	params:
 		count_per_umi=config['EXTRACTION']['minimum-counts-per-UMI'],
 		cellBarcodeEditDistance=config['EXTRACTION']['UMI-edit-distance'],
-		dropseq_wrapper='../scripts/drop-seq-tools-wrapper.sh',
+		dropseq_wrapper='scripts/drop-seq-tools-wrapper.sh',
 		memory=config['LOCAL']['memory'],
 		temp_directory=config['LOCAL']['temp-directory']
 	conda: '../envs/dropseq_tools.yaml'
