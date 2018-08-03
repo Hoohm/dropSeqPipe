@@ -37,8 +37,8 @@ rule all:
         '{}.rRNA.intervals'.format(reference_prefix),
         expand('{star_index_prefix}_{read_length}/SA', star_index_prefix=star_index_prefix, read_length=read_lengths),
         #qc
-        expand('logs/{sample}_R1_fastqc.html', sample=samples.index),
-        expand('logs/{sample}_R2_fastqc.html', sample=samples.index),
+        expand('logs/fastqc/{sample}_R1_fastqc.html', sample=samples.index),
+        expand('logs/fastqc/{sample}_R2_fastqc.html', sample=samples.index),
         'reports/fastqc_reads.html',
         'reports/fastqc_barcodes.html',
         #filter
@@ -84,8 +84,8 @@ rule meta:
 
 rule qc:
     input:
-        expand('logs/{sample}_R1_fastqc.html', sample=samples.index),
-        expand('logs/{sample}_R2_fastqc.html', sample=samples.index),
+        expand('logs/fastqc/{sample}_R1_fastqc.html', sample=samples.index),
+        expand('logs/fastqc/{sample}_R2_fastqc.html', sample=samples.index),
         'reports/fastqc_reads.html',
         'reports/fastqc_barcodes.html'
 
