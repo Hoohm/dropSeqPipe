@@ -26,7 +26,8 @@ rule reduce_gtf:
 		reference_dict='{}.dict'.format(reference_prefix),
 		annotation=annotation_file
 	params:
-		memory=config['LOCAL']['memory']
+		memory=config['LOCAL']['memory'],
+		temp_directory=config['LOCAL']['temp-directory']
 	output:
 		'{}.reduced.gtf'.format(annotation_prefix)
 	conda: '../envs/dropseq_tools.yaml'
@@ -44,7 +45,8 @@ rule create_refFlat:
 		annotation=annotation_file,
 		reference_dict='{}.dict'.format(reference_prefix)
 	params:
-		memory=config['LOCAL']['memory']
+		memory=config['LOCAL']['memory'],
+		temp_directory=config['LOCAL']['temp-directory']
 	output:
 		'{}.refFlat'.format(annotation_prefix)
 	conda: '../envs/dropseq_tools.yaml'
@@ -62,7 +64,8 @@ rule create_intervals:
 	params:
 		memory=config['LOCAL']['memory'],
 		reference_directory=config['META']['reference-directory'],
-		reference_prefix=re.split(".fasta|.fa",config['META']['reference-file'])[0]
+		reference_prefix=re.split(".fasta|.fa",config['META']['reference-file'])[0],
+		temp_directory=config['LOCAL']['temp-directory']
 		
 	output:
 		'{}.rRNA.intervals'.format(reference_prefix)
