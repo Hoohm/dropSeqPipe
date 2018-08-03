@@ -8,8 +8,8 @@ rule fastqc_barcodes:
 	input: 
 		'data/{sample}_R1.fastq.gz'
 	output:
-		html='logs/{sample}_R1_fastqc.html',
-		zip='logs/{sample}_R1_fastqc.zip'
+		html='logs/fastqc/{sample}_R1_fastqc.html',
+		zip='logs/fastqc/{sample}_R1_fastqc.zip'
 	params: '--extract'
 	wrapper:
 		'0.21.0/bio/fastqc'
@@ -19,8 +19,8 @@ rule fastqc_reads:
 	input: 
 		'data/{sample}_R2.fastq.gz'
 	output:
-		html='logs/{sample}_R2_fastqc.html',
-		zip='logs/{sample}_R2_fastqc.zip'
+		html='logs/fastqc/{sample}_R2_fastqc.html',
+		zip='logs/fastqc/{sample}_R2_fastqc.zip'
 	params: '--extract'
 	wrapper:
 		'0.21.0/bio/fastqc'
@@ -28,7 +28,7 @@ rule fastqc_reads:
 
 rule multiqc_fastqc_barcodes:
 	input:
-		expand('logs/{sample}_R1_fastqc.html', sample=samples.index)
+		expand('logs/fastqc/{sample}_R1_fastqc.html', sample=samples.index)
 	output:
 		html='reports/fastqc_barcodes.html'
 	params: '-m fastqc --ignore *_R2*'
@@ -37,10 +37,9 @@ rule multiqc_fastqc_barcodes:
 
 rule multiqc_fastqc_reads:
 	input: 
-		expand('logs/{sample}_R2_fastqc.html', sample=samples.index)
+		expand('logs/fastqc/{sample}_R2_fastqc.html', sample=samples.index)
 	output:
-		html='reports/fastqc_reads.html',
-		txt='reports/fastqc_reads_data/multiqc_general_stats.txt'
+		html='reports/fastqc_reads.html'
 	params: '-m fastqc --ignore *_R1*'
 	wrapper:
 		'0.21.0/bio/multiqc'

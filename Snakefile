@@ -41,7 +41,6 @@ rule all:
         expand('logs/{sample}_R2_fastqc.html', sample=samples.index),
         'reports/fastqc_reads.html',
         'reports/fastqc_barcodes.html',
-        'reports/fastqc_reads_data/multiqc_general_stats.txt',
         #filter
         expand('data/{sample}_filtered.fastq.gz', sample=samples.index),
         expand('plots/{sample}_polya_trimmed.pdf', sample=samples.index),
@@ -88,8 +87,7 @@ rule qc:
         expand('logs/{sample}_R1_fastqc.html', sample=samples.index),
         expand('logs/{sample}_R2_fastqc.html', sample=samples.index),
         'reports/fastqc_reads.html',
-        'reports/fastqc_barcodes.html',
-        'reports/fastqc_reads_data/multiqc_general_stats.txt'
+        'reports/fastqc_barcodes.html'
 
 rule filter:
     input:
