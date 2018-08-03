@@ -23,7 +23,7 @@ rule extract_umi_expression:
 		memory=config['LOCAL']['memory']
 	conda: '../envs/dropseq_tools.yaml'
 	shell:
-		"""export _JAVA_OPTIONS="-Djava.io.tmpdir={params.temp_directory} $_JAVA_OPTIONS" && DigitalExpression -m {params.memory}\
+		"""export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && DigitalExpression -m {params.memory}\
 		I={input}\
 		O={output}\
 		EDIT_DISTANCE={params.cellBarcodeEditDistance}\
@@ -46,7 +46,7 @@ rule extract_umi_expression_whitelist:
 		memory=config['LOCAL']['memory']
 	conda: '../envs/dropseq_tools.yaml'
 	shell:
-		"""export _JAVA_OPTIONS="-Djava.io.tmpdir={params.temp_directory} $_JAVA_OPTIONS" && DigitalExpression -m {params.memory}\
+		"""export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && DigitalExpression -m {params.memory}\
 		I={input.data}\
 		O={output}\
 		EDIT_DISTANCE={params.cellBarcodeEditDistance}\
@@ -68,7 +68,7 @@ rule extract_reads_expression_whitelist:
 		memory=config['LOCAL']['memory']
 	conda: '../envs/dropseq_tools.yaml'	
 	shell:
-		"""export _JAVA_OPTIONS="-Djava.io.tmpdir={params.temp_directory} $_JAVA_OPTIONS" && DigitalExpression -m {params.memory}\
+		"""export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && DigitalExpression -m {params.memory}\
 		I={input.data}\
 		O={output}\
 		EDIT_DISTANCE={params.cellBarcodeEditDistance}\
@@ -90,7 +90,7 @@ rule extract_reads_expression:
 		memory=config['LOCAL']['memory']
 	conda: '../envs/dropseq_tools.yaml'	
 	shell:
-		"""export _JAVA_OPTIONS="-Djava.io.tmpdir={params.temp_directory} $_JAVA_OPTIONS" && DigitalExpression -m {params.memory}\
+		"""export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && DigitalExpression -m {params.memory}\
 		I={input}\
 		O={output}\
 		EDIT_DISTANCE={params.cellBarcodeEditDistance}\
@@ -111,7 +111,7 @@ rule extract_umi_per_gene:
 		memory=config['LOCAL']['memory']
 	conda: '../envs/dropseq_tools.yaml'	
 	shell:
-		"""export _JAVA_OPTIONS="-Djava.io.tmpdir={params.temp_directory} $_JAVA_OPTIONS" && GatherMolecularBarcodeDistributionByGene -m {params.memory}\
+		"""export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && GatherMolecularBarcodeDistributionByGene -m {params.memory}\
 		EDIT_DISTANCE={params.cellBarcodeEditDistance}\
 		I={input}\
 		O={output}\
@@ -129,7 +129,7 @@ rule extract_umi_per_gene_whitelist:
 		memory=config['LOCAL']['memory']
 	conda: '../envs/dropseq_tools.yaml'
 	shell:
-		"""export _JAVA_OPTIONS="-Djava.io.tmpdir={params.temp_directory} $_JAVA_OPTIONS" && GatherMolecularBarcodeDistributionByGene -m {params.memory}\
+		"""export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && GatherMolecularBarcodeDistributionByGene -m {params.memory}\
 		EDIT_DISTANCE={params.cellBarcodeEditDistance}\
 		I={input.data}\
 		O={output}\
@@ -149,7 +149,7 @@ rule SingleCellRnaSeqMetricsCollector:
 		'logs/{sample}_rna_metrics.txt'
 	conda: '../envs/dropseq_tools.yaml'
 	shell:
-		"""export _JAVA_OPTIONS="-Djava.io.tmpdir={params.temp_directory} $_JAVA_OPTIONS" && SingleCellRnaSeqMetricsCollector -m {params.memory}\
+		"""export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && SingleCellRnaSeqMetricsCollector -m {params.memory}\
 		INPUT={input.data}\
 		OUTPUT={output}\
 		ANNOTATIONS_FILE={input.refFlat}\
@@ -170,7 +170,7 @@ rule SingleCellRnaSeqMetricsCollector_whitelist:
 		'logs/{sample}_rna_metrics.txt'
 	conda: '../envs/dropseq_tools.yaml'
 	shell:
-		"""export _JAVA_OPTIONS="-Djava.io.tmpdir={params.temp_directory} $_JAVA_OPTIONS" && SingleCellRnaSeqMetricsCollector -m {params.memory}\
+		"""export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && SingleCellRnaSeqMetricsCollector -m {params.memory}\
 		INPUT={input.data}\
 		OUTPUT={output}\
 		ANNOTATIONS_FILE={input.refFlat}\

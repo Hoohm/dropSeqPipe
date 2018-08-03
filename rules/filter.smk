@@ -37,7 +37,7 @@ rule BC_tags:
 		temp_directory=config['LOCAL']['temp-directory']
 	conda: '../envs/dropseq_tools.yaml'
 	shell:
-		"""export _JAVA_OPTIONS="-Djava.io.tmpdir={params.temp_directory} $_JAVA_OPTIONS" && TagBamWithReadSequenceExtended -m {params.memory}\
+		"""export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && TagBamWithReadSequenceExtended -m {params.memory}\
 		SUMMARY={output.BC_summary}\
 		BASE_RANGE={params.BC_start}-{params.BC_end}\
 		BASE_QUALITY={params.BC_minQuality}\
@@ -64,7 +64,7 @@ rule UMI_tags:
 		temp_directory=config['LOCAL']['temp-directory']
 	conda: '../envs/dropseq_tools.yaml'
 	shell:
-		"""export _JAVA_OPTIONS="-Djava.io.tmpdir={params.temp_directory} $_JAVA_OPTIONS" && TagBamWithReadSequenceExtended -m {params.memory}\
+		"""export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && TagBamWithReadSequenceExtended -m {params.memory}\
 		SUMMARY={output.UMI_summary}\
 		BASE_RANGE={params.UMI_start}-{params.UMI_end}\
 		BASE_QUALITY={params.UMI_minQuality}\
@@ -113,7 +113,7 @@ rule start_trim:
 		temp_directory=config['LOCAL']['temp-directory']
 	conda: '../envs/dropseq_tools.yaml'
 	shell:
-		"""export _JAVA_OPTIONS="-Djava.io.tmpdir={params.temp_directory} $_JAVA_OPTIONS" && TrimStartingSequence -m {params.memory}\
+		"""export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && TrimStartingSequence -m {params.memory}\
 		OUTPUT_SUMMARY={output.trim_summary}\
 		SEQUENCE={params.SmartAdapter}\
 		MISMATCHES=1\
@@ -132,7 +132,7 @@ rule polya_trim:
 		temp_directory=config['LOCAL']['temp-directory']
 	conda: '../envs/dropseq_tools.yaml'
 	shell:
-		"""export _JAVA_OPTIONS="-Djava.io.tmpdir={params.temp_directory} $_JAVA_OPTIONS" && PolyATrimmer -m {params.memory}\
+		"""export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && PolyATrimmer -m {params.memory}\
 		OUTPUT_SUMMARY={output.trim_summary}\
 		MISMATCHES=0\
 		NUM_BASES=5\
