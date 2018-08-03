@@ -12,12 +12,12 @@ rule split_bam_species:
 		'data/{species}/{sample}_unfiltered.bam'
 	params:
 		species=lambda wildcards: wildcards.species,
-		dropseq_wrapper='scripts/drop-seq-tools-wrapper.sh',
+		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
 		memory=config['LOCAL']['memory'],
 		temp_directory=config['LOCAL']['temp-directory']
 	conda: '../envs/dropseq_tools.yaml'
 	shell:
-		"""{params.dropseq_wrapper} -t {params.temp_directory} -m {params.memory} -p FilterBAM\
+		"""export _JAVA_OPTIONS="-Djava.io.tmpdir={params.temp_directory} $_JAVA_OPTIONS" && FilterBAM -m {params.memory}\
 		REF_SOFT_MATCHED_RETAINED={params.species}\
 		INPUT={input}\
 		OUTPUT={output}"""
@@ -34,12 +34,12 @@ rule extract_all_umi_expression_species:
 		count_per_umi=config['EXTRACTION']['minimum-counts-per-UMI'],
 		num_cells=lambda wildcards: samples.loc[wildcards.sample,'expected_cells'],
 		cellBarcodeEditDistance=config['EXTRACTION']['UMI-edit-distance'],
-		dropseq_wrapper='scripts/drop-seq-tools-wrapper.sh',
+		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
 		memory=config['LOCAL']['memory'],
 		temp_directory=config['LOCAL']['temp-directory']
 	conda: '../envs/dropseq_tools.yaml'
 	shell:
-		"""{params.dropseq_wrapper} -t {params.temp_directory} -m {params.memory} -p DigitalExpression\
+		"""export _JAVA_OPTIONS="-Djava.io.tmpdir={params.temp_directory} $_JAVA_OPTIONS" && DigitalExpression -m {params.memory}\
 		I={input}\
 		O={output.umi_matrix}\
 		SUMMARY={output.summary}\
@@ -57,12 +57,12 @@ rule extract_all_umi_expression_whitelist_species:
 	params:
 		count_per_umi=config['EXTRACTION']['minimum-counts-per-UMI'],
 		cellBarcodeEditDistance=config['EXTRACTION']['UMI-edit-distance'],
-		dropseq_wrapper='scripts/drop-seq-tools-wrapper.sh',
+		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
 		memory=config['LOCAL']['memory'],
 		temp_directory=config['LOCAL']['temp-directory']
 	conda: '../envs/dropseq_tools.yaml'
 	shell:
-		"""{params.dropseq_wrapper} -t {params.temp_directory} -m {params.memory} -p DigitalExpression\
+		"""export _JAVA_OPTIONS="-Djava.io.tmpdir={params.temp_directory} $_JAVA_OPTIONS" && DigitalExpression -m {params.memory}\
 		I={input.data}\
 		O={output.umi_matrix}\
 		SUMMARY={output.summary}\
