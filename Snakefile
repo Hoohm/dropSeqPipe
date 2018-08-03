@@ -61,7 +61,12 @@ rule all:
         expand('plots/{sample}_rna_metrics.pdf', sample=samples.index),
         'summary/umi_expression_matrix.tsv',
         'summary/counts_expression_matrix.tsv'
-        
+
+
+rule testing:
+    input: 
+        expand('data/{sample}/{sample}_trimmed_unmapped.fastq.gz', sample=samples.index)
+
 rule meta:
     input:
         '{}.refFlat'.format(annotation_prefix),

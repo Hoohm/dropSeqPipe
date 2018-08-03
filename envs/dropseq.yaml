@@ -1,4 +1,0 @@
-channels:
-  - conda-forge
-dependencies:
-  - openjdk=8.0.144

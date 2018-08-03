@@ -95,7 +95,7 @@ rule get_genomeChrBinNbits:
 		reference_file=reference_file
 	params:
 		samples_file='samples.csv',
-		reference_directory=config['reference-directory']
+		reference_directory=config['META']['reference-directory']
 	output:
 		'{params.reference_directory}/index_params.txt'
 	run:
