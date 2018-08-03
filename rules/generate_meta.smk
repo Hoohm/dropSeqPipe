@@ -26,7 +26,6 @@ rule reduce_gtf:
 		reference_dict='{}.dict'.format(reference_prefix),
 		annotation=annotation_file
 	params:
-		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
 		memory=config['LOCAL']['memory']
 	output:
 		'{}.reduced.gtf'.format(annotation_prefix)
@@ -45,7 +44,6 @@ rule create_refFlat:
 		annotation=annotation_file,
 		reference_dict='{}.dict'.format(reference_prefix)
 	params:
-		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
 		memory=config['LOCAL']['memory']
 	output:
 		'{}.refFlat'.format(annotation_prefix)
@@ -62,7 +60,6 @@ rule create_intervals:
 		annotation_reduced='{}.reduced.gtf'.format(annotation_prefix),
 		reference_dict='{}.dict'.format(reference_prefix)
 	params:
-		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
 		memory=config['LOCAL']['memory'],
 		reference_directory=config['META']['reference-directory'],
 		reference_prefix=re.split(".fasta|.fa",config['META']['reference-file'])[0]

@@ -33,7 +33,6 @@ rule BC_tags:
 		BC_end=config['FILTER']['cell-barcode']['end'],
 		BC_minQuality=config['FILTER']['cell-barcode']['min-quality'],
 		BC_minQuality_num=config['FILTER']['cell-barcode']['num-below-quality']+1,
-		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
 		memory=config['LOCAL']['memory'],
 		temp_directory=config['LOCAL']['temp-directory']
 	conda: '../envs/dropseq_tools.yaml'
@@ -61,7 +60,6 @@ rule UMI_tags:
 		UMI_end=config['FILTER']['UMI-barcode']['end'],
 		UMI_minQuality=config['FILTER']['UMI-barcode']['min-quality'],
 		UMI_minQuality_num=config['FILTER']['UMI-barcode']['num-below-quality']+1,
-		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
 		memory=config['LOCAL']['memory'],
 		temp_directory=config['LOCAL']['temp-directory']
 	conda: '../envs/dropseq_tools.yaml'
@@ -82,8 +80,7 @@ rule filter_tags:
 		'data/{sample}_BC_UMI_tagged_unmapped.bam'
 	output: 
 		temp('data/{sample}_tags_filtered_unmapped.bam')
-	params:
-		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
+	params:		
 		memory=config['LOCAL']['memory'],
 		temp_directory=config['LOCAL']['temp-directory']
 	conda: '../envs/dropseq_tools.yaml'
@@ -112,7 +109,6 @@ rule start_trim:
 		trim_summary='logs/{sample}_start_trim.txt'
 	params:
 		SmartAdapter=config['FILTER']['5-prime-smart-adapter'],
-		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
 		memory=config['LOCAL']['memory'],
 		temp_directory=config['LOCAL']['temp-directory']
 	conda: '../envs/dropseq_tools.yaml'
@@ -131,8 +127,7 @@ rule polya_trim:
 	output:
 		data='data/{sample}_trimmed_unmapped.bam',
 		trim_summary='logs/{sample}_polyA_trim.txt'
-	params:
-		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
+	params:		
 		memory=config['LOCAL']['memory'],
 		temp_directory=config['LOCAL']['temp-directory']
 	conda: '../envs/dropseq_tools.yaml'

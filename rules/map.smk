@@ -88,7 +88,6 @@ rule TagReadWithGeneExon:
 		data='data/{sample}.Aligned.merged.bam',
 		refFlat='{}.refFlat'.format(annotation_prefix)
 	params:
-		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
 		memory=config['LOCAL']['memory'],
 		temp_directory=config['LOCAL']['temp-directory']
 	output:
@@ -112,7 +111,6 @@ rule bead_errors_metrics:
 		out_stats='logs/{sample}_synthesis_stats.txt',
 		summary='logs/{sample}_synthesis_stats_summary.txt',
 		barcodes=lambda wildcards: int(samples.loc[wildcards.sample,'expected_cells']) * 2,
-		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
 		memory =config['LOCAL']['memory'],
 		SmartAdapter=config['FILTER']['5-prime-smart-adapter'],
 		temp_directory=config['LOCAL']['temp-directory']
@@ -131,7 +129,6 @@ rule bam_hist:
 	input:
 		'data/{sample}_final.bam'
 	params:
-		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
 		memory=config['LOCAL']['memory'],
 		temp_directory=config['LOCAL']['temp-directory']
 	output:
