@@ -15,7 +15,7 @@ rule extract_umi_expression_species:
 		temp_directory=config['LOCAL']['temp-directory']
 	conda: '../envs/dropseq_tools.yaml'
 	shell:
-		"""export _JAVA_OPTIONS="-Djava.io.tmpdir={params.temp_directory} $_JAVA_OPTIONS" && DigitalExpression -m {params.memory}\
+		"""export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && DigitalExpression -m {params.memory}\
 		I={input.data}\
 		O={output}\
 		MIN_BC_READ_THRESHOLD={params.count_per_umi}\
@@ -32,7 +32,7 @@ rule extract_reads_expression_species:
 		'summary/{species}/{sample}_counts_expression_matrix.txt'
 	conda: '../envs/dropseq_tools.yaml'
 	shell:
-		"""export _JAVA_OPTIONS="-Djava.io.tmpdir={params.temp_directory} $_JAVA_OPTIONS" && DigitalExpression -m {params.memory}\
+		"""export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && DigitalExpression -m {params.memory}\
 		I={input.data}\
 		O={output}\
 		CELL_BC_FILE={input.barcode_whitelist}\
@@ -50,7 +50,7 @@ rule extract_umi_per_gene_species:
 		'logs/{species}/{sample}_umi_per_gene.tsv'
 	conda: '../envs/dropseq_tools.yaml'
 	shell:
-		"""export _JAVA_OPTIONS="-Djava.io.tmpdir={params.temp_directory} $_JAVA_OPTIONS" && GatherMolecularBarcodeDistributionByGene -m {params.memory}\
+		"""export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && GatherMolecularBarcodeDistributionByGene -m {params.memory}\
 		I={input.data}\
 		O={output}\
 		CELL_BC_FILE={input.barcode_whitelist}"""
@@ -69,7 +69,7 @@ rule SingleCellRnaSeqMetricsCollector_whitelist_species:
 		'logs/{species}/{sample}_rna_metrics.txt'
 	conda: '../envs/dropseq_tools.yaml'
 	shell:
-		"""export _JAVA_OPTIONS="-Djava.io.tmpdir={params.temp_directory} $_JAVA_OPTIONS" && SingleCellRnaSeqMetricsCollector -m {params.memory}\
+		"""export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && SingleCellRnaSeqMetricsCollector -m {params.memory}\
 		INPUT={input.data}\
 		OUTPUT={output}\
 		ANNOTATIONS_FILE={input.refFlat}\

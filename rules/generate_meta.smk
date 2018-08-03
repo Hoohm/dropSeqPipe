@@ -31,7 +31,7 @@ rule reduce_gtf:
 		'{}.reduced.gtf'.format(annotation_prefix)
 	conda: '../envs/dropseq_tools.yaml'
 	shell:
-		"""export _JAVA_OPTIONS="-Djava.io.tmpdir={params.temp_directory} $_JAVA_OPTIONS" && ReduceGTF -m {params.memory}\
+		"""export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && ReduceGTF -m {params.memory}\
 		GTF={input.annotation}\
 		OUTPUT={output}\
 		SEQUENCE_DICTIONARY={input.reference_dict}\
@@ -50,7 +50,7 @@ rule create_refFlat:
 		'{}.refFlat'.format(annotation_prefix)
 	conda: '../envs/dropseq_tools.yaml'
 	shell:
-		"""export _JAVA_OPTIONS="-Djava.io.tmpdir={params.temp_directory} $_JAVA_OPTIONS" && ConvertToRefFlat -m {params.memory}\
+		"""export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && ConvertToRefFlat -m {params.memory}\
 		ANNOTATIONS_FILE={input.annotation}\
 		OUTPUT={output}\
 		SEQUENCE_DICTIONARY={input.reference_dict}
@@ -69,7 +69,7 @@ rule create_intervals:
 		'{}.rRNA.intervals'.format(reference_prefix)
 	conda: '../envs/dropseq_tools.yaml'
 	shell:
-		"""export _JAVA_OPTIONS="-Djava.io.tmpdir={params.temp_directory} $_JAVA_OPTIONS" && CreateIntervalsFiles -m {params.memory}\
+		"""export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && CreateIntervalsFiles -m {params.memory}\
 		REDUCED_GTF={input.annotation_reduced}\
 		SEQUENCE_DICTIONARY={input.reference_dict}\
 		O={params.reference_directory}\
