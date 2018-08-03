@@ -66,14 +66,14 @@ rule TagReadWithGeneExon:
 		data='data/{sample}.Aligned.merged.bam',
 		refFlat='{}.refFlat'.format(annotation_prefix)
 	params:
-		dropseq_wrapper='scripts/drop-seq-tools-wrapper.sh',
+		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
 		memory=config['LOCAL']['memory'],
 		temp_directory=config['LOCAL']['temp-directory']
 	output:
 		temp('data/{sample}_gene_exon_tagged.bam')
 	conda: '../envs/dropseq_tools.yaml'
 	shell:
-		"""TagReadWithGeneExon\
+		"""export _JAVA_OPTIONS="-Djava.io.tmpdir={params.temp_directory} $_JAVA_OPTIONS" && TagReadWithGeneExon -m {params.memory}\
 		INPUT={input.data}\
 		OUTPUT={output}\
 		ANNOTATIONS_FILE={input.refFlat}\
@@ -90,12 +90,12 @@ rule bead_errors_metrics:
 		out_stats='logs/{sample}_synthesis_stats.txt',
 		summary='logs/{sample}_synthesis_stats_summary.txt',
 		barcodes=lambda wildcards: int(samples.loc[wildcards.sample,'expected_cells']) * 2,
-		dropseq_wrapper='scripts/drop-seq-tools-wrapper.sh',
+		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
 		memory =config['LOCAL']['memory'],
 		temp_directory=config['LOCAL']['temp-directory']
 	conda: '../envs/dropseq_tools.yaml'
 	shell:
-		"""DetectBeadSynthesisErrors\
+		"""export _JAVA_OPTIONS="-Djava.io.tmpdir={params.temp_directory} $_JAVA_OPTIONS" && DetectBeadSynthesisErrors -m {params.memory}\
 		INPUT={input}\
 		OUTPUT={output}\
 		OUTPUT_STATS={params.out_stats}\
@@ -108,14 +108,14 @@ rule bam_hist:
 	input:
 		'data/{sample}_final.bam'
 	params:
-		dropseq_wrapper='scripts/drop-seq-tools-wrapper.sh',
+		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
 		memory=config['LOCAL']['memory'],
 		temp_directory=config['LOCAL']['temp-directory']
 	output:
 		'logs/{sample}_hist_out_cell.txt'
 	conda: '../envs/dropseq_tools.yaml'
 	shell:
-		"""BAMTagHistogram\
+		"""export _JAVA_OPTIONS="-Djava.io.tmpdir={params.temp_directory} $_JAVA_OPTIONS" && BAMTagHistogram -m {params.memory}\
 		TAG=XC\
 		I={input}\
 		READ_QUALITY=10\

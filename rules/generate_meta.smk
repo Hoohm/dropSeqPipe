@@ -26,13 +26,13 @@ rule reduce_gtf:
 		reference_dict='{}.dict'.format(reference_prefix),
 		annotation=annotation_file
 	params:
-		dropseq_wrapper='scripts/drop-seq-tools-wrapper.sh',
+		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
 		memory=config['LOCAL']['memory']
 	output:
 		'{}.reduced.gtf'.format(annotation_prefix)
 	conda: '../envs/dropseq_tools.yaml'
 	shell:
-		"""{params.dropseq_wrapper} -m {params.memory} -p ReduceGTF\
+		"""export _JAVA_OPTIONS="-Djava.io.tmpdir={params.temp_directory} $_JAVA_OPTIONS" && ReduceGTF -m {params.memory}\
 		GTF={input.annotation}\
 		OUTPUT={output}\
 		SEQUENCE_DICTIONARY={input.reference_dict}\
@@ -51,7 +51,7 @@ rule create_refFlat:
 		'{}.refFlat'.format(annotation_prefix)
 	conda: '../envs/dropseq_tools.yaml'
 	shell:
-		"""ConvertToRefFlat\
+		"""export _JAVA_OPTIONS="-Djava.io.tmpdir={params.temp_directory} $_JAVA_OPTIONS" && ConvertToRefFlat -m {params.memory}\
 		ANNOTATIONS_FILE={input.annotation}\
 		OUTPUT={output}\
 		SEQUENCE_DICTIONARY={input.reference_dict}
@@ -62,7 +62,7 @@ rule create_intervals:
 		annotation_reduced='{}.reduced.gtf'.format(annotation_prefix),
 		reference_dict='{}.dict'.format(reference_prefix)
 	params:
-		dropseq_wrapper='scripts/drop-seq-tools-wrapper.sh',
+		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
 		memory=config['LOCAL']['memory'],
 		reference_directory=config['META']['reference-directory'],
 		reference_prefix=re.split(".fasta|.fa",config['META']['reference-file'])[0]
@@ -71,7 +71,7 @@ rule create_intervals:
 		'{}.rRNA.intervals'.format(reference_prefix)
 	conda: '../envs/dropseq_tools.yaml'
 	shell:
-		"""{params.dropseq_wrapper} -m {params.memory} -p CreateIntervalsFiles\
+		"""export _JAVA_OPTIONS="-Djava.io.tmpdir={params.temp_directory} $_JAVA_OPTIONS" && CreateIntervalsFiles -m {params.memory}\
 		REDUCED_GTF={input.annotation_reduced}\
 		SEQUENCE_DICTIONARY={input.reference_dict}\
 		O={params.reference_directory}\
