@@ -19,7 +19,6 @@ rule extract_umi_expression:
 		count_per_umi=config['EXTRACTION']['minimum-counts-per-UMI'],
 		num_cells=lambda wildcards: samples.loc[wildcards.sample,'expected_cells'],
 		cellBarcodeEditDistance=config['EXTRACTION']['UMI-edit-distance'],
-		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
 		temp_directory=config['LOCAL']['temp-directory'],
 		memory=config['LOCAL']['memory']
 	conda: '../envs/dropseq_tools.yaml'
@@ -42,8 +41,7 @@ rule extract_umi_expression_whitelist:
 	params:
 		summary='summary/{sample}_dge.summary.txt',
 		count_per_umi=config['EXTRACTION']['minimum-counts-per-UMI'],
-		cellBarcodeEditDistance=config['EXTRACTION']['UMI-edit-distance'],
-		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
+		cellBarcodeEditDistance=config['EXTRACTION']['UMI-edit-distance'],		
 		temp_directory=config['LOCAL']['temp-directory'],
 		memory=config['LOCAL']['memory']
 	conda: '../envs/dropseq_tools.yaml'
@@ -65,8 +63,7 @@ rule extract_reads_expression_whitelist:
 	params:
 		summary='summary/{sample}_dge.summary.txt',
 		count_per_umi=config['EXTRACTION']['minimum-counts-per-UMI'],
-		cellBarcodeEditDistance=config['EXTRACTION']['UMI-edit-distance'],
-		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
+		cellBarcodeEditDistance=config['EXTRACTION']['UMI-edit-distance'],		
 		temp_directory=config['LOCAL']['temp-directory'],
 		memory=config['LOCAL']['memory']
 	conda: '../envs/dropseq_tools.yaml'	
@@ -88,8 +85,7 @@ rule extract_reads_expression:
 	params:
 		count_per_umi=config['EXTRACTION']['minimum-counts-per-UMI'],
 		num_cells=lambda wildcards: samples.loc[wildcards.sample,'expected_cells'],
-		cellBarcodeEditDistance=config['EXTRACTION']['UMI-edit-distance'],
-		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
+		cellBarcodeEditDistance=config['EXTRACTION']['UMI-edit-distance'],	
 		temp_directory=config['LOCAL']['temp-directory'],
 		memory=config['LOCAL']['memory']
 	conda: '../envs/dropseq_tools.yaml'	
@@ -110,8 +106,7 @@ rule extract_umi_per_gene:
 		'logs/{sample}_umi_per_gene.tsv'
 	params:
 		num_cells=lambda wildcards: samples.loc[wildcards.sample,'expected_cells'],
-		cellBarcodeEditDistance=config['EXTRACTION']['UMI-edit-distance'],
-		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
+		cellBarcodeEditDistance=config['EXTRACTION']['UMI-edit-distance'],	
 		temp_directory=config['LOCAL']['temp-directory'],
 		memory=config['LOCAL']['memory']
 	conda: '../envs/dropseq_tools.yaml'	
@@ -129,8 +124,7 @@ rule extract_umi_per_gene_whitelist:
 	output:
 		'logs/{sample}_umi_per_gene.tsv'
 	params:
-		cellBarcodeEditDistance=config['EXTRACTION']['UMI-edit-distance'],
-		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
+		cellBarcodeEditDistance=config['EXTRACTION']['UMI-edit-distance'],	
 		temp_directory=config['LOCAL']['temp-directory'],
 		memory=config['LOCAL']['memory']
 	conda: '../envs/dropseq_tools.yaml'
@@ -148,8 +142,7 @@ rule SingleCellRnaSeqMetricsCollector:
 		refFlat="{}.refFlat".format(annotation_prefix),
 		rRNA_intervals="{}.rRNA.intervals".format(reference_prefix),
 	params:
-		cells=lambda wildcards: samples.loc[wildcards.sample,'expected_cells'],
-		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
+		cells=lambda wildcards: samples.loc[wildcards.sample,'expected_cells'],		
 		temp_directory=config['LOCAL']['temp-directory'],
 		memory=config['LOCAL']['memory']
 	output:
@@ -170,8 +163,7 @@ rule SingleCellRnaSeqMetricsCollector_whitelist:
 		barcode_whitelist='barcodes.csv',
 		refFlat="{}.refFlat".format(annotation_prefix),
 		rRNA_intervals="{}.rRNA.intervals".format(reference_prefix)
-	params:
-		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
+	params:		
 		temp_directory=config['LOCAL']['temp-directory'],
 		memory=config['LOCAL']['memory']
 	output:
