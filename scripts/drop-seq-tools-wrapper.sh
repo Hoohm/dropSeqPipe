@@ -2,8 +2,6 @@
 #Author: Paul Hoffman
 set -eo pipefail
 
-JAR_DIR="$(dirname $0)/jar"
-
 declare -a PROGRAMS=(
     'BAMTagHistogram'
     'BAMTagofTagCounts'
@@ -72,4 +70,5 @@ done
 [[ ${PROGRAMS[@]} =~ ${PROGRAM} ]] || (echo "Invalid program: ${PROGRAM}" >&2; exit 1)
 
 [[ -d "${TEMP}" ]] || (set -x; mkdir -p "${TEMP}")
-(set -x; java -Xmx${XMX} -Djava.io.tmpdir=${TEMP} -jar "${JAR_DIR}/dropseq.jar" "${PROGRAM}" ${ARGUMENTS[@]})
+
+(set -x; export _JAVA_OPTIONS="-Djava.io.tmpdir=${TEMP} $_JAVA_OPTIONS" && "${PROGRAM}" ${ARGUMENTS[@]})

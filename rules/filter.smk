@@ -33,11 +33,11 @@ rule BC_tags:
 		BC_end=config['FILTER']['cell-barcode']['end'],
 		BC_minQuality=config['FILTER']['cell-barcode']['min-quality'],
 		BC_minQuality_num=config['FILTER']['cell-barcode']['num-below-quality']+1,
-		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
 		memory=config['LOCAL']['memory'],
 		temp_directory=config['LOCAL']['temp-directory']
+	conda: '../envs/dropseq_tools.yaml'
 	shell:
-		"""{params.dropseq_wrapper} -m {params.memory} -t {params.temp_directory} -p TagBamWithReadSequenceExtended\
+		"""export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && TagBamWithReadSequenceExtended -m {params.memory}\
 		SUMMARY={output.BC_summary}\
 		BASE_RANGE={params.BC_start}-{params.BC_end}\
 		BASE_QUALITY={params.BC_minQuality}\
@@ -60,11 +60,11 @@ rule UMI_tags:
 		UMI_end=config['FILTER']['UMI-barcode']['end'],
 		UMI_minQuality=config['FILTER']['UMI-barcode']['min-quality'],
 		UMI_minQuality_num=config['FILTER']['UMI-barcode']['num-below-quality']+1,
-		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
 		memory=config['LOCAL']['memory'],
 		temp_directory=config['LOCAL']['temp-directory']
+	conda: '../envs/dropseq_tools.yaml'
 	shell:
-		"""{params.dropseq_wrapper} -m {params.memory} -t {params.temp_directory} -p TagBamWithReadSequenceExtended\
+		"""export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && TagBamWithReadSequenceExtended -m {params.memory}\
 		SUMMARY={output.UMI_summary}\
 		BASE_RANGE={params.UMI_start}-{params.UMI_end}\
 		BASE_QUALITY={params.UMI_minQuality}\
@@ -80,12 +80,12 @@ rule filter_tags:
 		'data/{sample}_BC_UMI_tagged_unmapped.bam'
 	output: 
 		temp('data/{sample}_tags_filtered_unmapped.bam')
-	params:
-		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
+	params:		
 		memory=config['LOCAL']['memory'],
 		temp_directory=config['LOCAL']['temp-directory']
+	conda: '../envs/dropseq_tools.yaml'
 	shell:
-		"""{params.dropseq_wrapper} -m {params.memory} -t {params.temp_directory} -p FilterBAM\
+		"""export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} &&  FilterBAM -m {params.memory}\
 		TAG_REJECT=XQ\
 		INPUT={input}\
 		OUTPUT={output}
@@ -109,11 +109,11 @@ rule start_trim:
 		trim_summary='logs/{sample}_start_trim.txt'
 	params:
 		SmartAdapter=config['FILTER']['5-prime-smart-adapter'],
-		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
 		memory=config['LOCAL']['memory'],
 		temp_directory=config['LOCAL']['temp-directory']
+	conda: '../envs/dropseq_tools.yaml'
 	shell:
-		"""{params.dropseq_wrapper} -m {params.memory} -t {params.temp_directory} -p TrimStartingSequence\
+		"""export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && TrimStartingSequence -m {params.memory}\
 		OUTPUT_SUMMARY={output.trim_summary}\
 		SEQUENCE={params.SmartAdapter}\
 		MISMATCHES=1\
@@ -127,12 +127,12 @@ rule polya_trim:
 	output:
 		data='data/{sample}_trimmed_unmapped.bam',
 		trim_summary='logs/{sample}_polyA_trim.txt'
-	params:
-		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
+	params:		
 		memory=config['LOCAL']['memory'],
 		temp_directory=config['LOCAL']['temp-directory']
+	conda: '../envs/dropseq_tools.yaml'
 	shell:
-		"""{params.dropseq_wrapper} -m {params.memory} -t {params.temp_directory} -p PolyATrimmer\
+		"""export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && PolyATrimmer -m {params.memory}\
 		OUTPUT_SUMMARY={output.trim_summary}\
 		MISMATCHES=0\
 		NUM_BASES=5\

@@ -3,7 +3,7 @@ import platform
 """Generate all the meta data files"""
 
 #Which rules will be run on the host computer and not sent to nodes
-localrules: create_dict, reduce_gtf, create_refFlat, create_intervals, create_star_index
+localrules: create_dict, reduce_gtf, create_refFlat, create_intervals
 
 rule create_dict:
 	input:
@@ -26,12 +26,13 @@ rule reduce_gtf:
 		reference_dict='{}.dict'.format(reference_prefix),
 		annotation=annotation_file
 	params:
-		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
-		memory=config['LOCAL']['memory']
+		memory=config['LOCAL']['memory'],
+		temp_directory=config['LOCAL']['temp-directory']
 	output:
 		'{}.reduced.gtf'.format(annotation_prefix)
+	conda: '../envs/dropseq_tools.yaml'
 	shell:
-		"""{params.dropseq_wrapper} -m {params.memory} -p ReduceGTF\
+		"""export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && ReduceGTF -m {params.memory}\
 		GTF={input.annotation}\
 		OUTPUT={output}\
 		SEQUENCE_DICTIONARY={input.reference_dict}\
@@ -44,12 +45,13 @@ rule create_refFlat:
 		annotation=annotation_file,
 		reference_dict='{}.dict'.format(reference_prefix)
 	params:
-		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
-		memory=config['LOCAL']['memory']
+		memory=config['LOCAL']['memory'],
+		temp_directory=config['LOCAL']['temp-directory']
 	output:
 		'{}.refFlat'.format(annotation_prefix)
+	conda: '../envs/dropseq_tools.yaml'
 	shell:
-		"""{params.dropseq_wrapper} -m {params.memory} -p ConvertToRefFlat\
+		"""export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && ConvertToRefFlat -m {params.memory}\
 		ANNOTATIONS_FILE={input.annotation}\
 		OUTPUT={output}\
 		SEQUENCE_DICTIONARY={input.reference_dict}
@@ -60,15 +62,16 @@ rule create_intervals:
 		annotation_reduced='{}.reduced.gtf'.format(annotation_prefix),
 		reference_dict='{}.dict'.format(reference_prefix)
 	params:
-		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
 		memory=config['LOCAL']['memory'],
 		reference_directory=config['META']['reference-directory'],
-		reference_prefix=re.split(".fasta|.fa",config['META']['reference-file'])[0]
+		reference_prefix=re.split(".fasta|.fa",config['META']['reference-file'])[0],
+		temp_directory=config['LOCAL']['temp-directory']
 		
 	output:
 		'{}.rRNA.intervals'.format(reference_prefix)
+	conda: '../envs/dropseq_tools.yaml'
 	shell:
-		"""{params.dropseq_wrapper} -m {params.memory} -p CreateIntervalsFiles\
+		"""export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && CreateIntervalsFiles -m {params.memory}\
 		REDUCED_GTF={input.annotation_reduced}\
 		SEQUENCE_DICTIONARY={input.reference_dict}\
 		O={params.reference_directory}\
@@ -98,11 +101,11 @@ rule create_star_index:
 		genomeChrBinNbits=get_genomeChrBinNbits(reference_file)
 	output:
 		'{star_index_prefix}_{read_length}/SA'
-	threads: 4
+	threads: 12
 	conda: '../envs/star.yaml'
 	shell:
 		"""mkdir -p {params.genomeDir}; STAR\
-		--runThreadN 4\
+		--runThreadN {threads}\
 		--runMode genomeGenerate\
 		--genomeDir {params.genomeDir}\
 		--genomeFastaFiles {input.reference_file}\
