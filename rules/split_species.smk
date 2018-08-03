@@ -29,7 +29,6 @@ rule extract_all_umi_expression_species:
 	output:
 		umi_matrix=temp('summary/{species}/{sample}_unfiltered_umi_expression_matrix.tsv'),
 		summary='summary/{species}/{sample}_dge.summary.txt'
-
 	params:
 		count_per_umi=config['EXTRACTION']['minimum-counts-per-UMI'],
 		num_cells=lambda wildcards: samples.loc[wildcards.sample,'expected_cells'],

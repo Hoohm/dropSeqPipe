@@ -90,6 +90,27 @@ def get_genomeChrBinNbits(file):
 	referenceNumber = int(next(referenceNumber))
 	return(min([18,int(math.log2(genomeLength/referenceNumber))]))
 
+rule get_genomeChrBinNbits:
+	input:
+		reference_file=reference_file
+	params:
+		samples_file='samples.csv',
+		reference_directory=config['reference-directory']
+	output:
+		'{params.reference_directory}/index_params.txt'
+	run:
+		"""
+		from math import log2
+		from platform import system
+		if (system() == 'Darwin'):
+			genomeLength = shell("wc -c {} | cut -d' ' -f2".format(snakemake.reference_file), iterable=True)
+		else:
+			genomeLength = shell("wc -c {} | cut -d' ' -f1".format(snakemake.reference_file), iterable=True)
+		genomeLength = int(next(genomeLength))
+		referenceNumber = shell('grep "^>" {} | wc -l'.format(snakemake.reference_file), iterable=True)
+		referenceNumber = int(next(referenceNumber))
+		value = min([18,int(log2(genomeLength/referenceNumber))])
+		"""
 
 rule create_star_index:
 	input:
