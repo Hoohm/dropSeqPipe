@@ -85,7 +85,7 @@ rule filter_tags:
 		temp_directory=config['LOCAL']['temp-directory']
 	conda: '../envs/dropseq_tools.yaml'
 	shell:
-		"""{params.dropseq_wrapper} -m {params.memory} -t {params.temp_directory} -p FilterBAM -m {params.memory}\
+		"""export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} &&  FilterBAM -m {params.memory}\
 		TAG_REJECT=XQ\
 		INPUT={input}\
 		OUTPUT={output}
