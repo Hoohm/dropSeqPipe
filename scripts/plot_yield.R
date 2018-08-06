@@ -3,6 +3,7 @@ library(reshape2)
 library(grid)
 library(gridExtra)
 library(viridis)
+library(stringr)
 
 samples = snakemake@params$sample_names
 batches = snakemake@params$batches
@@ -15,11 +16,61 @@ for(i in 1:length(samples)){
   STAR_output = read.table(snakemake@input$STAR_output[i], skip = 5, sep = '\t', fill = TRUE, stringsAsFactors = FALSE)
   sample = samples[i]
   #Read files
-  BC_UMI_filtered_reads_left = read.table(snakemake@input$reads_left[i])
-  trimmomatic_filtered_reads_left = read.table(snakemake@input$trimmomatic_filtered[i])/4
-  BC_tagged_data = read.table(snakemake@input$BC_tagged[i], header = TRUE)
+  bbmap_log = read.table(snakemake@input$repaired[i], sep=':', header=FALSE, skip=6, row.names=1, nrows=4)
+  total_reads = as.numeric(str_match(bbmap_log['Input',], pattern = "\t([0-9]{1,20}) reads \t.*")[,2])/2
+  reads_after_filtering = as.numeric(str_match(bbmap_log['Pairs',], pattern = "\t([0-9]{1,20}) reads.*")[,2])/2
+  
+  R1_filtered = read.table(snakemake@input$R1_filtered[i], header = FALSE, skip=8, sep=':', nrows=7, row.names=1)
+  R2_filtered = read.table(snakemake@input$R2_filtered[i], header = FALSE, skip=8, sep=':', nrows=7, row.names=1)
+  
+  R1_adapters = as.numeric(str_remove_all(str_match(R1_filtered['Reads with adapters',], pattern = "(.*) \\(")[,2], pattern = (' |,')))
+  R1_too_short = as.numeric(str_remove_all(str_match(R1_filtered['Reads that were too short',], pattern = "(.*) \\(")[,2], pattern = (' |,')))
+  R1_passed = as.numeric(str_remove_all(str_match(R1_filtered['Reads written (passing filters)',], pattern = "(.*) \\(")[,2], pattern = (' |,')))
+  R1_bad_base_quality = R1_too_short - R1_adapters
+  
+  R2_adapters = as.numeric(str_remove_all(str_match(R2_filtered['Reads with adapters',], pattern = "(.*) \\(")[,2], pattern = (' |,')))
+  R2_too_short = as.numeric(str_remove_all(str_match(R2_filtered['Reads that were too short',], pattern = "(.*) \\(")[,2], pattern = (' |,')))
+  R2_passed = as.numeric(str_remove_all(str_match(R2_filtered['Reads written (passing filters)',], pattern = "(.*) \\(")[,2], pattern = (' |,')))
+  R2_bad_base_quality = R2_too_short - R2_adapters
   
   data[i,'Trimmomatic_filtered'] = BC_UMI_filtered_reads_left - trimmomatic_filtered_reads_left
+  
+total_reads = as.numeric(str_remove_all(R1_filtered['Total reads processed',], pattern = (' |,')))
+
+  R1_adapters = as.numeric(str_remove_all(str_match(R1_filtered['Reads with adapters',], pattern = "(.*) \\(")[,2], pattern = (' |,')))
+  print(R1_filtered)
+  R1_too_short = as.numeric(str_remove_all(str_match(R1_filtered['Reads that were too short',], pattern = "(.*) \\(")[,2], pattern = (' |,')))
+  R1_passed = as.numeric(str_remove_all(str_match(R1_filtered['Reads written (passing filters)',], pattern = "(.*) \\(")[,2], pattern = (' |,')))
+  R1_bad_base_quality = R1_too_short - R1_adapters
+  
+  R2_adapters = as.numeric(str_remove_all(str_match(R2_filtered['Reads with adapters',], pattern = "(.*) \\(")[,2], pattern = (' |,')))
+  print(R2_filtered)
+  
+  R2_too_short = as.numeric(str_remove_all(str_match(R2_filtered['Reads that were too short',], pattern = "(.*) \\(")[,2], pattern = (' |,')))
+  R2_passed = as.numeric(str_remove_all(str_match(R2_filtered['Reads written (passing filters)',], pattern = "(.*) \\(")[,2], pattern = (' |,')))
+  R2_trimmed_reads_adapters = total_reads - (R2_passed + R2_too_short)
+  R2_not_trimmed_reads_adapters = R2_adapters - R2_trimmed_reads_adapters
+
+  data[which(data$Sample == sample),'Pair'] = c('R1','R2')
+
+  data[which(data$Sample == sample),'Adapter presence'] = c(R1_adapters, R2_trimmed_reads_adapters)
+  data[which(data$Sample == sample),'Too short'] = c(R1_too_short, R2_too_short)
+  data[which(data$Sample == sample),'Passed filters'] = c(R1_passed, R2_passed)
+  print(data)
+  tagged_cell_ids = which(Cell_tagged_data$num_failed_bases > snakemake@params$min_num_below_Cell)
+  num_reads_Cell_tagged = sum(Cell_tagged_data$num_barcodes[tagged_cell_ids])
+  UMI_tagged_data = read.table(snakemake@input$UMI_tagged[i], header = TRUE)
+  tagged_umi_ids = which(UMI_tagged_data$num_failed_bases > snakemake@params$min_num_below_UMI)
+  num_reads_UMI_tagged = sum(UMI_tagged_data$num_barcodes[tagged_umi_ids])
+
+  intersection = num_reads_Cell_tagged + num_reads_UMI_tagged + Cell_UMI_filtered_reads_left - data[i,'Total_reads']
+  total_tags_filtered = data[i,'Total_reads'] - Cell_UMI_filtered_reads_left
+  #Since we don't know how much of cell and UMI barcodes intersect in terms of tagging, we assume linear proportions and substract them.
+  num_reads_Cell_dropped = num_reads_Cell_tagged - intersection
+  num_reads_UMI_dropped = num_reads_UMI_tagged - intersection
+  #num_reads_Cell_dropped = round(num_reads_Cell_tagged - (intersection/total_tags_filtered)*num_reads_Cell_tagged)
+  #num_reads_UMI_dropped = total_tags_filtered - num_reads_Cell_dropped
+
   
   #STAR output
   reads_in = as.numeric(STAR_output$V2[1])

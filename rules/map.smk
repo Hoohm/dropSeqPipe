@@ -9,7 +9,7 @@ localrules: multiqc_star, plot_yield, plot_knee_plot, plot_knee_plot_whitelist
 
 rule STAR_align:
 	input:
-		fq1="data/{sample}_filtered.fastq.gz",
+		fq1="data/{sample}/{sample}_trimmmed_repaired_R2.fastq.gz",
 		index=lambda wildcards: star_index_prefix + '_' + str(samples.loc[wildcards.sample,'read_length']) + '/SA'
 	output:
 		temp('data/{sample}/Aligned.out.bam')
@@ -17,6 +17,7 @@ rule STAR_align:
 		'data/{sample}/Log.final.out'
 	params:
 		extra="""--outReadsUnmapped Fastx\
+				--outSAMattributes NH HI NM AS MD\
 			 	--outFilterMismatchNmax {}\
 			 	--outFilterMismatchNoverLmax {}\
 			 	--outFilterMismatchNoverReadLmax {}\
@@ -34,23 +35,6 @@ rule STAR_align:
 	wrapper:
 		"0.22.0/bio/star/align"
 
-rule sort_sam:
-	input:
-		'data/{sample}/Aligned.out.bam'
-	params:
-		temp_directory=config['LOCAL']['temp-directory'],
-		picard="$CONDA_PREFIX/share/picard-2.14.1-0/picard.jar",
-		memory=config['LOCAL']['memory']
-	output:
-		temp('data/{sample}.Aligned.sorted.bam')
-	conda: '../envs/picard.yaml'
-	shell:
-		"""java -Xmx{params.memory} -jar -Djava.io.tmpdir={params.temp_directory} {params.picard} SortSam\
-		INPUT={input}\
-		OUTPUT={output}\
-		SORT_ORDER=queryname\
-		TMP_DIR={params.temp_directory}
-		"""
 rule multiqc_star:
 	input:
 		expand('data/{sample}/Log.final.out', sample=samples.index)
@@ -63,26 +47,20 @@ rule multiqc_star:
 
 rule MergeBamAlignment:
 	input:
-		unmapped='data/{sample}_trimmed_unmapped.bam',
-		mapped='data/{sample}.Aligned.sorted.bam',
-		dict_file='{}.dict'.format(reference_prefix)
+		mapped='data/{sample}/Aligned.out.bam',
+		R1_ref = "data/{sample}/{sample}_trimmmed_repaired_R1.fastq.gz"
 	output:
 		temp('data/{sample}.Aligned.merged.bam')
 	params:
-		picard="$CONDA_PREFIX/share/picard-2.14.1-0/picard.jar",
-		reference_file=reference_file,
-		temp_directory=config['LOCAL']['temp-directory'],
-		memory=config['LOCAL']['memory']
-	conda: '../envs/picard.yaml'
-	shell:
-		"""java -Djava.io.tmpdir={params.temp_directory} -Xmx{params.memory} -jar {params.picard} MergeBamAlignment\
-		REFERENCE_SEQUENCE={params.reference_file}\
-		UNMAPPED_BAM={input.unmapped}\
-		ALIGNED_BAM={input.mapped}\
-		INCLUDE_SECONDARY_ALIGNMENTS=false\
-		PAIRED_RUN=false\
-		OUTPUT={output}
-		"""
+		BC_start=config['FILTER']['cell-barcode']['start']-1,
+		BC_end=config['FILTER']['cell-barcode']['end'],
+		UMI_start=config['FILTER']['UMI-barcode']['start']-1,
+		UMI_end=config['FILTER']['UMI-barcode']['end'],
+		discard_secondary_alignements=True
+	conda: '../envs/merge_bam.yaml'
+	script:
+		'../scripts/merge_bam.py'
+
 rule TagReadWithGeneExon:
 	input:
 		data='data/{sample}.Aligned.merged.bam',
@@ -93,9 +71,8 @@ rule TagReadWithGeneExon:
 		temp_directory=config['LOCAL']['temp-directory']
 	output:
 		temp('data/{sample}_gene_exon_tagged.bam')
-	conda: '../envs/dropseq.yaml'
 	shell:
-		"""{params.dropseq_wrapper} -t {params.temp_directory} -m {params.memory} -p TagReadWithGeneExon\
+		"""TagReadWithGeneExon\
 		INPUT={input.data}\
 		OUTPUT={output}\
 		ANNOTATIONS_FILE={input.refFlat}\
@@ -114,11 +91,9 @@ rule bead_errors_metrics:
 		barcodes=lambda wildcards: int(samples.loc[wildcards.sample,'expected_cells']) * 2,
 		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
 		memory =config['LOCAL']['memory'],
-		SmartAdapter=config['FILTER']['5-prime-smart-adapter'],
 		temp_directory=config['LOCAL']['temp-directory']
-	conda: '../envs/dropseq.yaml'
 	shell:
-		"""{params.dropseq_wrapper} -t {params.temp_directory} -m {params.memory} -p DetectBeadSynthesisErrors\
+		"""DetectBeadSynthesisErrors\
 		INPUT={input}\
 		OUTPUT={output}\
 		OUTPUT_STATS={params.out_stats}\
@@ -136,9 +111,8 @@ rule bam_hist:
 		temp_directory=config['LOCAL']['temp-directory']
 	output:
 		'logs/{sample}_hist_out_cell.txt'
-	conda: '../envs/dropseq.yaml'
 	shell:
-		"""{params.dropseq_wrapper} -p BAMTagHistogram -m {params.memory} -t {params.temp_directory}\
+		"""BAMTagHistogram\
 		TAG=XC\
 		I={input}\
 		READ_QUALITY=10\
@@ -147,18 +121,13 @@ rule bam_hist:
 
 rule plot_yield:
 	input:
-		BC_tagged=expand('logs/{sample}_CELL_barcode.txt', sample=samples.index),
-		UMI_tagged=expand('logs/{sample}_UMI_barcode.txt', sample=samples.index),
-		reads_left=expand('logs/{sample}_reads_left.txt', sample=samples.index),
+		R1_filtered=expand('logs/cutadapt/{sample}_R1.qc.txt', sample=samples.index),
+		R2_filtered=expand('logs/cutadapt/{sample}_R2.qc.txt', sample=samples.index),
+		repaired=expand('logs/bbmap/{sample}_repair.txt', sample=samples.index),
 		STAR_output=expand('data/{sample}/Log.final.out', sample=samples.index),
-		trimmomatic_filtered=expand('logs/{sample}_reads_left_trim.txt', sample=samples.index)
 	params:
 		BC_length=config['FILTER']['cell-barcode']['end'] - config['FILTER']['cell-barcode']['start']+1,
 		UMI_length=config['FILTER']['UMI-barcode']['end'] - config['FILTER']['UMI-barcode']['start']+1,
-		min_num_below_BC=config['FILTER']['cell-barcode']['num-below-quality'],
-		min_num_below_UMI=config['FILTER']['UMI-barcode']['num-below-quality'],
-		min_BC_quality=config['FILTER']['cell-barcode']['min-quality'],
-		min_UMI_quality=config['FILTER']['UMI-barcode']['min-quality'],
 		sample_names=lambda wildcards: samples.index,
 		batches=lambda wildcards: samples.loc[samples.index, 'batch']
 	conda: '../envs/plots.yaml'

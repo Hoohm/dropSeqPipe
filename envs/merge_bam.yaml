@@ -1,0 +1,6 @@
+channels:
+  - bioconda
+dependencies:
+  - pysam
+  - biopython
+  - python>=3.6

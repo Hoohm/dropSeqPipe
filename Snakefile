@@ -65,7 +65,15 @@ rule all:
 
 rule testing:
     input: 
-        expand('data/{sample}/{sample}_trimmed_unmapped.fastq.gz', sample=samples.index)
+        # expand('data/{sample}/{sample}_trimmmed_repaired_R1.fastq.gz', sample=samples.index),
+        # expand('data/{sample}/{sample}_trimmmed_repaired_R2.fastq.gz', sample=samples.index),
+        # expand('data/{sample}/Aligned.out.bam', sample=samples.index),
+        # 'reports/star.html',
+        # expand('data/{sample}.Aligned.merged.bam', sample=samples.index),
+        # expand('data/{sample}_gene_exon_tagged.bam', sample=samples.index),
+        # expand('logs/{sample}_hist_out_cell.txt', sample=samples.index),
+        'reports/filter.html',
+        'plots/adapter_content.pdf'
 
 rule meta:
     input:

@@ -22,7 +22,6 @@ rule extract_umi_expression:
 		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
 		temp_directory=config['LOCAL']['temp-directory'],
 		memory=config['LOCAL']['memory']
-	conda: '../envs/dropseq.yaml'
 	shell:
 		"""{params.dropseq_wrapper} -t {params.temp_directory} -m {params.memory} -p DigitalExpression\
 		I={input}\
@@ -46,7 +45,6 @@ rule extract_umi_expression_whitelist:
 		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
 		temp_directory=config['LOCAL']['temp-directory'],
 		memory=config['LOCAL']['memory']
-	conda: '../envs/dropseq.yaml'
 	shell:
 		"""{params.dropseq_wrapper} -t {params.temp_directory} -m {params.memory} -p DigitalExpression\
 		I={input.data}\
@@ -69,7 +67,6 @@ rule extract_reads_expression_whitelist:
 		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
 		temp_directory=config['LOCAL']['temp-directory'],
 		memory=config['LOCAL']['memory']		
-	conda: '../envs/dropseq.yaml'
 	shell:
 		"""{params.dropseq_wrapper} -t {params.temp_directory} -m {params.memory} -p DigitalExpression\
 		I={input.data}\
@@ -92,7 +89,6 @@ rule extract_reads_expression:
 		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
 		temp_directory=config['LOCAL']['temp-directory'],
 		memory=config['LOCAL']['memory']		
-	conda: '../envs/dropseq.yaml'
 	shell:
 		"""{params.dropseq_wrapper} -t {params.temp_directory} -m {params.memory} -p DigitalExpression\
 		I={input}\
@@ -114,7 +110,6 @@ rule extract_umi_per_gene:
 		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
 		temp_directory=config['LOCAL']['temp-directory'],
 		memory=config['LOCAL']['memory']		
-	conda: '../envs/dropseq.yaml'
 	shell:
 		"""{params.dropseq_wrapper} -t {params.temp_directory} -m {params.memory} -p GatherMolecularBarcodeDistributionByGene\
 		EDIT_DISTANCE={params.cellBarcodeEditDistance}\
@@ -133,7 +128,6 @@ rule extract_umi_per_gene_whitelist:
 		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
 		temp_directory=config['LOCAL']['temp-directory'],
 		memory=config['LOCAL']['memory']
-	conda: '../envs/dropseq.yaml'
 	shell:
 		"""{params.dropseq_wrapper} -t {params.temp_directory} -m {params.memory} -p GatherMolecularBarcodeDistributionByGene\
 		EDIT_DISTANCE={params.cellBarcodeEditDistance}\
@@ -154,7 +148,6 @@ rule SingleCellRnaSeqMetricsCollector:
 		memory=config['LOCAL']['memory']
 	output:
 		'logs/{sample}_rna_metrics.txt'
-	conda: '../envs/dropseq.yaml'
 	shell:
 		"""{params.dropseq_wrapper} -t {params.temp_directory} -m {params.memory} -p SingleCellRnaSeqMetricsCollector\
 		INPUT={input.data}\
@@ -176,7 +169,6 @@ rule SingleCellRnaSeqMetricsCollector_whitelist:
 		memory=config['LOCAL']['memory']
 	output:
 		'logs/{sample}_rna_metrics.txt'
-	conda: '../envs/dropseq.yaml'
 	shell:
 		"""{params.dropseq_wrapper} -t {params.temp_directory} -m {params.memory} -p SingleCellRnaSeqMetricsCollector\
 		INPUT={input.data}\

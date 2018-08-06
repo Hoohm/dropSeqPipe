@@ -15,7 +15,6 @@ rule split_bam_species:
 		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
 		memory=config['LOCAL']['memory'],
 		temp_directory=config['LOCAL']['temp-directory']
-	conda: '../envs/dropseq.yaml'
 	shell:
 		"""{params.dropseq_wrapper} -t {params.temp_directory} -m {params.memory} -p FilterBAM\
 		REF_SOFT_MATCHED_RETAINED={params.species}\
@@ -36,7 +35,6 @@ rule extract_all_umi_expression_species:
 		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
 		memory=config['LOCAL']['memory'],
 		temp_directory=config['LOCAL']['temp-directory']
-	conda: '../envs/dropseq.yaml'
 	shell:
 		"""{params.dropseq_wrapper} -t {params.temp_directory} -m {params.memory} -p DigitalExpression\
 		I={input}\
@@ -59,7 +57,6 @@ rule extract_all_umi_expression_whitelist_species:
 		dropseq_wrapper=config['LOCAL']['dropseq-wrapper'],
 		memory=config['LOCAL']['memory'],
 		temp_directory=config['LOCAL']['temp-directory']
-	conda: '../envs/dropseq.yaml'
 	shell:
 		"""{params.dropseq_wrapper} -t {params.temp_directory} -m {params.memory} -p DigitalExpression\
 		I={input.data}\
