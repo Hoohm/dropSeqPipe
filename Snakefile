@@ -71,8 +71,9 @@ rule testing:
         # expand('data/{sample}.Aligned.merged.bam', sample=samples.index),
         # expand('data/{sample}_gene_exon_tagged.bam', sample=samples.index),
         # expand('logs/{sample}_hist_out_cell.txt', sample=samples.index),
-        'reports/filter.html',
-        'plots/adapter_content.pdf'
+        #'reports/filter.html',
+        #'plots/adapter_content.pdf'
+        'plots/yield.pdf'
 
 rule meta:
     input:

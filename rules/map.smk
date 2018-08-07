@@ -90,7 +90,8 @@ rule bead_errors_metrics:
 		summary='logs/{sample}_synthesis_stats_summary.txt',
 		barcodes=lambda wildcards: int(samples.loc[wildcards.sample,'expected_cells']) * 2,
 		memory =config['LOCAL']['memory'],
-		temp_directory=config['LOCAL']['temp-directory']
+		temp_directory=config['LOCAL']['temp-directory'],
+		SmartAdapter = config['FILTER']['5-prime-smart-adapter']
 	conda: '../envs/dropseq_tools.yaml'
 	shell:
 		"""export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && DetectBeadSynthesisErrors -m {params.memory}\
