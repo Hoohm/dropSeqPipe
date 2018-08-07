@@ -7,9 +7,9 @@ localrules: plot_barnyard
 
 rule split_bam_species:
 	input:
-		'data/{sample}_final.bam'
+		'data/{sample}/final.bam'
 	output:
-		'data/{species}/{sample}_unfiltered.bam'
+		'data/{species}/{sample}/unfiltered.bam'
 	params:
 		species=lambda wildcards: wildcards.species,
 		memory=config['LOCAL']['memory'],
@@ -24,10 +24,10 @@ rule split_bam_species:
 
 rule extract_all_umi_expression_species:
 	input:
-		'data/{species}/{sample}_unfiltered.bam'
+		'data/{species}/{sample}/unfiltered.bam'
 	output:
-		umi_matrix=temp('summary/{species}/{sample}_unfiltered_umi_expression_matrix.tsv'),
-		summary='summary/{species}/{sample}_dge.summary.txt'
+		umi_matrix=temp('summary/{species}/{sample}/unfiltered_umi_expression_matrix.tsv'),
+		summary='data/{species}/{sample}/dge.summary.txt'
 	params:
 		count_per_umi=config['EXTRACTION']['minimum-counts-per-UMI'],
 		num_cells=lambda wildcards: samples.loc[wildcards.sample,'expected_cells'],
@@ -46,11 +46,11 @@ rule extract_all_umi_expression_species:
 
 rule extract_all_umi_expression_whitelist_species:
 	input: 
-		data='data/{species}/{sample}_unfiltered.bam',
+		data='data/{species}/{sample}/unfiltered.bam',
 		barcode_whitelist='barcodes.csv'
 	output:
-		umi_matrix=temp('summary/{species}/{sample}_unfiltered_umi_expression_matrix.tsv'),
-		summary='summary/{species}/{sample}_dge.summary.txt'
+		umi_matrix=temp('summary/{species}/{sample}/unfiltered_umi_expression_matrix.tsv'),
+		summary='data/{species}/{sample}/dge.summary.txt'
 	params:
 		count_per_umi=config['EXTRACTION']['minimum-counts-per-UMI'],
 		cellBarcodeEditDistance=config['EXTRACTION']['UMI-edit-distance'],
@@ -69,7 +69,7 @@ rule extract_all_umi_expression_whitelist_species:
 
 rule plot_barnyard:
 	input:
-		expand('summary/{species}/{{sample}}_dge.summary.txt',species=config['META']['species'])
+		expand('data/{species}/{{sample}}/dge.summary.txt',species=config['META']['species'])
 	output: 
 		barcodes_species=expand('summary/{species}/{{sample}}_barcodes.csv', species=config['META']['species']),
 		genes_pdf='plots/{sample}_species_plot_genes.pdf',

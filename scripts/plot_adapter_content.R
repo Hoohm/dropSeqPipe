@@ -1,8 +1,5 @@
 library(ggplot2)
 library(reshape2)
-library(grid)
-library(gridExtra)
-library(viridis)
 library(stringr)
 
 
@@ -39,6 +36,6 @@ p1 = p1 + theme(axis.text.x=element_text(angle = 90, hjust = 0))
 p1 = p1 + facet_grid(~Batch, scales = "free")
 p1 = p1 + facet_wrap(~Pair, nrow=2, scales="free") + theme_minimal()
 p1 = p1 + ggtitle('Comparison accross samples of adapter content')
-p1
 
-ggsave(p1, snakemake@output$pdf)
+
+ggsave(plot=p1, filename=snakemake@output$pdf)

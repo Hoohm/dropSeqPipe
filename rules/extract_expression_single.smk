@@ -11,11 +11,12 @@ localrules: plot_umi_per_gene, plot_rna_metrics, plot_rna_metrics_whitelist, mer
 
 rule extract_umi_expression:
 	input:
-		'data/{sample}_final.bam'
+		'data/{sample}/final.bam'
 	output:
-		'summary/{sample}_umi_expression_matrix.tsv'
+		'data/{sample}/umi_expression_matrix.tsv'
+	log:
+		summary='data/{sample}/dge.summary.txt',
 	params:
-		summary='summary/{sample}_dge.summary.txt',
 		count_per_umi=config['EXTRACTION']['minimum-counts-per-UMI'],
 		num_cells=lambda wildcards: samples.loc[wildcards.sample,'expected_cells'],
 		cellBarcodeEditDistance=config['EXTRACTION']['UMI-edit-distance'],
@@ -27,19 +28,20 @@ rule extract_umi_expression:
 		I={input}\
 		O={output}\
 		EDIT_DISTANCE={params.cellBarcodeEditDistance}\
-		SUMMARY={params.summary}\
+		SUMMARY={log.summary}\
 		NUM_CORE_BARCODES={params.num_cells}\
 		MIN_BC_READ_THRESHOLD={params.count_per_umi}"""
 
 
 rule extract_umi_expression_whitelist:
 	input: 
-		data='data/{sample}_final.bam',
+		data='data/{sample}/final.bam',
 		barcode_whitelist='barcodes.csv'
 	output:
-		'summary/{sample}_umi_expression_matrix.tsv'
+		'data/{sample}/umi_expression_matrix.tsv'
+	log:
+		summary='data/{sample}/dge.summary.txt',
 	params:
-		summary='summary/{sample}_dge.summary.txt',
 		count_per_umi=config['EXTRACTION']['minimum-counts-per-UMI'],
 		cellBarcodeEditDistance=config['EXTRACTION']['UMI-edit-distance'],		
 		temp_directory=config['LOCAL']['temp-directory'],
@@ -51,17 +53,17 @@ rule extract_umi_expression_whitelist:
 		O={output}\
 		EDIT_DISTANCE={params.cellBarcodeEditDistance}\
 		CELL_BC_FILE={input.barcode_whitelist}\
-		SUMMARY={params.summary}\
+		SUMMARY={log.summary}\
 		MIN_BC_READ_THRESHOLD={params.count_per_umi}"""
 
 rule extract_reads_expression_whitelist:
 	input: 
-		data='data/{sample}_final.bam',
+		data='data/{sample}/final.bam',
 		barcode_whitelist='barcodes.csv'
 	output:
-		'summary/{sample}_counts_expression_matrix.tsv'
+		'data/{sample}/counts_expression_matrix.tsv'
 	params:
-		summary='summary/{sample}_dge.summary.txt',
+		summary='data/{sample}/dge.summary.txt',
 		count_per_umi=config['EXTRACTION']['minimum-counts-per-UMI'],
 		cellBarcodeEditDistance=config['EXTRACTION']['UMI-edit-distance'],		
 		temp_directory=config['LOCAL']['temp-directory'],
@@ -79,9 +81,9 @@ rule extract_reads_expression_whitelist:
 
 rule extract_reads_expression:
 	input:
-		'data/{sample}_final.bam'
+		'data/{sample}/final.bam'
 	output:
-		'summary/{sample}_counts_expression_matrix.tsv'
+		'data/{sample}/counts_expression_matrix.tsv'
 	params:
 		count_per_umi=config['EXTRACTION']['minimum-counts-per-UMI'],
 		num_cells=lambda wildcards: samples.loc[wildcards.sample,'expected_cells'],
@@ -101,9 +103,9 @@ rule extract_reads_expression:
 
 rule extract_umi_per_gene:
 	input:
-		'data/{sample}_final.bam'
+		'data/{sample}/final.bam'
 	output:
-		'logs/{sample}_umi_per_gene.tsv'
+		'logs/dropseq_tools/{sample}_umi_per_gene.tsv'
 	params:
 		num_cells=lambda wildcards: samples.loc[wildcards.sample,'expected_cells'],
 		cellBarcodeEditDistance=config['EXTRACTION']['UMI-edit-distance'],	
@@ -119,10 +121,10 @@ rule extract_umi_per_gene:
 
 rule extract_umi_per_gene_whitelist:
 	input: 
-		data='data/{sample}_final.bam',
+		data='data/{sample}/final.bam',
 		barcode_whitelist='barcodes.csv'
 	output:
-		'logs/{sample}_umi_per_gene.tsv'
+		'logs/dropseq_tools/{sample}_umi_per_gene.tsv'
 	params:
 		cellBarcodeEditDistance=config['EXTRACTION']['UMI-edit-distance'],	
 		temp_directory=config['LOCAL']['temp-directory'],
@@ -138,7 +140,7 @@ rule extract_umi_per_gene_whitelist:
 
 rule SingleCellRnaSeqMetricsCollector:
 	input: 
-		data='data/{sample}_final.bam',
+		data='data/{sample}/final.bam',
 		refFlat="{}.refFlat".format(annotation_prefix),
 		rRNA_intervals="{}.rRNA.intervals".format(reference_prefix),
 	params:
@@ -146,7 +148,7 @@ rule SingleCellRnaSeqMetricsCollector:
 		temp_directory=config['LOCAL']['temp-directory'],
 		memory=config['LOCAL']['memory']
 	output:
-		'logs/{sample}_rna_metrics.txt'
+		'logs/dropseq_tools/{sample}_rna_metrics.txt'
 	conda: '../envs/dropseq_tools.yaml'
 	shell:
 		"""export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && SingleCellRnaSeqMetricsCollector -m {params.memory}\
@@ -159,7 +161,7 @@ rule SingleCellRnaSeqMetricsCollector:
 
 rule SingleCellRnaSeqMetricsCollector_whitelist:
 	input:
-		data='data/{sample}_final.bam',
+		data='data/{sample}/final.bam',
 		barcode_whitelist='barcodes.csv',
 		refFlat="{}.refFlat".format(annotation_prefix),
 		rRNA_intervals="{}.rRNA.intervals".format(reference_prefix)
@@ -167,7 +169,7 @@ rule SingleCellRnaSeqMetricsCollector_whitelist:
 		temp_directory=config['LOCAL']['temp-directory'],
 		memory=config['LOCAL']['memory']
 	output:
-		'logs/{sample}_rna_metrics.txt'
+		'logs/dropseq_tools/{sample}_rna_metrics.txt'
 	conda: '../envs/dropseq_tools.yaml'
 	shell:
 		"""export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && SingleCellRnaSeqMetricsCollector -m {params.memory}\
@@ -180,7 +182,7 @@ rule SingleCellRnaSeqMetricsCollector_whitelist:
 
 rule plot_umi_per_gene:
 	input:
-		expand('logs/{sample}_umi_per_gene.tsv',sample=samples.index)
+		expand('logs/dropseq_tools/{sample}_umi_per_gene.tsv',sample=samples.index)
 	params:
 		sample_names=lambda wildcards: samples.index
 	conda: '../envs/plots.yaml'	
@@ -191,7 +193,7 @@ rule plot_umi_per_gene:
 
 rule plot_rna_metrics:
 	input:
-		'logs/{sample}_rna_metrics.txt'
+		'logs/dropseq_tools/{sample}_rna_metrics.txt'
 	params: 
 		cells=lambda wildcards: samples.loc[wildcards.sample,'expected_cells']
 	conda: '../envs/plots.yaml'
@@ -202,7 +204,7 @@ rule plot_rna_metrics:
 
 rule plot_rna_metrics_whitelist:
 	input:
-		rna_metrics='logs/{sample}_rna_metrics.txt',
+		rna_metrics='logs/dropseq_tools/{sample}_rna_metrics.txt',
 		barcodes='barcodes.csv'
 	conda: '../envs/plots.yaml'
 	output:
@@ -212,7 +214,7 @@ rule plot_rna_metrics_whitelist:
 
 rule merge_umi:
 	input:
-		expand('summary/{sample}_umi_expression_matrix.tsv', sample=samples.index)
+		expand('data/{sample}/umi_expression_matrix.tsv', sample=samples.index)
 	params:
 		sample_names=lambda wildcards: samples.index
 	conda: '../envs/merge.yaml'
@@ -223,7 +225,7 @@ rule merge_umi:
 
 rule merge_counts:
 	input:
-		expand('summary/{sample}_counts_expression_matrix.tsv', sample=samples.index)
+		expand('data/{sample}/counts_expression_matrix.tsv', sample=samples.index)
 	params:
 		sample_names=lambda wildcards: samples.index
 	conda: '../envs/merge.yaml'

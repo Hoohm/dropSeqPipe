@@ -10,7 +10,7 @@ rule cutadapt_R1:
         R1='data/{sample}_R1.fastq.gz',
         adapters=config['FILTER']['cutadapt']['adapters-file']
     output:
-        fastq=temp("data/{sample}/{sample}_trimmmed_R1.fastq.gz")
+        fastq=temp("data/{sample}/trimmmed_R1.fastq.gz")
     params:
         cell_barcode_length=config['FILTER']['cell-barcode']['end'] - config['FILTER']['cell-barcode']['start'] + 1,
         barcode_length=config['FILTER']['UMI-barcode']['end'] - config['FILTER']['cell-barcode']['start'] + 1,
@@ -29,7 +29,7 @@ rule cutadapt_R2:
         R2='data/{sample}_R2.fastq.gz',
         adapters=config['FILTER']['cutadapt']['adapters-file']
     output:
-        fastq=temp("data/{sample}/{sample}_trimmmed_R2.fastq.gz")
+        fastq=temp("data/{sample}/trimmmed_R2.fastq.gz")
     params:
         extra_params=config['FILTER']['cutadapt']['R2']['extra-params'],
         read_quality=config['FILTER']['cutadapt']['R2']['quality-filter'],
@@ -55,11 +55,11 @@ rule clean_cutadapt:
 
 rule repair:
 	input:
-		R1='data/{sample}/{sample}_trimmmed_R1.fastq.gz',
-		R2='data/{sample}/{sample}_trimmmed_R2.fastq.gz'
+		R1='data/{sample}/trimmmed_R1.fastq.gz',
+		R2='data/{sample}/trimmmed_R2.fastq.gz'
 	output:
-		R1=temp('data/{sample}/{sample}_trimmmed_repaired_R1.fastq.gz'),
-		R2=temp('data/{sample}/{sample}_trimmmed_repaired_R2.fastq.gz')
+		R1=temp('data/{sample}/trimmmed_repaired_R1.fastq.gz'),
+		R2=temp('data/{sample}/trimmmed_repaired_R2.fastq.gz')
 	log:
 		'logs/bbmap/{sample}_repair.txt'
 	conda: '../envs/bbmap.yaml'
@@ -75,7 +75,6 @@ rule plot_adapter_content:
 		UMI_length=config['FILTER']['UMI-barcode']['end'] - config['FILTER']['UMI-barcode']['start'] + 1,
 		sample_names=lambda wildcards: samples.index,
 		batches=lambda wildcards: samples.loc[samples.index, 'batch']
-		
 	conda: '../envs/plots.yaml'
 	output:
 		pdf='plots/adapter_content.pdf'
@@ -84,7 +83,7 @@ rule plot_adapter_content:
 
 rule multiqc_trimmomatic:
 	input:
-		expand('logs/cutadapt/', sample=samples.index)
+		expand('logs/cutadapt/{sample}_R1.qc.txt', sample=samples.index)
 	params: '-m cutadapt'
 	output:
 		html='reports/filter.html'
