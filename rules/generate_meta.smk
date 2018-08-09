@@ -47,7 +47,6 @@ rule create_refFlat:
 	params:
 		memory=config['LOCAL']['memory'],
 		temp_directory=config['LOCAL']['temp-directory']
-	conda: '../envs/picard.yaml'
 	output:
 		'{}.refFlat'.format(annotation_prefix)
 	conda: '../envs/dropseq_tools.yaml'
