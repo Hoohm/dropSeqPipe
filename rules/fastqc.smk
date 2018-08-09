@@ -12,7 +12,7 @@ rule fastqc_barcodes:
 		zip='logs/{sample}_R1_fastqc.zip'
 	params: '--extract'
 	wrapper:
-		'0.21.0/bio/fastqc'
+		'0.27.1/bio/fastqc'
 
 rule fastqc_reads:
 	"""Create fastqc report"""
@@ -23,7 +23,7 @@ rule fastqc_reads:
 		zip='logs/{sample}_R2_fastqc.zip'
 	params: '--extract'
 	wrapper:
-		'0.21.0/bio/fastqc'
+		'0.27.1/bio/fastqc'
 
 
 rule multiqc_fastqc_barcodes:
@@ -33,7 +33,7 @@ rule multiqc_fastqc_barcodes:
 		html='reports/fastqc_barcodes.html'
 	params: '-m fastqc --ignore *_R2*'
 	wrapper:
-		'0.21.0/bio/multiqc'
+		'0.27.1/bio/multiqc'
 
 rule multiqc_fastqc_reads:
 	input: 
@@ -43,4 +43,4 @@ rule multiqc_fastqc_reads:
 		txt='reports/fastqc_reads_data/multiqc_general_stats.txt'
 	params: '-m fastqc --ignore *_R1*'
 	wrapper:
-		'0.21.0/bio/multiqc'
+		'0.27.1/bio/multiqc'
