@@ -6,7 +6,7 @@ localrules: multiqc_fastqc_reads, multiqc_fastqc_barcodes
 rule fastqc_barcodes:
 	"""Create fastqc report"""
 	input: 
-		'data/{sample}_R1.fastq.gz'
+		'data/{sample}_R1_001.fastq.gz'
 	output:
 		html='logs/fastqc/{sample}_R1_fastqc.html',
 		zip='logs/fastqc/{sample}_R1_fastqc.zip'
@@ -17,7 +17,7 @@ rule fastqc_barcodes:
 rule fastqc_reads:
 	"""Create fastqc report"""
 	input: 
-		'data/{sample}_R2.fastq.gz'
+		'data/{sample}_R2_001.fastq.gz'
 	output:
 		html='logs/fastqc/{sample}_R2_fastqc.html',
 		zip='logs/fastqc/{sample}_R2_fastqc.zip'

@@ -77,18 +77,6 @@ rule create_intervals:
 		O={params.reference_directory}\
 		PREFIX={params.reference_prefix}
 		"""
-def get_sjdbOverhang(wildcards):
-	return(int(wildcards.read_length)-1)
-
-def get_genomeChrBinNbits(file):
-	if (platform.system() == 'Darwin'):
-		genomeLength = shell("wc -c {} | cut -d' ' -f2".format(file), iterable=True)
-	else:
-		genomeLength = shell("wc -c {} | cut -d' ' -f1".format(file), iterable=True)
-	genomeLength = int(next(genomeLength))
-	referenceNumber = shell('grep "^>" {} | wc -l'.format(file), iterable=True)
-	referenceNumber = int(next(referenceNumber))
-	return(min([18,int(math.log2(genomeLength/referenceNumber))]))
 
 rule get_genomeChrBinNbits:
 	input:
@@ -111,6 +99,23 @@ rule get_genomeChrBinNbits:
 		referenceNumber = int(next(referenceNumber))
 		value = min([18,int(log2(genomeLength/referenceNumber))])
 		"""
+def get_sjdbOverhang(wildcards):
+	return(int(wildcards.read_length)-1)
+
+
+rule prep_star_index:
+	input:
+		reference_file=reference_file,
+		config_file='config.yaml'
+	output:
+		'{reference_directory}/star_ref_config.txt'
+	conda:
+		'../envs/pyyaml.yaml'
+	script:
+		'../scripts/prep_star.py'
+
+
+	
 
 rule create_star_index:
 	input:
@@ -119,7 +124,7 @@ rule create_star_index:
 	params:
 		sjdbOverhang=lambda wildcards: get_sjdbOverhang(wildcards),
 		genomeDir='{star_index_prefix}_{read_length}',
-		genomeChrBinNbits=get_genomeChrBinNbits(reference_file)
+		genomeChrBinNbits=config['MAPPING']['STAR']['genomeChrBinNbits']
 	output:
 		'{star_index_prefix}_{read_length}/SA'
 	threads: 12
