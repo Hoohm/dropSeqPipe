@@ -106,9 +106,9 @@ gg <- ggplot(meta.data, aes(x = nUMI, y=nCounts, color=orig.ident)) +
 
 # how about unaligned reads/UMI?
 # Note(Seb): raw.data is actually filtered data i.e. nr of genes likely to be smaller than input data!
-mito.gene.names  <- grep("^mt-", rownames(seuratobj@raw.data), value=TRUE)
-sribo.gene.names <- grep("^Rps", rownames(seuratobj@raw.data), value=TRUE)
-lribo.gene.names <- grep("^Rpl", rownames(seuratobj@raw.data), value=TRUE)
+mito.gene.names  <- grep("^mt-", rownames(seuratobj@raw.data), value=TRUE, ignore.case=TRUE)
+sribo.gene.names <- grep("^Rps", rownames(seuratobj@raw.data), value=TRUE, ignore.case=TRUE)
+lribo.gene.names <- grep("^Rpl", rownames(seuratobj@raw.data), value=TRUE, ignore.case=TRUE)
 
 col.total            <- Matrix::colSums(seuratobj@raw.data)
 meta.data$col.total   <- col.total
