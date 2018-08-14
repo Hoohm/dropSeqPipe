@@ -30,7 +30,7 @@ rule extract_all_umi_expression_species:
 		summary='summary/{species}/{sample}_dge.summary.txt'
 	params:
 		count_per_umi=config['EXTRACTION']['minimum-counts-per-UMI'],
-		num_cells=lambda wildcards: samples.loc[wildcards.sample,'expected_cells'],
+		num_cells=lambda wildcards: int(samples.loc[wildcards.sample,'expected_cells']),
 		cellBarcodeEditDistance=config['EXTRACTION']['UMI-edit-distance'],
 		memory=config['LOCAL']['memory'],
 		temp_directory=config['LOCAL']['temp-directory']

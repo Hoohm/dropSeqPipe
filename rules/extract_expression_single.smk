@@ -17,7 +17,7 @@ rule extract_umi_expression:
 	params:
 		summary='summary/{sample}_dge.summary.txt',
 		count_per_umi=config['EXTRACTION']['minimum-counts-per-UMI'],
-		num_cells=lambda wildcards: samples.loc[wildcards.sample,'expected_cells'],
+		num_cells=lambda wildcards: int(samples.loc[wildcards.sample,'expected_cells']),
 		cellBarcodeEditDistance=config['EXTRACTION']['UMI-edit-distance'],
 		temp_directory=config['LOCAL']['temp-directory'],
 		memory=config['LOCAL']['memory']
@@ -84,7 +84,7 @@ rule extract_reads_expression:
 		'summary/{sample}_counts_expression_matrix.tsv'
 	params:
 		count_per_umi=config['EXTRACTION']['minimum-counts-per-UMI'],
-		num_cells=lambda wildcards: samples.loc[wildcards.sample,'expected_cells'],
+		num_cells=lambda wildcards: int(samples.loc[wildcards.sample,'expected_cells']),
 		cellBarcodeEditDistance=config['EXTRACTION']['UMI-edit-distance'],	
 		temp_directory=config['LOCAL']['temp-directory'],
 		memory=config['LOCAL']['memory']
@@ -105,7 +105,7 @@ rule extract_umi_per_gene:
 	output:
 		'logs/{sample}_umi_per_gene.tsv'
 	params:
-		num_cells=lambda wildcards: samples.loc[wildcards.sample,'expected_cells'],
+		num_cells=lambda wildcards: int(samples.loc[wildcards.sample,'expected_cells']),
 		cellBarcodeEditDistance=config['EXTRACTION']['UMI-edit-distance'],	
 		temp_directory=config['LOCAL']['temp-directory'],
 		memory=config['LOCAL']['memory']
@@ -142,7 +142,7 @@ rule SingleCellRnaSeqMetricsCollector:
 		refFlat="{}.refFlat".format(annotation_prefix),
 		rRNA_intervals="{}.rRNA.intervals".format(reference_prefix),
 	params:
-		cells=lambda wildcards: samples.loc[wildcards.sample,'expected_cells'],		
+		cells=lambda wildcards: int(samples.loc[wildcards.sample,'expected_cells']),		
 		temp_directory=config['LOCAL']['temp-directory'],
 		memory=config['LOCAL']['memory']
 	output:
@@ -193,7 +193,7 @@ rule plot_rna_metrics:
 	input:
 		'logs/{sample}_rna_metrics.txt'
 	params: 
-		cells=lambda wildcards: samples.loc[wildcards.sample,'expected_cells']
+		cells=lambda wildcards: int(samples.loc[wildcards.sample,'expected_cells'])
 	conda: '../envs/plots.yaml'
 	output:
 		pdf='plots/{sample}_rna_metrics.pdf'

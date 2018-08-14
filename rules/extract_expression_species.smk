@@ -62,7 +62,7 @@ rule SingleCellRnaSeqMetricsCollector_whitelist_species:
 		refFlat='{}.refFlat'.format(annotation_prefix),
 		rRNA_intervals='{}.rRNA.intervals'.format(reference_prefix)
 	params:
-		cells=lambda wildcards: samples.loc[wildcards.sample,'expected_cells'],		
+		cells=lambda wildcards: int(samples.loc[wildcards.sample,'expected_cells']),		
 		memory=config['LOCAL']['memory'],
 		temp_directory=config['LOCAL']['temp-directory']
 	output:

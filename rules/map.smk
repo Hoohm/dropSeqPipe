@@ -168,7 +168,7 @@ rule plot_knee_plot:
 	input:
 		'logs/{sample}_hist_out_cell.txt'
 	params: 
-		cells=lambda wildcards: samples.loc[wildcards.sample,'expected_cells'],
+		cells=lambda wildcards: int(samples.loc[wildcards.sample,'expected_cells']),
 		edit_distance=config['EXTRACTION']['UMI-edit-distance']
 	conda: '../envs/plots.yaml'
 	output:
@@ -181,7 +181,7 @@ rule plot_knee_plot_whitelist:
 		data='logs/{sample}_hist_out_cell.txt',
 		barcodes='barcodes.csv'
 	params: 
-		cells=lambda wildcards: samples.loc[wildcards.sample,'expected_cells']
+		cells=lambda wildcards: int(samples.loc[wildcards.sample,'expected_cells'])
 	conda: '../envs/plots.yaml'
 	output:
 		pdf='plots/{sample}_knee_plot.pdf'
