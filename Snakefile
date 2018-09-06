@@ -8,7 +8,7 @@ configfile: "config.yaml"
 # Get sample names from samples.csv
 samples = pd.read_table("samples.csv", header=0, sep=',', index_col=0)
 # Get read_lengths from samples.csv
-read_lengths = list(lanes.loc[:,'read_length'])
+read_lengths = list(samples.loc[:,'read_length'])
 
 # Constraint sample names wildcards
 wildcard_constraints:
