@@ -72,7 +72,7 @@ rule qc:
 
 rule filter:
     input:
-        expand('data/{sample}/filtered.fastq.gz', sample=samples.index),
+        expand('data/{sample}/trimmmed_repaired_R1.fastq.gz', sample=samples.index),
         'reports/filter.html',
         'plots/adapter_content.pdf'
         
