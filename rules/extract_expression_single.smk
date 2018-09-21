@@ -7,7 +7,7 @@ ruleorder: SingleCellRnaSeqMetricsCollector_whitelist > SingleCellRnaSeqMetricsC
 ruleorder: plot_rna_metrics_whitelist > plot_rna_metrics
 
 #Which rules will be run on the host computer and not sent to nodes
-localrules: plot_umi_per_gene, plot_rna_metrics, plot_rna_metrics_whitelist, merge_umi, merge_counts
+localrules: plot_umi_per_gene, plot_rna_metrics, plot_rna_metrics_whitelist, merge_umi, merge_counts, violine_plots
 
 rule extract_umi_expression:
 	input:
@@ -149,6 +149,8 @@ rule SingleCellRnaSeqMetricsCollector:
 		memory=config['LOCAL']['memory']
 	output:
 		'logs/dropseq_tools/{sample}_rna_metrics.txt'
+	wildcard_constraints:
+		sample="({})".format("|".join(samples.index))
 	conda: '../envs/dropseq_tools.yaml'
 	shell:
 		"""export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && SingleCellRnaSeqMetricsCollector -m {params.memory}\
@@ -170,6 +172,8 @@ rule SingleCellRnaSeqMetricsCollector_whitelist:
 		memory=config['LOCAL']['memory']
 	output:
 		'logs/dropseq_tools/{sample}_rna_metrics.txt'
+	wildcard_constraints:
+		sample="({})".format("|".join(samples.index))
 	conda: '../envs/dropseq_tools.yaml'
 	shell:
 		"""export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && SingleCellRnaSeqMetricsCollector -m {params.memory}\
@@ -209,6 +213,8 @@ rule plot_rna_metrics_whitelist:
 	conda: '../envs/plots.yaml'
 	output:
 		pdf='plots/{sample}_rna_metrics.pdf',
+	wildcard_constraints:
+		sample="({})".format("|".join(samples.index))
 	script:
 		'../scripts/plot_rna_metrics.R'
 
@@ -233,3 +239,18 @@ rule merge_counts:
 		'summary/counts_expression_matrix.tsv'
 	script:
 		"../scripts/merge_counts_single.R"
+
+rule violine_plots:
+	input:
+		UMIs='summary/umi_expression_matrix.tsv',
+		counts='summary/counts_expression_matrix.tsv',
+		design='samples.csv'
+	conda: '../envs/plots_ext.yaml'
+	output:
+		pdf_violine='plots/violinplots_comparison_UMI.pdf',
+		pdf_umivscounts='plots/UMI_vs_counts.pdf',
+		pdf_umi_vs_gene='plots/UMI_vs_gene.pdf',
+		pdf_count_vs_gene='plots/Count_vs_gene.pdf',
+		R_objects='summary/R_Seurat_objects.rdata'
+	script:
+		'../scripts/plot_violine.R'

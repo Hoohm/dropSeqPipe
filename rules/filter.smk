@@ -1,21 +1,4 @@
-import glob
 """Filter data"""
-
-R1_pattern = re.compile("data\/(.*)_R1_001.fastq.gz")
-R2_pattern = re.compile("data\/(.*)_R2_001.fastq.gz")
-
-samples = pd.read_table("samples.csv", header=0, sep=',', index_col=0)
-
-
-def get_R1_files(wildcards):
-    samples = [f for f in glob.glob("data/*.fastq.gz") if re.match(R1_pattern,f)]
-    return(samples)
-
-def get_R2_files(wildcards):
-    samples = [f for f in glob.glob("data/*.fastq.gz") if re.match(R2_pattern,f)]
-    return(samples)
-
-
 
 
 #Which rules will be run on the host computer and not sent to nodes
@@ -23,7 +6,7 @@ localrules: clean_cutadapt, plot_adapter_content, multiqc_cutadapt
 
 rule cutadapt_R1:
     input:
-        R1='data/{sample}_R1_001.fastq.gz',
+        R1=get_R1_files,
         adapters=config['FILTER']['cutadapt']['adapters-file']
     output:
         fastq=temp("data/{sample}/trimmmed_R1.fastq.gz")
@@ -42,7 +25,7 @@ rule cutadapt_R1:
 
 rule cutadapt_R2:
     input:
-        R2='data/{sample}_R2_001.fastq.gz',
+        R2=get_R2_files,
         adapters=config['FILTER']['cutadapt']['adapters-file']
     output:
         fastq=temp("data/{sample}/trimmmed_R2.fastq.gz")
@@ -70,38 +53,40 @@ rule clean_cutadapt:
 
 
 rule repair:
-	input:
-		R1='data/{sample}/trimmmed_R1.fastq.gz',
-		R2='data/{sample}/trimmmed_R2.fastq.gz'
-	output:
-		R1='data/{sample}/trimmmed_repaired_R1.fastq.gz',
-		R2='data/{sample}/trimmmed_repaired_R2.fastq.gz'
-	log:
-		'logs/bbmap/{sample}_repair.txt'
-	conda: '../envs/bbmap.yaml'
-	shell:
-		"""repair.sh -Xmx400g in={input.R1} in2={input.R2} out1={output.R1} out2={output.R2} repair=t 2> {log}"""
+    input:
+        R1='data/{sample}/trimmmed_R1.fastq.gz',
+        R2='data/{sample}/trimmmed_R2.fastq.gz'
+    output:
+        R1='data/{sample}/trimmmed_repaired_R1.fastq.gz',
+        R2='data/{sample}/trimmmed_repaired_R2.fastq.gz'
+    log:
+        'logs/bbmap/{sample}_repair.txt'
+    params:
+        memory=config['LOCAL']['memory']
+    conda: '../envs/bbmap.yaml'
+    shell:
+        """repair.sh -Xmx{params.memory} in={input.R1} in2={input.R2} out1={output.R1} out2={output.R2} repair=t 2> {log}"""
 
 
 rule plot_adapter_content:
-	input:
-		expand('logs/cutadapt/{sample}.clean_qc.csv', sample=samples.index)
-	params:
-		Cell_length=config['FILTER']['cell-barcode']['end'] - config['FILTER']['cell-barcode']['start'] + 1,
-		UMI_length=config['FILTER']['UMI-barcode']['end'] - config['FILTER']['UMI-barcode']['start'] + 1,
-		sample_names=lambda wildcards: samples.index,
-		batches=lambda wildcards: samples.loc[samples.index, 'batch']
-	conda: '../envs/plots.yaml'
-	output:
-		pdf='plots/adapter_content.pdf'
-	script:
-		'../scripts/plot_adapter_content.R'
+    input:
+        expand('logs/cutadapt/{sample}.clean_qc.csv', sample=samples.index)
+    params:
+        Cell_length=config['FILTER']['cell-barcode']['end'] - config['FILTER']['cell-barcode']['start'] + 1,
+        UMI_length=config['FILTER']['UMI-barcode']['end'] - config['FILTER']['UMI-barcode']['start'] + 1,
+        sample_names=lambda wildcards: samples.index,
+        batches=lambda wildcards: samples.loc[samples.index, 'batch']
+    conda: '../envs/plots.yaml'
+    output:
+        pdf='plots/adapter_content.pdf'
+    script:
+        '../scripts/plot_adapter_content.R'
 
 rule multiqc_cutadapt:
-	input:
-		expand('logs/cutadapt/{sample}_R1.qc.txt', sample=samples.index)
-	params: '-m cutadapt'
-	output:
-		html='reports/filter.html'
-	wrapper:
-		'0.21.0/bio/multiqc'
+    input:
+        expand('logs/cutadapt/{sample}_R1.qc.txt', sample=samples.index)
+    params: '-m cutadapt'
+    output:
+        html='reports/filter.html'
+    wrapper:
+        '0.21.0/bio/multiqc'

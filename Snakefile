@@ -1,6 +1,7 @@
 import pandas as pd
 import os
 import re
+import glob
 
 # Load configuration file
 configfile: "config.yaml"
@@ -13,6 +14,21 @@ read_lengths = list(samples.loc[:,'read_length'])
 # Constraint sample names wildcards
 wildcard_constraints:
     sample="({})".format("|".join(samples.index))
+
+
+def get_R1_files(wildcards):
+    samples = [f for f in glob.glob("data/*.fastq.gz") if (re.search('R1', f) and re.search(wildcards.sample,f))]
+    if len(samples)!=1:
+        exit('Multiple read files for one sample. Please check file names or run snakemake -s rules/prepare.smk for multilane samples first.')
+    return(samples)
+
+def get_R2_files(wildcards):
+    samples = [f for f in glob.glob("data/*.fastq.gz") if (re.search('R2',f) and re.search(wildcards.sample,f))]
+    if len(samples)!=1:
+        exit('Multiple read files for one sample. Please check file names or run snakemake -s rules/prepare.smk for multilane samples first.')
+    return(samples)
+
+
 
 # Create reference files prefixes
 reference_prefix = os.path.join(config['META']['reference-directory'], re.split(".fasta|.fa",config['META']['reference-file'])[0])
@@ -57,6 +73,14 @@ rule all:
         'summary/counts_expression_matrix.tsv'
 
 
+
+rule test:
+    input:
+        'summary/barcode_ref.pkl',
+        'summary/barcode_ext_ref.pkl',
+        'summary/barcode_mapping.pkl',
+        expand('data/{sample}/Aligned.repaired.bam', sample=samples.index)
+
 rule meta:
     input:
         '{}.refFlat'.format(annotation_prefix),
@@ -81,23 +105,20 @@ rule map:
         expand('data/{sample}/final.bam', sample=samples.index),
         expand('logs/dropseq_tools/{sample}_hist_out_cell.txt', sample=samples.index),
         expand('plots/{sample}_knee_plot.pdf', sample=samples.index),
-        'reports/star.html',
-        'plots/violinplots_comparison_UMI.pdf',
-        # 'plots/UMI_vs_counts.html',
-        'plots/UMI_vs_counts.pdf',
-        # 'plots/UMI_vs_gene.html',
-        'plots/UMI_vs_gene.pdf',
-        # 'plots/Count_vs_gene.html',
-        'plots/Count_vs_gene.pdf',
-        'summary/R_Seurat_objects.rdata',
-        'plots/yield.pdf'
+        'reports/star.html'
         
 rule extract:
     input:
         expand('logs/dropseq_tools/{sample}_umi_per_gene.tsv', sample=samples.index),
         expand('plots/{sample}_rna_metrics.pdf', sample=samples.index),
         'summary/umi_expression_matrix.tsv',
-        'summary/counts_expression_matrix.tsv'
+        'summary/counts_expression_matrix.tsv',
+        'plots/violinplots_comparison_UMI.pdf',
+        'plots/UMI_vs_counts.pdf',
+        'plots/UMI_vs_gene.pdf',
+        'plots/Count_vs_gene.pdf',
+        'summary/R_Seurat_objects.rdata',
+        'plots/yield.pdf'
         
 
 rule split_species:
