@@ -76,10 +76,7 @@ rule all:
 
 rule test:
     input:
-        'summary/barcode_ref.pkl',
-        'summary/barcode_ext_ref.pkl',
-        'summary/barcode_mapping.pkl',
-        expand('data/{sample}/Aligned.repaired.bam', sample=samples.index)
+        expand('data/{sample}/test.csv', sample=samples.index)
 
 rule meta:
     input:

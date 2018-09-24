@@ -67,6 +67,13 @@ rule repair:
     shell:
         """repair.sh -Xmx{params.memory} in={input.R1} in2={input.R2} out1={output.R1} out2={output.R2} repair=t 2> {log}"""
 
+rule detect_barcodes:
+    input:
+        R1='data/{sample}/trimmmed_repaired_R1.fastq.gz'
+    output:
+        positions='data/{sample}/test.csv'
+    script:
+        '../scripts/detect_barcodes.py'
 
 rule plot_adapter_content:
     input:
