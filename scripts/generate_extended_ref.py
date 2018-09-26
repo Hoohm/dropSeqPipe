@@ -41,10 +41,11 @@ mapping=defaultdict(dict)
 # Initiate ref and mapping with the given barcodes
 with open(snakemake.input.whitelist,'r') as ref_file:
     for line in ref_file.readlines():
-        barcode_ref.add(line.strip())
-        mapping[0][line.strip()]=defaultdict(dict)
-        mapping[0][line.strip()][line.strip()]=0
-
+        barcode = line.strip()
+        barcode_ref.add(barcode)
+        mapping[0][barcode]=defaultdict(dict)
+        mapping[0][barcode]['ref'] = barcode
+        mapping[0][barcode]['count'] = 0
 
 barcode_ext_ref = deepcopy(barcode_ref)
 # For now edit distance is one, but can be extended to a higher number later on.

@@ -2,7 +2,7 @@
 
 
 #Which rules will be run on the host computer and not sent to nodes
-localrules: clean_cutadapt, plot_adapter_content, multiqc_cutadapt
+localrules: clean_cutadapt, plot_adapter_content, multiqc_cutadapt, detect_barcodes
 
 rule cutadapt_R1:
     input:
@@ -62,16 +62,18 @@ rule repair:
     log:
         'logs/bbmap/{sample}_repair.txt'
     params:
-        memory=config['LOCAL']['memory']
+        memory='{}g'.format(int(config['LOCAL']['memory'].rstrip('g')) * 10)
     conda: '../envs/bbmap.yaml'
+    threads: 28
     shell:
-        """repair.sh -Xmx{params.memory} in={input.R1} in2={input.R2} out1={output.R1} out2={output.R2} repair=t 2> {log}"""
+        """repair.sh -Xmx{params.memory} in={input.R1} in2={input.R2} out1={output.R1} out2={output.R2} repair=t threads={threads} 2> {log}"""
 
 rule detect_barcodes:
     input:
         R1='data/{sample}/trimmmed_repaired_R1.fastq.gz'
     output:
         positions='data/{sample}/test.csv'
+    conda: '../envs/merge_bam.yaml'
     script:
         '../scripts/detect_barcodes.py'
 

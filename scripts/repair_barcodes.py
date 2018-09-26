@@ -21,13 +21,13 @@ barcode_ext_ref = load_obj(snakemake.input.barcode_ext_ref)
 for bam_read in infile_bam:
 	barcode = bam_read.get_tag('XC')
 	if barcode in barcode_ref:
-		reference_barcode = mapping[0][barcode]['count'] += 1
+		mapping[0][barcode]['count'] += 1
 		outfile.write(bam_read)
 		continue
 	elif barcode in barcode_ext_ref:
 		# The barcode is in our extended reference. Change the barcode to the original one
 		reference_barcode = mapping[1][barcode]['ref']
-		reference_barcode = mapping[1][barcode]['count'] += 1
+		mapping[1][barcode]['count'] += 1
 		bam_read.set_tags([('XC',reference_barcode,'Z')])
 		outfile.write(bam_read)
 		continue
