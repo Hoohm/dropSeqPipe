@@ -2,12 +2,21 @@
 
 
 #Which rules will be run on the host computer and not sent to nodes
-localrules: clean_cutadapt, plot_adapter_content, multiqc_cutadapt, detect_barcodes
+localrules: clean_cutadapt, plot_adapter_content, multiqc_cutadapt, detect_barcodes, create_log_folder
+
+rule create_log_folder:
+    input:
+        'config.yaml'
+    output:
+        directory('logs/cluster')
+    shell:
+        """mkdir {output}"""
 
 rule cutadapt_R1:
     input:
         R1=get_R1_files,
-        adapters=config['FILTER']['cutadapt']['adapters-file']
+        adapters=config['FILTER']['cutadapt']['adapters-file'],
+        log_folder = 'logs/cluster'
     output:
         fastq=temp("data/{sample}/trimmmed_R1.fastq.gz")
     params:
@@ -21,25 +30,43 @@ rule cutadapt_R1:
         qc="logs/cutadapt/{sample}_R1.qc.txt"
     conda: '../envs/cutadapt.yaml' 
     shell:
-        """cutadapt --max-n {params.max_n} -a file:{input.adapters} -g file:{input.adapters} -q {params.barcode_quality},{params.barcode_quality} --minimum-length {params.barcode_length} --cores={threads} -o {output.fastq} {input.R1} --overlap {params.cell_barcode_length} {params.extra_params} > {log.qc}"""
+        """cutadapt\
+        --max-n {params.max_n}\
+        -a file:{input.adapters}\
+        -g file:{input.adapters}\
+        -q {params.barcode_quality},{params.barcode_quality}\
+        --minimum-length {params.barcode_length}\
+        --cores={threads}\
+        --overlap {params.cell_barcode_length}\
+        -o {output.fastq} {input.R1}\
+        {params.extra_params} > {log.qc}"""
 
 rule cutadapt_R2:
     input:
         R2=get_R2_files,
-        adapters=config['FILTER']['cutadapt']['adapters-file']
+        adapters=config['FILTER']['cutadapt']['adapters-file'],
+        log_folder = 'logs/cluster'
     output:
         fastq=temp("data/{sample}/trimmmed_R2.fastq.gz")
     params:
         extra_params=config['FILTER']['cutadapt']['R2']['extra-params'],
         read_quality=config['FILTER']['cutadapt']['R2']['quality-filter'],
         minimum_length=config['FILTER']['cutadapt']['R2']['minimum-length'],
-        adapters_minimum_overlap=config['FILTER']['cutadapt']['R2']['minimum-adapters-overlap']
+        adapters_minimum_overlap=config['FILTER']['cutadapt']['R2']['minimum-adapters-overlap'],
     threads: 10
     log:
         qc="logs/cutadapt/{sample}_R2.qc.txt"
     conda: '../envs/cutadapt.yaml' 
     shell:
-        """cutadapt -a file:{input.adapters} -g file:{input.adapters} -q {params.read_quality} --minimum-length {params.minimum_length} --cores={threads} -o {output.fastq} {input.R2} {params.extra_params} --overlap {params.adapters_minimum_overlap} > {log.qc}"""
+        """cutadapt\
+        -a file:{input.adapters}\
+        -g file:{input.adapters}\
+        -q {params.read_quality}\
+        --minimum-length {params.minimum_length}\
+        --cores={threads}\
+        --overlap {params.adapters_minimum_overlap}\
+        -o {output.fastq} {input.R2}\
+        {params.extra_params} > {log.qc}"""
 
 rule clean_cutadapt:
     input:

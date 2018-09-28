@@ -7,3 +7,4 @@ dependencies:
   - r-reshape2
   - r-viridis
   - r-stringdist
+  - r-dplyr
