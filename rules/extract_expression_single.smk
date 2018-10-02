@@ -202,7 +202,7 @@ rule plot_rna_metrics:
 		cells=lambda wildcards: samples.loc[wildcards.sample,'expected_cells']
 	conda: '../envs/plots.yaml'
 	output:
-		pdf='plots/{sample}_rna_metrics.pdf'
+		pdf='plots/rna_metrics/{sample}_rna_metrics.pdf'
 	script:
 		'../scripts/plot_rna_metrics.R'
 
@@ -212,7 +212,7 @@ rule plot_rna_metrics_whitelist:
 		barcodes='barcodes.csv'
 	conda: '../envs/plots.yaml'
 	output:
-		pdf='plots/{sample}_rna_metrics.pdf',
+		pdf='plots/rna_metrics/{sample}_rna_metrics.pdf',
 	wildcard_constraints:
 		sample="({})".format("|".join(samples.index))
 	script:

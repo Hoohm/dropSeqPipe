@@ -82,7 +82,7 @@ rule plot_rna_metrics_species:
 		barcode='summary/{species}/{sample}_barcodes.csv'
 	conda: '../envs/plots.yaml'
 	output:
-		pdf='plots/{species}/{sample}_rna_metrics.pdf'
+		pdf='plots/{species}/rna_metrics/{sample}_rna_metrics.pdf'
 	script:
 		'../scripts/plot_rna_metrics.R'
 

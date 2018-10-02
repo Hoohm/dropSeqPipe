@@ -170,7 +170,7 @@ rule plot_knee_plot:
 		edit_distance=config['EXTRACTION']['UMI-edit-distance']
 	conda: '../envs/plots.yaml'
 	output:
-		pdf='plots/{sample}_knee_plot.pdf'
+		pdf='plots/knee_plots/{sample}_knee_plot.pdf'
 	script:
 		'../scripts/plot_knee_plot.R'
 
@@ -182,6 +182,6 @@ rule plot_knee_plot_whitelist:
 		cells=lambda wildcards: samples.loc[wildcards.sample,'expected_cells']
 	conda: '../envs/plots.yaml'
 	output:
-		pdf='plots/{sample}_knee_plot.pdf'
+		pdf='plots/knee_plots/{sample}_knee_plot.pdf'
 	script:
 		'../scripts/plot_knee_plot.R'
