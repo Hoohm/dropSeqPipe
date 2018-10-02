@@ -59,7 +59,7 @@ rule all:
         'plots/adapter_content.pdf',
         'reports/filter.html',
         #mapping
-        expand('plots/{sample}_knee_plot.pdf', sample=samples.index),
+        expand('plots/knee_plots/{sample}_knee_plot.pdf', sample=samples.index),
         'reports/star.html',
         'plots/yield.pdf',
         'plots/UMI_vs_counts.pdf',
@@ -68,7 +68,7 @@ rule all:
         'summary/R_Seurat_objects.rdata',
         #extract
         expand('logs/dropseq_tools/{sample}_umi_per_gene.tsv', sample=samples.index),
-        expand('plots/{sample}_rna_metrics.pdf', sample=samples.index),
+        expand('plots/rna_metrics/{sample}_rna_metrics.pdf', sample=samples.index),
         'summary/umi_expression_matrix.tsv',
         'summary/counts_expression_matrix.tsv'
 
@@ -101,13 +101,13 @@ rule map:
     input:  
         expand('data/{sample}/final.bam', sample=samples.index),
         expand('logs/dropseq_tools/{sample}_hist_out_cell.txt', sample=samples.index),
-        expand('plots/{sample}_knee_plot.pdf', sample=samples.index),
+        expand('plots/knee_plots/{sample}_knee_plot.pdf', sample=samples.index),
         'reports/star.html'
         
 rule extract:
     input:
         expand('logs/dropseq_tools/{sample}_umi_per_gene.tsv', sample=samples.index),
-        expand('plots/{sample}_rna_metrics.pdf', sample=samples.index),
+        expand('plots/rna_metrics/{sample}_rna_metrics.pdf', sample=samples.index),
         'summary/umi_expression_matrix.tsv',
         'summary/counts_expression_matrix.tsv',
         'plots/violinplots_comparison_UMI.pdf',
@@ -133,7 +133,7 @@ rule extract_species:
         expand('logs/{species}/{sample}_umi_per_gene.tsv', sample=samples.index, species=config['META']['species']),
         expand('summary/Experiment_{species}_counts_expression_matrix.tsv', species=config['META']['species']),
         expand('summary/Experiment_{species}_umi_expression_matrix.tsv', species=config['META']['species']),
-        expand('plots/{species}/{sample}_rna_metrics.pdf', sample=samples.index, species=config['META']['species'])
+        expand('plots/{species}/rna_metrics/{sample}_rna_metrics.pdf', sample=samples.index, species=config['META']['species'])
         
 
 
