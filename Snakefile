@@ -77,7 +77,9 @@ rule all:
 
 rule test:
     input:
-        expand('data/{sample}/test.csv', sample=samples.index)
+        expand('data/{sample}_R1.fastq.gz', sample=samples.index),
+        expand('data/{sample}_R2.fastq.gz', sample=samples.index)
+
 
 rule meta:
     input:

@@ -37,10 +37,10 @@ for bam_read in infile_bam:
 	else:
 		# If the barcode is not found in the extended ref, then don't modify it.
 		if barcode in unknown_barcodes:
-			mapping['unknown'][barcode] += 1
+			mapping['unknown'][barcode]['count'] += 1
 			mapping['unknown'][barcode]['lanes'][lane_number] += 1
 		else:
-			mapping['unknown'][barcode] = {'count':1, 'lanes':{1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0}}
+			mapping['unknown'][barcode] = {'count':1, 'lanes':{'1':0,'2':0,'3':0,'4':0,'5':0,'6':0,'7':0,'8':0}}
 			mapping['unknown'][barcode]['lanes'][lane_number] += 1
 			unknown_barcodes.add(barcode)
 		outfile.write(bam_read)
