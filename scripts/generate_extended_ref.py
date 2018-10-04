@@ -15,6 +15,9 @@ def generate_all(barcode, reference, mapping, edit_distance):
             reference.add(mutant)
             mapping[edit_distance][mutant]['ref'] = barcode
             mapping[edit_distance][mutant]['count'] = 0
+            mapping[edit_distance][mutant]['lanes'] = {1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0}
+
+    mapping['unknown']=defaultdict()
     return(reference, mapping)
 
 
@@ -46,6 +49,7 @@ with open(snakemake.input.whitelist,'r') as ref_file:
         mapping[0][barcode]=defaultdict(dict)
         mapping[0][barcode]['ref'] = barcode
         mapping[0][barcode]['count'] = 0
+        mapping[0][barcode]['lanes'] = {1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0}
 
 barcode_ext_ref = deepcopy(barcode_ref)
 # For now edit distance is one, but can be extended to a higher number later on.
