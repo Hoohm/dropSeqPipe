@@ -57,7 +57,8 @@ rule all:
         'reports/fastqc_barcodes.html',
         #filter
         'plots/adapter_content.pdf',
-        'reports/filter.html',
+        'reports/barcode_filtering.html',
+        'reports/RNA_filtering.html',
         #mapping
         expand('plots/knee_plots/{sample}_knee_plot.pdf', sample=samples.index),
         'reports/star.html',
@@ -94,7 +95,8 @@ rule qc:
 rule filter:
     input:
         expand('data/{sample}/trimmmed_repaired_R1.fastq.gz', sample=samples.index),
-        'reports/filter.html',
+        'reports/barcode_filtering.html',
+        'reports/RNA_filtering.html',
         'plots/adapter_content.pdf'
         
 rule map:

@@ -118,11 +118,20 @@ rule plot_adapter_content:
     script:
         '../scripts/plot_adapter_content.R'
 
-rule multiqc_cutadapt:
+rule multiqc_cutadapt_barcodes:
     input:
         expand('logs/cutadapt/{sample}_R1.qc.txt', sample=samples.index)
-    params: '-m cutadapt'
+    params: '-m cutadapt --ignore *_R2*'
     output:
-        html='reports/filter.html'
+        html='reports/barcode_filtering.html'
+    wrapper:
+        '0.21.0/bio/multiqc'
+
+rule multiqc_cutadapt_RNA:
+    input:
+        expand('logs/cutadapt/{sample}_R2.qc.txt', sample=samples.index)
+    params: '-m cutadapt --ignore *_R1*'
+    output:
+        html='reports/RNA_filtering.html'
     wrapper:
         '0.21.0/bio/multiqc'
