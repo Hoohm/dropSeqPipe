@@ -20,7 +20,7 @@ unknown_barcodes = set()
 
 for bam_read in infile_bam:
 	barcode = bam_read.get_tag('XC')
-	lane_number = bam_read.queryname.split(':')[3]
+	lane_number = bam_read.query_name.split(':')[3]
 	if barcode in barcode_ref:
 		mapping[0][barcode]['count'] += 1
 		mapping[0][barcode]['lanes'][lane_number] += 1
