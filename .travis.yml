@@ -27,7 +27,7 @@ script:
   - snakemake --use-conda --directory .test -p
 
 after_success:
-  - snakemake --use-conda build_docs
+  - cd docs && snakemake --use-conda build_docs
 
 deploy:
   provider: pages
