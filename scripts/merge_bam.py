@@ -24,6 +24,8 @@ def parse_barcodes(fastq_parser, query_name, read_barcodes, barcodes_struct):
 	for fastq_R1 in fastq_parser:
 		read_barcodes[fastq_R1.id]['XC'] = str(fastq_R1.seq)[barcodes_struct['BC_start']:barcodes_struct['BC_end']]
 		read_barcodes[fastq_R1.id]['XM'] = str(fastq_R1.seq)[barcodes_struct['UMI_start']:barcodes_struct['UMI_end']]
+		if(read_barcodes[fastq_R1.id]['XM']==''):
+			sys.SystemExit('UMI empty for read {}.\n The barcode is: {}'.format(fastq_R1.id, fastq_R1.seq))
 		if (fastq_R1.id == query_name):
 			return(fastq_parser,read_barcodes)
 	

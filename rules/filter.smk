@@ -2,7 +2,7 @@
 
 
 #Which rules will be run on the host computer and not sent to nodes
-localrules: clean_cutadapt, plot_adapter_content, multiqc_cutadapt, detect_barcodes, create_log_folder
+localrules: clean_cutadapt, plot_adapter_content, multiqc_cutadapt_barcodes, multiqc_cutadapt_RNA, detect_barcodes, create_log_folder
 
 rule create_log_folder:
     input:
@@ -20,7 +20,7 @@ rule cutadapt_R1:
     output:
         fastq=temp("data/{sample}/trimmmed_R1.fastq.gz")
     params:
-        cell_barcode_length=config['FILTER']['cell-barcode']['end'] - config['FILTER']['cell-barcode']['start'] + 2,
+        cell_barcode_length=round((config['FILTER']['cell-barcode']['end'] - config['FILTER']['cell-barcode']['start'] + 1) * 1.3),
         barcode_length=config['FILTER']['UMI-barcode']['end'] - config['FILTER']['cell-barcode']['start'] + 1,
         extra_params=config['FILTER']['cutadapt']['R1']['extra-params'],
         max_n=config['FILTER']['cutadapt']['R1']['maximum-Ns'],
@@ -34,7 +34,7 @@ rule cutadapt_R1:
         --max-n {params.max_n}\
         -a file:{input.adapters}\
         -g file:{input.adapters}\
-        -q {params.barcode_quality},{params.barcode_quality}\
+        -q {params.barcode_quality},0\
         --minimum-length {params.barcode_length}\
         --cores={threads}\
         --overlap {params.cell_barcode_length}\
@@ -91,7 +91,7 @@ rule repair:
     params:
         memory='{}g'.format(int(config['LOCAL']['memory'].rstrip('g')) * 10)
     conda: '../envs/bbmap.yaml'
-    threads: 28
+    threads: 2
     shell:
         """repair.sh -Xmx{params.memory} in={input.R1} in2={input.R2} out1={output.R1} out2={output.R2} repair=t threads={threads} 2> {log}"""
 
