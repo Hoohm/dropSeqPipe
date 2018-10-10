@@ -31,7 +31,7 @@ for bam_read in infile_bam:
 		reference_barcode = mapping[1][barcode]['ref']
 		mapping[1][barcode]['count'] += 1
 		mapping[1][barcode]['lanes'][lane_number] += 1
-		bam_read.set_tags([('XC',reference_barcode,'Z')])
+		bam_read.set_tag('XC',reference_barcode,value_type='Z',replace=True)
 		outfile.write(bam_read)
 		continue
 	else:

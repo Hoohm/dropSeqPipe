@@ -79,14 +79,14 @@ rule repair_barcodes:
 		barcode_mapping='summary/barcode_mapping.pkl'
 	conda: '../envs/merge_bam.yaml'
 	output:
-		bam='data/{sample}/Aligned.repaired.bam',
+		bam=temp('data/{sample}/Aligned.repaired.bam'),
 		barcode_mapping_counts='data/{sample}/barcode_mapping_counts.pkl'
 	script:
 		'../scripts/repair_barcodes.py'
 
 rule TagReadWithGeneExon:
 	input:
-		data='data/{sample}/Aligned.repaired.bam',
+		data=temp('data/{sample}/Aligned.repaired.bam'),
 		refFlat='{}.refFlat'.format(annotation_prefix)
 	params:
 		memory=config['LOCAL']['memory'],
