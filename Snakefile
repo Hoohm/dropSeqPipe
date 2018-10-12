@@ -8,6 +8,7 @@ configfile: "config.yaml"
 
 # Get sample names from samples.csv
 samples = pd.read_table("samples.csv", header=0, sep=',', index_col=0)
+types=['counts','umi']
 # Get read_lengths from samples.csv
 read_lengths = list(samples.loc[:,'read_length'])
 
@@ -37,7 +38,7 @@ reference_file = os.path.join(config['META']['reference-directory'], config['MET
 annotation_file = os.path.join(config['META']['reference-directory'], config['META']['annotation-file'])
 annotation_reduced_file = os.path.join(config['META']['reference-directory'],'.'.join([config['META']['annotation-file'].split('.gtf')[0],'reduced','gtf']))
 star_index_prefix = os.path.join(config['META']['reference-directory'],'STAR_INDEX/SA')
-
+salmon_index = os.path.join(config['META']['reference-directory'], 'salmon','index')
 # Get barcode length
 starttrim_length = config['FILTER']['cell-barcode']['end'] - config['FILTER']['cell-barcode']['start'] + 1
 
@@ -67,9 +68,11 @@ rule all:
         'plots/UMI_vs_gene.pdf',
         'plots/Count_vs_gene.pdf',
         'summary/R_Seurat_objects.rdata',
+        #expand('data/{sample}/salmon/mapping.tsv', sample=samples.index),
         #extract
         expand('logs/dropseq_tools/{sample}_umi_per_gene.tsv', sample=samples.index),
         expand('plots/rna_metrics/{sample}_rna_metrics.pdf', sample=samples.index),
+        #expand('data/{sample}/{type}/expression_matrix.mtx', sample=samples.index, type=types),
         'summary/umi_expression_matrix.tsv',
         'summary/counts_expression_matrix.tsv'
 
@@ -106,12 +109,14 @@ rule map:
         expand('data/{sample}/final.bam', sample=samples.index),
         expand('logs/dropseq_tools/{sample}_hist_out_cell.txt', sample=samples.index),
         expand('plots/knee_plots/{sample}_knee_plot.pdf', sample=samples.index),
+        expand('data/{sample}/salmon/mapping.tsv', sample=samples.index),
         'reports/star.html'
         
 rule extract:
     input:
         expand('logs/dropseq_tools/{sample}_umi_per_gene.tsv', sample=samples.index),
         expand('plots/rna_metrics/{sample}_rna_metrics.pdf', sample=samples.index),
+        #expand('data/{sample}/{type}/expression_matrix.mtx', sample=samples.index, type=types),
         'summary/umi_expression_matrix.tsv',
         'summary/counts_expression_matrix.tsv',
         'plots/violinplots_comparison_UMI.pdf',

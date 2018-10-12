@@ -140,3 +140,14 @@ rule create_star_index:
 		--sjdbOverhang {params.sjdbOverhang}\
 		--genomeChrBinNbits {params.genomeChrBinNbits}
 		"""
+
+# rule create_salmon_index:
+# 	input:
+# 		fa=reference_file
+# 	params:
+# 		reference_directory=config['META']['reference-directory']
+# 	output:
+# 		'{salmon_index}'
+# 	conda: '../envs/salmon.yaml'
+# 	shell:
+# 		"""salmon index -t {input.fa} -i {output} --type quasi -k 31"""

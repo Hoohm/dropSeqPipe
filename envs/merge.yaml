@@ -4,3 +4,4 @@ channels:
 dependencies:
   - r=3.4.1
   - readline=6.2
+  - r-matrix

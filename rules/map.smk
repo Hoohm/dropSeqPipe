@@ -35,6 +35,32 @@ rule STAR_align:
 	wrapper:
 		"0.22.0/bio/star/align"
 
+# rule alevin:
+# 	input:
+# 		index='{salmon_index}',
+# 		R1="data/{sample}/trimmmed_repaired_R1.fastq.gz",
+# 		R2="data/{sample}/trimmmed_repaired_R2.fastq.gz",
+# 	conda: '../envs/salmon.yaml'
+# 	params:
+# 		cell_barcode_length=(config['FILTER']['cell-barcode']['end'] - config['FILTER']['cell-barcode']['start'] + 1),
+# 		umi_barcode_length=(config['FILTER']['UMI-barcode']['end'] - config['FILTER']['UMI-barcode']['start'] + 1)
+# 	output:
+# 		out_folder='data/{sample}/salmon/',
+# 		counts='data/{sample}/salmon/mapping.tsv'
+# 	shell:
+# 		"""salmon alevin\
+# 		-l ISR\
+# 		-1 {input.R1}\
+# 		-2 {input.R2}\
+# 		-i {inout.index}\
+# 		-p 10\
+# 		-o {output.out_folder}\
+# 		--tgMap {output.counts}\
+# 		--barcodeLength {params.cell_barcode_length}\
+# 		--umiLength {params.umi_barcode_length}\
+# 		--end 5"""
+
+
 rule multiqc_star:
 	input:
 		expand('data/{sample}/Log.final.out', sample=samples.index)

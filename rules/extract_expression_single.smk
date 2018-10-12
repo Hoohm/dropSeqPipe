@@ -7,7 +7,7 @@ ruleorder: SingleCellRnaSeqMetricsCollector_whitelist > SingleCellRnaSeqMetricsC
 ruleorder: plot_rna_metrics_whitelist > plot_rna_metrics
 
 #Which rules will be run on the host computer and not sent to nodes
-localrules: plot_umi_per_gene, plot_rna_metrics, plot_rna_metrics_whitelist, merge_umi, merge_counts, violine_plots
+localrules: plot_umi_per_gene, plot_rna_metrics, plot_rna_metrics_whitelist, merge_umi, merge_counts, violine_plots, convert_full_to_sparse
 
 rule extract_umi_expression:
 	input:
@@ -31,6 +31,18 @@ rule extract_umi_expression:
 		SUMMARY={log.summary}\
 		NUM_CORE_BARCODES={params.num_cells}\
 		MIN_BC_READ_THRESHOLD={params.count_per_umi}"""
+
+# rule convert_full_to_sparse:
+# 	input:
+# 		'data/{sample}/{type}_expression_matrix.tsv'
+# 	output:
+# 		mtx='data/{sample}/{type}/expression_matrix.mtx',
+# 		barcodes='data/{sample}/{type}/barcodes.csv',
+# 		features='data/{sample}/{type}/features.csv'
+# 	conda: '../envs/merge.yaml'
+# 	script:
+# 		'convert_full_to_sparse.R'
+
 
 
 rule extract_umi_expression_whitelist:
