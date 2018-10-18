@@ -1,0 +1,14 @@
+rule build_docs:
+   """Build docs using mkdocs"""
+   conda:
+     "mkdocs_env.yml"
+   shell:
+     "mkdocs build"
+
+rule serve_docs:
+   """Build docs and run through developement server"""
+   conda:
+     "mkdocs_env.yml"
+   shell:
+     "mkdocs serve"
+
