@@ -1,0 +1,33 @@
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - bzip2=1.0.6=h470a237_2
+  - ca-certificates=2018.8.24=ha4d7672_0
+  - certifi=2018.8.24=py37_1001
+  - click=7.0=py_0
+  - jinja2=2.10=py_1
+  - libffi=3.2.1=hfc679d8_5
+  - libgcc-ng=7.2.0=hdf63c60_3
+  - libstdcxx-ng=7.2.0=hdf63c60_3
+  - livereload=2.5.2=py_0
+  - markdown=2.6.11=py_0
+  - markupsafe=1.0=py37h470a237_1
+  - mkdocs=1.0.4=py_0
+  - ncurses=6.1=hfc679d8_1
+  - openssl=1.0.2p=h470a237_0
+  - pip=18.1=py37_1000
+  - python=3.7.0=h5001a0f_4
+  - python-markdown-math=0.6=py_0
+  - pyyaml=3.13=py37h470a237_1
+  - readline=7.0=haf1bffa_1
+  - setuptools=40.4.3=py37_0
+  - six=1.11.0=py37_1001
+  - sqlite=3.25.2=hb1c47c0_0
+  - tk=8.6.8=ha92aebf_0
+  - tornado=5.1.1=py37h470a237_0
+  - wheel=0.32.1=py37_0
+  - xz=5.2.4=h470a237_1
+  - yaml=0.1.7=h470a237_1
+  - zlib=1.2.11=h470a237_3
+
