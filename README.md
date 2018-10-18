@@ -17,41 +17,55 @@ It uses STAR to map the reads. It is usable for any single cell protocol using t
 This package is trying to be as user friendly as possible. One of the hopes is that non-bioinformatician can make use of it without too much hassle. It will still require some command line execution, this is not going to be fully interactive package.
 
 
-Latest changes
------------------
+## Authors
 
-## [0.31]
-### Changed
-- Fixed error for STAR index generation. It crashed saying it couldn't write in folder.
-- Fixed a missing plot for plot_knee_plot_whitelist.
-- Input files for the STAR_align rule have been changed. Adding samples in an already aligned experiment with a different R2 length, will only align the new data and not realign the old one.
-- Split reads and barcodes multiqc reports for qc step.
-- Modified a few rules to follow the guidelines for [snakemake workflows](https://github.com/snakemake-workflows/docs)
-- Fixed an issue where snakemake would crash on clusters if using `expand()` on fixed variables such as `annotation_prefix`. Now using normal python formatting.
-- Changed the config.yaml parameters names to lowercase and hyphens! Software specific variables have their original style making it easier to search in manuals. You will have to either copy the new config.yaml from the templates or modify your own accordingly.
-- cell-barcode-edit-distance changed to what it actually is, UMI-edit-distance.
-- Updated all the envs to fix bugs.
-- Fixed a bug where the mixed species would not run properly.
+* Patrick Roelli (@Hoohm)
+* Sebastian Mueller (@seb-mueller)
+* Charles Girardot (@cgirardot)
 
-### Added
-- Added ggpubr in environment.yaml file.
-- Added a `templates` folder which will hold `config.yaml`, `samples.csv`, `cluster.yaml` as well as adapters files. This will also help cloning the repository without overwritting your own config.yaml file when updating the pipeline.
-- Added the possibility of using your own adapters fasta file for trimmomatic. To use it, please refer to the [WIKI](https://github.com/Hoohm/dropSeqPipe/wiki/Create-config-files#filter)
-- Added fastqc, multiqc, STAR wrappers. You have now to use the `--use-conda` option to run the pipeline.
-- Added cluster recommendations on the wiki.
-- Added Localrules for certain rules. This allows to run low ressource rules on the host computer instead of nodes when using clusters.
-- genomeChrBinNbits will be calculated automacially for STAR.
-- Exposed all variables for trimmomatic in config.yaml under trimming.
+## Usage
 
-### Removed
-- png plots have been removed. It was causing some issues on clusters with cairo. Usability is more important than png plots to me.
+### Step 1: Install workflow
+
+If you simply want to use this workflow, download and extract the [latest release](https://github.com/Hoohm/dropSeqPipe/releases).
+If you intend to modify and further develop this workflow, fork this reposity. Please consider providing any generally applicable modifications via a pull request.
+
+In any case, if you use this workflow in a paper, don't forget to give credits to the authors by citing the URL of this repository and, once available, its DOI.
+
+### Step 2: Configure workflow
+
+Configure the workflow according to your needs via editing the file `config.yaml` and the  `samples.tsv` following those [instructions](https://github.com/Hoohm/dropSeqPipe/wiki/Create-config-files)
+
+### Step 3: Execute workflow
+
+All you need to execute this workflow is to install Snakemake via the [Conda package manager](http://snakemake.readthedocs.io/en/stable/getting_started/installation.html#installation-via-conda). Software needed by this workflow is automatically deployed into isolated environments by Snakemake.
+
+Test your configuration by performing a dry-run via
+
+    snakemake --use-conda -n
+
+Execute the workflow locally via
+
+    snakemake --use-conda --cores $N
+
+using `$N` cores. Alternatively, it can be run in cluster or cloud environments (see [the docs](http://snakemake.readthedocs.io/en/stable/executable.html) for details).
+
+If you not only want to fix the software stack but also the underlying OS, use
+
+    snakemake --use-conda --use-singularity
+
+in combination with any of the modes above.
+
+### Step 4: Investigate results
+
+After successful execution, you can create a self-contained report with all results via:
+
+    snakemake --report report.html
 
 
-installation
-------------
-
-The installation process can be found in the [Installation](https://github.com/Hoohm/dropSeqPipe/wiki/Installation) section of the wiki.
-
+Documentation
+------------------
+You can find the documentation [here](https://hoohm.github.io/dropSeqPipe/)
 
 Future implementations
 ---------------------------
@@ -60,7 +74,6 @@ I'm actively seeking help to implement the points listed bellow. Don't hesitate 
 * Create a sharing platform where quality plots/logs can be discussed and troubleshooted.
 * Create a full html report for the whole pipeline
 * Multiqc module for drop-seq-tools
-* Conda package for drop-seq-tools
 * RData object of all the summary data and plots so that you can create your own report.
 * Implement an elegant "preview" mode where the pipeline would only run on a couple of millions of reads and allow you to have an approximated view before running all of the data. This would dramatically reduce the time needed to get an idea of what filters whould be used.
 
