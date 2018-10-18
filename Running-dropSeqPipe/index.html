@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Running dropSeqPipe - dropSeqPipe</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Running dropSeqPipe";
+    var mkdocs_page_input_path = "Running-dropSeqPipe.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> dropSeqPipe</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="..">Home</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../Installation/">Installation</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../Reference-Files/">Reference Files</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../Create-config-files/">Config file and sample file</a>
+	    </li>
+          
+            <li class="toctree-l1 current">
+		
+    <a class="current" href="./">Running dropSeqPipe</a>
+    <ul class="subnav">
+            
+    <li class="toctree-l2"><a href="#context">Context</a></li>
+    
+
+    <li class="toctree-l2"><a href="#working-dir-folder-preparation">Working dir folder preparation</a></li>
+    
+
+    <li class="toctree-l2"><a href="#running-the-pipeline-tldr-version">Running the pipeline (TLDR version)</a></li>
+    
+
+    <li class="toctree-l2"><a href="#running-the-pipeline">Running the pipeline</a></li>
+    
+
+    <li class="toctree-l2"><a href="#modes">Modes</a></li>
+    
+        <ul>
+        
+            <li><a class="toctree-l3" href="#single-species">Single species:</a></li>
+        
+            <li><a class="toctree-l3" href="#mixed-species">Mixed species</a></li>
+        
+        </ul>
+    
+
+    <li class="toctree-l2"><a href="#barcode-whitelist">Barcode whitelist</a></li>
+    
+
+    <li class="toctree-l2"><a href="#advanced-options">Advanced options</a></li>
+    
+
+    <li class="toctree-l2"><a href="#further-options">Further options</a></li>
+    
+
+    <li class="toctree-l2"><a href="#running-on-clusters">Running on clusters</a></li>
+    
+
+    <li class="toctree-l2"><a href="#folder-structure">Folder Structure</a></li>
+    
+
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../Plots/">Plots</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../CHANGELOG/">Change Log</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../FAQ/">FAQ</a>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">dropSeqPipe</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Running dropSeqPipe</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/Hoohm/dropSeqPipe/edit/master/docs/Running-dropSeqPipe.md"
+          class="icon icon-github"> Edit on GitHub</a>
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h2 id="context">Context</h2>
+<p>The pipeline is supposed to be cloned once and then run on a folder containing your data as well as the configuration files. The run folder can contain multiple runs (aka batches) as you can easily add new samples when recieving new data and run the same commands. This will simply run the pipeline on the newly added data and recreate reports as well as plots containing all the samples.</p>
+<p>Example: You run 2 biological conditions with 2 replicates. This makes up for 4 samples. Assume a simple dropseq protocol with only human cells.
+1. You sequence the data and recieve the 8 files (two files per sample) and set up the pipeline
+2. You run the pipeline with the command: <code>snakemake --use-conda --cores N --directory WORKING_DIR</code> <code>N</code> being the number of cores available and <code>WORKING_DIR</code> being the folder containing your data.
+3. You see that there is an issue with the protocol and you modify it
+4. You create a new set of libraries and sequence them (same 2x2 design)
+5. You add the new files in the data folder of <code>WORKING_DIR</code> and edit the samples.csv to add missing samples.
+6. You run the pipeline as you did the first time <code>snakemake --use-conda --cores N --directory WORKING_DIR</code>
+7. This will run the new samples only and recreate the reports as well as the BC_drop and yield plots.
+8. It is now easy to compare the impact of your change in the procotol</p>
+<h2 id="working-dir-folder-preparation">Working dir folder preparation</h2>
+<p>The raw data from the sequencer should be stored in the <code>data</code> folder of <code>WORKING_DIR</code> folder like this:</p>
+<pre><code>/path/to/your/WORKING_DIR/
+| -- data/
+| -- -- sample1_R1.fastq.gz
+| -- -- sample1_R2.fastq.gz
+| samples.csv
+| config.yaml
+| barcodes.csv
+</code></pre>
+
+<p><em>Note: In DropSeq or ScrbSeq you expect a paired sequencing. R1 will hold the information of your barcode and UMI, R2 will hold the 3' end of the captured mRNA.</em></p>
+<p>Once everything is in place, you can run the pipeline using the normal snakemake commands.</p>
+<h2 id="running-the-pipeline-tldr-version">Running the pipeline (TLDR version)</h2>
+<p>For a simple single cell run you only need to run: <code>snakemake --cores N --use-conda --directory WORKING_DIR</code>
+This will run the whole pipeline and use the X number of cores you gave to it.</p>
+<h2 id="running-the-pipeline">Running the pipeline</h2>
+<p>I highly recommend to take a <a href="http://snakemake.readthedocs.io/en/latest/">look at the options</a> that are available since I won't cover everything here.</p>
+<h2 id="modes">Modes</h2>
+<p>You have two main ways to run the pipeline.</p>
+<p>You can either just run <code>snakemake --use-conda --directory WORKING_DIR</code> in the root folder containing your experiment and it will run everything without stopping.</p>
+<p>You can also run each step separately. The main advantage of the second way is that you are able to fine tune your parameters based on the results of fastqc, filtering, mapping quality, etc...
+I would suggest using the second approach when you work on a new protocol and the first one when you are confident of your parameters.</p>
+<p>There are seven different modes available and to run one specifically you need to call the mode.</p>
+<p>Example: To run the <code>qc</code> mode: <code>snakemake --cores 8 qc --use-conda --directory WORKING_DIR</code>
+You can also run multiple modes at the same time if you want: <code>snakemake --cores 8 qc filter --use-conda --directory WORKING_DIR</code></p>
+<h3 id="single-species">Single species:</h3>
+<ul>
+<li><code>meta</code>: Generates all the subsequent references files and STAR index needed to run the pipeline. You can run this alone if you just want to create the meta-data file before running a new set of data.</li>
+<li><code>qc</code>: Creates fastqc reports of your data.    </li>
+<li><code>filter</code>: Go from sample_R1.fastq.gz to sample_filtered.fastq.gz ready to be mapped to the genome.  This step filters out your data for low quality reads and trims adapter you provided in the FILTER section.</li>
+<li><code>map</code>: Go from sample_filtered.fastq.gz to the sample_final.bam read to extract the expression data. This maps the data to the genom.</li>
+<li><code>extract</code>: Extract the expression data. You'll get a umi and a count expression matrix from your whole experiment.</li>
+</ul>
+<h3 id="mixed-species">Mixed species</h3>
+<p>The next two step are only necessary for mixed experiment. Note that you can't just run <code>snakemake --directory WORKING_DIR --use-conda</code> for a mixed experiment but you have to run <code>snakemake extract-species --directory WORKING_DIR</code> instead.
+<em> <code>split_species</code>: Poduces the species plot and the species specific barcode list for extract-species.
+</em> <code>extract_species</code>: Extract the expression data. You'll get a umi and a count expression matrix from your whole experiment/specie in the summary folder.</p>
+<p>If you want all the plots for mixed experiment, you have to call all the modes:  <code>snakemake --cores 8 qc filter map split_species extract_species --use-conda --directory WORKING_DIR</code></p>
+<h2 id="barcode-whitelist">Barcode whitelist</h2>
+<p>In protocols such as SCRBseq, the expected barcodes sequences are known. This pipeline also does allow the use of known barcodes instread of a number of expected cells.
+In order to use this functionnality you just need to add a <code>barcodes.csv</code> file at the root of the working dir and run the pipeline as usual.</p>
+<h2 id="advanced-options">Advanced options</h2>
+<p>If you have some specific adapters that are not present by default in the ones in the <code>templates</code> folder, you can add whatever adapters you want to trim (as many as you need) following the fasta syntax in any fasta files proposed. Be sure to specify it properly in the config.yaml at <code>FILTER:IlluminaClip</code></p>
+<h2 id="further-options">Further options</h2>
+<ul>
+<li><code>--cores N</code> Use this argument to use X amunt of cores available.</li>
+<li><code>--notemp</code> Use this to not delete all the temporary files. Without this option, only files between steps are kept. Use this option if you are troobleshooting the pipeline or you want to analyze in between files yourself.</li>
+<li><code>--dryrun</code> Use this to check out what is going to run if you run your command. This is nice to check for potential missing files.</li>
+</ul>
+<h2 id="running-on-clusters">Running on clusters</h2>
+<p>There is a file in the <code>templates</code> called <code>cluster.yaml</code>. This can be used to modify ressources needed for your data. I generally recommand moving the file to the root of the folder so that it doesn't get replaced by updates.</p>
+<p>Bellow is an example of running on a cluster using the template file <code>cluster.yaml</code> on SLURM.</p>
+<pre><code>snakemake --cluster 'sbatch -n {cluster.n}  -t {cluster.time} --clusters=CLUSTERNAME --output={cluster.output}' --jobs N --cluster-config cluster.yaml --use-conda --local-cores C
+</code></pre>
+
+<ul>
+<li>N: is the number of jobs you are allowed to run at the same time</li>
+<li>C: is the local-cores of the host machine. A few simple rules are gonna be run locally (not sent to nodes) because they are not that heavy (mostly plotting)</li>
+<li>CLUSTERNAME: the name of the cluster you want to use</li>
+</ul>
+<h2 id="folder-structure">Folder Structure</h2>
+<p>This is the folder structure you get in the end:</p>
+<pre><code>/path/to/your/WORKING_DIR/
+| -- data/
+| -- logs/
+| -- -- cluster/
+| -- plots/
+| -- reports/
+| -- summary/
+| Snakefile
+| samples.csv
+| config.yaml
+| barcodes.csv
+| .snakemake/
+</code></pre>
+
+<ul>
+<li><code>data/</code> Contains all your samples as well as the intermediary files</li>
+<li><code>logs/</code> Contains all the logfiles generated by the pipeline</li>
+<li><code>logs/cluster</code> Contains all the logfiles generated by the cluster</li>
+<li><code>plots/</code> Contains all the plots generated by the pipeline</li>
+<li><code>reports/</code> Contains all the reports generated by the pipeline</li>
+<li><code>summary/</code> Contains all the files you might use for downstream analysis (contains barcodes selected per sample per species, final umi/counts expression matrix)</li>
+<li><code>samples.csv</code> File containing sample details</li>
+<li><code>config.yaml</code> File containing pipeline parameters as well as system parameters</li>
+<li><code>.snakemake/</code> Folder that contains all the environements created for the run as well as a lot of other things that I don't know about.</li>
+</ul>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../Plots/" class="btn btn-neutral float-right" title="Plots">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../Create-config-files/" class="btn btn-neutral" title="Config file and sample file"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/Hoohm/dropSeqPipe/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../Create-config-files/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../Plots/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+
+</body>
+</html>

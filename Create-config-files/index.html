@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Config file and sample file - dropSeqPipe</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Config file and sample file";
+    var mkdocs_page_input_path = "Create-config-files.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> dropSeqPipe</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="..">Home</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../Installation/">Installation</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../Reference-Files/">Reference Files</a>
+	    </li>
+          
+            <li class="toctree-l1 current">
+		
+    <a class="current" href="./">Config file and sample file</a>
+    <ul class="subnav">
+            
+    <li class="toctree-l2"><a href="#config-file-and-sample-file">Config file and sample file</a></li>
+    
+        <ul>
+        
+            <li><a class="toctree-l3" href="#1-configyaml-executables-system-and-experiment-parameters">1. config.yaml - Executables, system and experiment parameters</a></li>
+        
+            <li><a class="toctree-l3" href="#subsections">Subsections</a></li>
+        
+        </ul>
+    
+
+    <li class="toctree-l2"><a href="#2-samplescsv-samples-parameters">2. samples.csv - Samples parameters</a></li>
+    
+
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../Running-dropSeqPipe/">Running dropSeqPipe</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../Plots/">Plots</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../CHANGELOG/">Change Log</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../FAQ/">FAQ</a>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">dropSeqPipe</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Config file and sample file</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/Hoohm/dropSeqPipe/edit/master/docs/Create-config-files.md"
+          class="icon icon-github"> Edit on GitHub</a>
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="config-file-and-sample-file">Config file and sample file</h1>
+<hr />
+<p>In order to run the pipeline you will need to complete the config.yaml file and the samples.csv file. Both are located in the <code>templates</code> folder and should be moved to the root folder of the experiment.</p>
+<h2 id="1-configyaml-executables-system-and-experiment-parameters">1. config.yaml - Executables, system and experiment parameters</h2>
+<p>The config.yaml contains the paths to the the Drop-Seq tools wrapper, paths to references and parameters for each step of the pipeline.</p>
+<pre><code>    :*emp-directory: /path/to/temp/or/scratch/folder
+    r*q-wrapper: /path/to/drop-seq-tools-wrapper.sh
+memory: 4g
+META:
+    *cies:
+    *   - SPECIES_ONE
+    *   - SPECIES_TWO
+    ratio: 0.2
+    reference-file: reference.fasta
+    annotation-file: annotation.gtf
+    reference-directory: /path/references/files/
+FILTER:
+    5-prime-smart-adapter: DEPENDS ON THE PROTOCOL
+    cell-barcode:
+        start:
+        end:
+        min-quality:
+        num-below-quality:
+    UMI-barcode:
+        start:
+        end:
+        min-quality:
+        num-below-quality:
+    trimmomatic:
+        adapters-file: /path/to/adapters.fa
+        LEADING: 3
+        TRAILING: 3
+        SLIDINGWINDOW:
+            windowSize: 4
+            requiredQuality: 20
+        MINLEN: 20
+        ILLUMINACLIP:
+            seedMismatches: 2
+            palindromeClipThreshold: 30
+            simpleClipThreshold: 10
+MAPPING:
+    STAR:
+        outFilterMismatchNmax: 10
+        outFilterMismatchNoverLmax: 0.3
+        outFilterMismatchNoverReadLmax: 1
+        outFilterMatchNmin: 0
+        outFilterMatchNminOverLread: 0.66
+        outFilterScoreMinOverLread: 0.66
+EXTRACTION:
+    UMI-edit-distance:
+    minimum-counts-per-UMI:
+
+
+</code></pre>
+
+<p>Please note the "space" after the colon, is needed for the yaml to work.</p>
+<h2 id="subsections">Subsections</h2>
+<h3 id="local">[LOCAL]</h3>
+<ul>
+<li><code>temp-directory</code> is the temp or scratch folder with enough space to keep temporary files.</li>
+<li><code>dropseq-wrapper</code> is the wrapper that will call all the drop-seq-tools executables.</li>
+<li><code>memory</code> is the maximum memory allocation pool for a Java Virtual Machine.</li>
+</ul>
+<h3 id="meta">[META]</h3>
+<ul>
+<li><code>species</code> is the species used in the experiment. [Required for mixed species experiment]
+Ex:</li>
+</ul>
+<pre><code> species:
+    - MOUSE
+    - HUMAN
+</code></pre>
+
+<ul>
+<li>
+<p><code>ratio</code> is how much "contamination" from another species you allow to validate them as a species or mixed. 0.2 means you allow a maximum of 20% mixing.
+Note: Those species name must reflect names used in the genome.fasta</p>
+</li>
+<li>
+<p><code>reference-file</code> is the reference file of your genome (fasta).</p>
+</li>
+<li><code>annotation-file</code> is the gene annotation file (GTF).</li>
+<li><code>reference-folder</code> is the folder where both of these files are gonna be stored.</li>
+</ul>
+<h3 id="filter">[FILTER]</h3>
+<ul>
+<li><code>5-prime-smart-adapter</code> is the 5" smart adapter used in your protocol.</li>
+<li>
+<p><code>cell-barcode and UMI-barcode</code>: Is the section for cell/umi barcode filtering.</p>
+<ul>
+<li><code>start</code> is the first base position of your cell/umi barcode.</li>
+<li><code>end</code> is the last base position of your cell/umi barcode.</li>
+<li><code>min-quality</code> is the minimum quality filtering for bases in your cell barcodes or UMI to discard reads.</li>
+<li><code>num-below-quality</code> is the maximum bases under <code>min_quality</code>. A value of <code>0</code> means all reads that have more than 0 (1 or more) bases under <code>min-quality</code> in the cell/umi barcode are discarded.</li>
+</ul>
+</li>
+<li>
+<p><code>trimmomatic</code>: Is the section for trimming.</p>
+</li>
+<li><code>adapters-file</code> is the file containing your list of adapters as fasta. you can choose between 6 files in the <code>templates</code> folder, add any sequence to existing files or provide your own custom one.<ul>
+<li>NexteraPE-PE.fa </li>
+<li>TruSeq2-PE.fa</li>
+<li>TruSeq2-SE.fa</li>
+<li>TruSeq3-PE-2.fa</li>
+<li>TruSeq3-PE.fa</li>
+<li>TruSeq3-SE.fa
+Provide the path to the file you want to use for trimming. If you want to add custom sequences or create a complete new one, I would advise to store it in the ROOT folder of the experiment. This will ensure that your custom file will not be overwritten if you update the pipeline.</li>
+</ul>
+</li>
+</ul>
+<p>Example: <code>NexteraPE-PE.fa</code></p>
+<ul>
+<li><code>LEADING</code> (default:3) quality: Specifies the minimum quality required to keep a base.</li>
+<li><code>TRAILING</code> (default:3) quality: Specifies the minimum quality required to keep a base.</li>
+<li><code>SLIDINGWINDOW</code>: <ul>
+<li><code>windowSize</code> (default:4) specifies the number of bases to average across.</li>
+<li><code>requiredQuality</code> (default:20) specifies the average quality required.</li>
+</ul>
+</li>
+<li><code>MINLEN</code> (default:20) Specifies the minimum length of reads to be kept.</li>
+<li><code>ILLUMINACLIP</code>:<ul>
+<li><code>seedMismatches</code> (default:2) specifies the maximum mismatch count which will still allow a full match to be performed.</li>
+<li><code>palindromeClipThreshold</code> (default:30) specifies how accurate the match between the two 'adapter ligated' reads must be for PE palindrome read alignment.</li>
+<li><code>simpleClipThreshold</code> (default:10) specifies how accurate the match between any adapter etc. sequence must be against a read.
+All of the values for trimmomatic are the default ones. For details about trimmomatic parameters and what they do, please refer to the <a href="http://www.usadellab.org/cms/?page=trimmomatic">trimmomatic web page</a>.</li>
+</ul>
+</li>
+</ul>
+<h3 id="mapping">[MAPPING]</h3>
+<ul>
+<li><code>STAR</code><ul>
+<li><code>outFilterMismatchNmax</code> (default:10) is the maximum number of mismatches allowed.</li>
+<li><code>outFilterMismatchNoverLmax</code> (default:0.3) is the maximum ratio of mismatched bases that mapped.</li>
+<li><code>outFilterMismatchNoverReadLmax</code> (default:1.0) is the maximum ratio of mismatched bases of the whole read.</li>
+<li><code>outFilterMatchNmin</code> (default:0) is the minimum number of matched bases.</li>
+<li><code>outFilterMatchNminOverLread</code> (default:0.66) alignment will be output only if the ratio of matched bases is higher than or equal to this value.</li>
+<li><code>outFilterScoreMinOverLread</code> (default:0.66) alignment will be output only if its ratio score is higher than or equal to this value.</li>
+</ul>
+</li>
+</ul>
+<p>All of the values for STAR are the default ones. For details about STAR parameters and what they do, please refer to the <a href="https://github.com/alexdobin/STAR/tree/master/doc">STAR manual on git</a>.</p>
+<h3 id="extraction">[EXTRACTION]</h3>
+<ul>
+<li><code>UMI-edit-distance</code> This is the maximum manhattan distance between two UMI barcode when extracting count matrices.</li>
+<li><code>min-count-per-umi</code> is the minimum UMI/Gene pair needed to be counted as one.</li>
+</ul>
+<h1 id="2-samplescsv-samples-parameters">2. samples.csv - Samples parameters</h1>
+<p>This file holds the sample names, expected cell numbers and read length for each sample.
+The file has to have this format:</p>
+<pre><code>samples,expected_cells,read_lengths,batch
+sample_name1,500,100,Batch1
+sample_name2,500,100,Batch2
+</code></pre>
+
+<ul>
+<li><code>expected_cells</code> is the amount of cells you expect from your sample.</li>
+<li><code>read_length</code> is the read length of the mRNA (Read2). This is necessary for STAR index generation</li>
+<li><code>batch</code> is the batch of your sample. If you are added new samples to the same experiment, this is typically a good place to add the main batch.</li>
+</ul>
+<p><code>Note:</code> You can add any other column you wish here, it won't affect the pipeline and you can use it later on in your analysis.</p>
+<p>Next step <a href="https://github.com/Hoohm/dropSeqPipe/wiki/Reference-Files">downloading the reference files</a></p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../Running-dropSeqPipe/" class="btn btn-neutral float-right" title="Running dropSeqPipe">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../Reference-Files/" class="btn btn-neutral" title="Reference Files"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/Hoohm/dropSeqPipe/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../Reference-Files/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../Running-dropSeqPipe/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+
+</body>
+</html>
