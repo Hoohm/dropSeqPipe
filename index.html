@@ -53,29 +53,7 @@
     <a class="current" href=".">Home</a>
     <ul class="subnav">
             
-    <li class="toctree-l2"><a href="#description">Description</a></li>
-    
-
-    <li class="toctree-l2"><a href="#latest-changes">Latest changes</a></li>
-    
-
-    <li class="toctree-l2"><a href="#031">[0.31]</a></li>
-    
-        <ul>
-        
-            <li><a class="toctree-l3" href="#changed">Changed</a></li>
-        
-            <li><a class="toctree-l3" href="#added">Added</a></li>
-        
-            <li><a class="toctree-l3" href="#removed">Removed</a></li>
-        
-        </ul>
-    
-
-    <li class="toctree-l2"><a href="#installation">installation</a></li>
-    
-
-    <li class="toctree-l2"><a href="#future-implementations">Future implementations</a></li>
+    <li class="toctree-l2"><a href="#welcome">Welcome</a></li>
     
 
     </ul>
@@ -151,63 +129,9 @@
           <div role="main">
             <div class="section">
               
-                <p><a href="https://snakemake.bitbucket.io"><img alt="Snakemake" src="https://img.shields.io/badge/snakemake-≥4.1.0-brightgreen.svg" /></a>
-<a href="https://travis-ci.org/Hoohm/dropSeqPipe"><img alt="Build Status" src="https://travis-ci.org/Hoohm/dropSeqPipe.svg?branch=master" /></a></p>
-<h2 id="description">Description</h2>
-<p>This pipeline is based on <a href="https://snakemake.readthedocs.io/en/stable/">snakemake</a> and the dropseq tools provided by the <a href="http://mccarrolllab.com/dropseq/">McCarroll Lab</a>. It allows to go from raw data of your Single Cell RNA seq experiment until the final count matrix with QC plots along the way.</p>
-<p>This is the tool we use in our lab to improve our wetlab protocol as well as provide an easy framework to reproduce and compare different experiments with different parameters.</p>
-<p>It uses STAR to map the reads. It is usable for any single cell protocol using two reads where the first one holds the Cell and UMI barcodes and the second read holds the RNA. Here is a non-exhausitve list of compatible protocols:</p>
-<ul>
-<li>Drop-Seq</li>
-<li>SCRB-Seq</li>
-<li>10x Genomics</li>
-<li>DroNc-seq</li>
-</ul>
-<p>This package is trying to be as user friendly as possible. One of the hopes is that non-bioinformatician can make use of it without too much hassle. It will still require some command line execution, this is not going to be fully interactive package.</p>
-<h2 id="latest-changes">Latest changes</h2>
-<h2 id="031">[0.31]</h2>
-<h3 id="changed">Changed</h3>
-<ul>
-<li>Fixed error for STAR index generation. It crashed saying it couldn't write in folder.</li>
-<li>Fixed a missing plot for plot_knee_plot_whitelist.</li>
-<li>Input files for the STAR_align rule have been changed. Adding samples in an already aligned experiment with a different R2 length, will only align the new data and not realign the old one.</li>
-<li>Split reads and barcodes multiqc reports for qc step.</li>
-<li>Modified a few rules to follow the guidelines for <a href="https://github.com/snakemake-workflows/docs">snakemake workflows</a></li>
-<li>Fixed an issue where snakemake would crash on clusters if using <code>expand()</code> on fixed variables such as <code>annotation_prefix</code>. Now using normal python formatting.</li>
-<li>Changed the config.yaml parameters names to lowercase and hyphens! Software specific variables have their original style making it easier to search in manuals. You will have to either copy the new config.yaml from the templates or modify your own accordingly.</li>
-<li>cell-barcode-edit-distance changed to what it actually is, UMI-edit-distance.</li>
-<li>Updated all the envs to fix bugs.</li>
-<li>Fixed a bug where the mixed species would not run properly.</li>
-</ul>
-<h3 id="added">Added</h3>
-<ul>
-<li>Added ggpubr in environment.yaml file.</li>
-<li>Added a <code>templates</code> folder which will hold <code>config.yaml</code>, <code>samples.csv</code>, <code>cluster.yaml</code> as well as adapters files. This will also help cloning the repository without overwritting your own config.yaml file when updating the pipeline.</li>
-<li>Added the possibility of using your own adapters fasta file for trimmomatic. To use it, please refer to the <a href="https://github.com/Hoohm/dropSeqPipe/wiki/Create-config-files#filter">WIKI</a></li>
-<li>Added fastqc, multiqc, STAR wrappers. You have now to use the <code>--use-conda</code> option to run the pipeline.</li>
-<li>Added cluster recommendations on the wiki.</li>
-<li>Added Localrules for certain rules. This allows to run low ressource rules on the host computer instead of nodes when using clusters.</li>
-<li>genomeChrBinNbits will be calculated automacially for STAR.</li>
-<li>Exposed all variables for trimmomatic in config.yaml under trimming.</li>
-</ul>
-<h3 id="removed">Removed</h3>
-<ul>
-<li>png plots have been removed. It was causing some issues on clusters with cairo. Usability is more important than png plots to me.</li>
-</ul>
-<h2 id="installation">installation</h2>
-<p>The installation process can be found in the <a href="https://github.com/Hoohm/dropSeqPipe/wiki/Installation">Installation</a> section of the wiki.</p>
-<h2 id="future-implementations">Future implementations</h2>
-<p>I'm actively seeking help to implement the points listed bellow. Don't hesitate to contact me if you wish to contribute.</p>
-<ul>
-<li>Create a sharing platform where quality plots/logs can be discussed and troubleshooted.</li>
-<li>Create a full html report for the whole pipeline</li>
-<li>Multiqc module for drop-seq-tools</li>
-<li>Conda package for drop-seq-tools</li>
-<li>RData object of all the summary data and plots so that you can create your own report.</li>
-<li>Implement an elegant "preview" mode where the pipeline would only run on a couple of millions of reads and allow you to have an approximated view before running all of the data. This would dramatically reduce the time needed to get an idea of what filters whould be used.</li>
-</ul>
-<p>I hope it can help you out in your single cell experiments!</p>
-<p>Feel free to comment and point out potential improvements.</p>
+                <h2 id="welcome">Welcome</h2>
+<p>Welcome to the documentation of dropSeqPipe.</p>
+<p>This documentation is under construction</p>
               
             </div>
           </div>
@@ -258,5 +182,5 @@
 
 <!--
 MkDocs version : 1.0.4
-Build Date UTC : 2018-10-18 11:49:30
+Build Date UTC : 2018-10-18 13:07:05
 -->
