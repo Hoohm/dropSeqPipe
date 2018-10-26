@@ -109,7 +109,7 @@ rule map:
         expand('data/{sample}/final.bam', sample=samples.index),
         expand('logs/dropseq_tools/{sample}_hist_out_cell.txt', sample=samples.index),
         expand('plots/knee_plots/{sample}_knee_plot.pdf', sample=samples.index),
-        expand('data/{sample}/salmon/mapping.tsv', sample=samples.index),
+        #expand('data/{sample}/salmon/mapping.tsv', sample=samples.index),
         'reports/star.html'
         
 rule extract:
