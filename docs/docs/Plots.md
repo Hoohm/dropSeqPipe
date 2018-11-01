@@ -70,11 +70,15 @@ Each point represents a barcode augmented by a violine-plot density estimator of
 
 On the x axis are the samples for each panel (Note: the dot distribution along the x-axis does't not bear information, it's just a visual aid to better assess density).
 On the y axis are the respecitve statistics described below for each panel.
+
 TOP panel from left to right: 
+
 - nUMI: number of UMI per barcode
 - nCounts: number of Counts per barcode
 - top50: fraction (percentage/100) of the highest expressed genes compared to entire set of genes. 
+
 BOTTOM: 
+
 - nUMI: average number of UMI per Gene per barcode
 - pct.Ribo: Fraction of ribosomal RNA (Note: ribsomal transcripts defined as starting with "^Rpl")
 - pct.mito: Fraction of mitochondrial RNA (Note: mitchondrial transcripts defined as starting with "^mt-")
@@ -90,7 +94,7 @@ This plot can indicate how many counts per barcode are required on average to fi
 Given enought coverage, it can also indicate how many genes are expressed for the examined cell type.
 
 ## 11 Saturation plot: Counts per barcode (across samples)
-![counts per barcode](images/mac_Counts_vs_gene.png)
+![counts per barcode](images/mac_Count_vs_gene.png)
 Number of Counts (x-axis) vs number of Genes (y-axis) for each barcode (points in plot) broken down by sample (different colors). 
 Number of Genes defined as Genes having at least 1 read mapped to them.
 Individual samples are color-coded. A loess regression curve of barcodes for each sample is fitted. 
