@@ -102,11 +102,23 @@
     <li class="toctree-l2"><a href="#8-yield-across-samples">8. Yield (across samples)</a></li>
     
 
+    <li class="toctree-l2"><a href="#9-violine-plots-for-barcode-properties-across-samples">9. Violine plots for barcode properties (across samples)</a></li>
+    
+
+    <li class="toctree-l2"><a href="#10-saturation-plot-umi-per-barcode-across-samples">10. Saturation plot: UMI per barcode (across samples)</a></li>
+    
+
+    <li class="toctree-l2"><a href="#11-saturation-plot-counts-per-barcode-across-samples">11 Saturation plot: Counts per barcode (across samples)</a></li>
+    
+
+    <li class="toctree-l2"><a href="#12-counts-per-umi-per-barcode-across-samples">12 Counts per UMI per barcode (across samples)</a></li>
+    
+
     <li class="toctree-l2"><a href="#mixed-experiment">Mixed experiment</a></li>
     
         <ul>
         
-            <li><a class="toctree-l3" href="#8-barnyard-plot-per-sample">8. Barnyard plot (per sample)</a></li>
+            <li><a class="toctree-l3" href="#10-barnyard-plot-per-sample">10. Barnyard plot (per sample)</a></li>
         
         </ul>
     
@@ -209,8 +221,46 @@ On the x axis are the samples.<br />
 TOP: On the y axis are the number of reads attributed to each category.
 BOTTOM: On the y axis are the percentage of attributed to each category.
 This plot gives you an overview of all the reads from your samples and how they are distributed in all the possible categories. The reads that are uniquely mapped ar the ones you will keep at the end for the UMI count matrix.</p>
+<h2 id="9-violine-plots-for-barcode-properties-across-samples">9. Violine plots for barcode properties (across samples)</h2>
+<p><img alt="Violine plots" src="../images/mac_violinplots_comparison_UMI.png" />
+Various statistic for barcodes that were taken forward as STAMPs as set as <code>expected_cells</code> in <code>config.yaml</code>.
+Each point represents a barcode augmented by a violine-plot density estimator of barcode distribution along the y-axis.</p>
+<p>On the x axis are the samples for each panel (Note: the dot distribution along the x-axis does't not bear information, it's just a visual aid to better assess density).
+On the y axis are the respecitve statistics described below for each panel.</p>
+<p>TOP panel from left to right: </p>
+<ul>
+<li>nUMI: number of UMI per barcode</li>
+<li>nCounts: number of Counts per barcode</li>
+<li>top50: fraction (percentage/100) of the highest expressed genes compared to entire set of genes. </li>
+</ul>
+<p>BOTTOM: </p>
+<ul>
+<li>nUMI: average number of UMI per Gene per barcode</li>
+<li>pct.Ribo: Fraction of ribosomal RNA (Note: ribsomal transcripts defined as starting with "^Rpl")</li>
+<li>pct.mito: Fraction of mitochondrial RNA (Note: mitchondrial transcripts defined as starting with "^mt-")</li>
+</ul>
+<h2 id="10-saturation-plot-umi-per-barcode-across-samples">10. Saturation plot: UMI per barcode (across samples)</h2>
+<p><img alt="umi per barcode" src="../images/mac_UMI_vs_gene.png" />
+Number of UMI (x-axis) vs number of Genes (y-axis) for each barcode (points in plot) broken down by sample (different colors). 
+Number of Genes defined as Genes having at least 1 read mapped to them.
+Individual samples are color-coded. A loess regression curve of barcodes for each sample is fitted. 
+Various statistic for barcodes that were taken forward as STAMPs as set as <code>expected_cells</code> in <code>config.yaml</code>.</p>
+<p>This plot can indicate how many counts per barcode are required on average to find all expressed genes in a cell.
+Given enought coverage, it can also indicate how many genes are expressed for the examined cell type.</p>
+<h2 id="11-saturation-plot-counts-per-barcode-across-samples">11 Saturation plot: Counts per barcode (across samples)</h2>
+<p><img alt="counts per barcode" src="../images/mac_Count_vs_gene.png" />
+Number of Counts (x-axis) vs number of Genes (y-axis) for each barcode (points in plot) broken down by sample (different colors). 
+Number of Genes defined as Genes having at least 1 read mapped to them.
+Individual samples are color-coded. A loess regression curve of barcodes for each sample is fitted. 
+Various statistic for barcodes that were taken forward as STAMPs as set as <code>expected_cells</code> in <code>config.yaml</code>.</p>
+<h2 id="12-counts-per-umi-per-barcode-across-samples">12 Counts per UMI per barcode (across samples)</h2>
+<p><img alt="counts per UMI" src="../images/mac_UMI_vs_counts.png" />
+Number of UMI (x-axis) vs number of Counts (y-axis) for each barcode (points in plot) broken down by sample (different colors). 
+Individual samples are color-coded. A loess regression curve of barcodes for each sample is fitted. 
+Black line indicate an optimal 1:1 ratio between UMI and Counts (i.e. no Duplicates!)</p>
+<p>This plots can give an indication on the level of duplication for each sample. The close to black line the lower duplication.</p>
 <h1 id="mixed-experiment">Mixed experiment</h1>
-<h2 id="8-barnyard-plot-per-sample">8. Barnyard plot (per sample)</h2>
+<h2 id="10-barnyard-plot-per-sample">10. Barnyard plot (per sample)</h2>
 <p><img alt="Barnyard plot" src="../images/hum_mus_species_plot_transcripts.png" />
 This plot shows you species purity for each STAMPS. Mixed and No call STAMPS are dropped and only single species are kept for extraction.
 You can change the minimum ratio of transcripts to define a STAMP as mixed or not in the configfile with: <code>species_ratio</code>
