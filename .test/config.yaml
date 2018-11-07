@@ -45,3 +45,4 @@ MAPPING:
         outFilterMatchNmin: 0
         outFilterMatchNminOverLread: 0
         outFilterScoreMinOverLread: 0
+DEBUG: True

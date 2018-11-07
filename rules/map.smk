@@ -208,3 +208,12 @@ rule violine_plots:
 		R_objects='summary/R_Seurat_objects.rdata'
 	script:
 		'../scripts/plot_violine.R'
+
+rule summary_stats:
+	input:
+		R_objects='summary/R_Seurat_objects.rdata'
+	conda: '../envs/plots_ext.yaml'
+	output:
+		stats='summary/stats.csv',
+	script:
+		'../scripts/create_summary_stats.R'
