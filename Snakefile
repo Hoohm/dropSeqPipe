@@ -88,9 +88,9 @@ rule filter:
         expand('plots/{sample}_UMI_dropped.pdf', sample=samples.index),
         'reports/filter.html',
         'plots/BC_drop.pdf'
-        
+
 rule map:
-    input:  
+    input:
         expand('data/{sample}_final.bam', sample=samples.index),
         expand('logs/{sample}_hist_out_cell.txt', sample=samples.index),
         expand('plots/{sample}_knee_plot.pdf', sample=samples.index),
@@ -104,14 +104,15 @@ rule map:
         'plots/Count_vs_gene.pdf',
         'summary/R_Seurat_objects.rdata',
         'plots/yield.pdf'
-        
+        'summary/barcode_stats_pre_filter.csv',
+        'summary/barcode_stats_post_filter.csv',
+
 rule extract:
     input:
         expand('logs/{sample}_umi_per_gene.tsv', sample=samples.index),
         expand('plots/{sample}_rna_metrics.pdf', sample=samples.index),
         'summary/umi_expression_matrix.tsv',
         'summary/counts_expression_matrix.tsv'
-        
 
 rule split_species:
     input:
@@ -129,7 +130,6 @@ rule extract_species:
         expand('summary/Experiment_{species}_counts_expression_matrix.tsv', species=config['META']['species']),
         expand('summary/Experiment_{species}_umi_expression_matrix.tsv', species=config['META']['species']),
         expand('plots/{species}/{sample}_rna_metrics.pdf', sample=samples.index, species=config['META']['species'])
-        
 
 
 include: "rules/generate_meta.smk"
