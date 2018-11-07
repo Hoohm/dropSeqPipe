@@ -191,7 +191,7 @@ rule plot_umi_per_gene:
 
 rule plot_rna_metrics:
 	input:
-		'logs/{sample}_rna_metrics.txt'
+		rna_metrics='logs/{sample}_rna_metrics.txt'
 	params: 
 		cells=lambda wildcards: int(samples.loc[wildcards.sample,'expected_cells'])
 	conda: '../envs/plots.yaml'
