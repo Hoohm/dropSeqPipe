@@ -103,7 +103,7 @@ rule map:
         # 'plots/Count_vs_gene.html',
         'plots/Count_vs_gene.pdf',
         'summary/R_Seurat_objects.rdata',
-        'plots/yield.pdf'
+        'plots/yield.pdf',
         'summary/barcode_stats_pre_filter.csv',
         'summary/barcode_stats_post_filter.csv',
 
