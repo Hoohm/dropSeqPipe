@@ -11,3 +11,7 @@ nav:
   - 'Plots.md'
   - 'CHANGELOG.md'
   - 'FAQ.md'
+
+google_analytics:
+  - 'UA-128943644-1'
+  - 'auto'
