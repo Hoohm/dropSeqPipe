@@ -19,11 +19,20 @@
 # load("debug/snakemake_create_summary_stats.rdata")
 # load(file="debug/R_image_create_summary_stats.rdata")
 
-if (snakemake@config$DEBUG) {
-  message("In debug mode: saving R objects to inspect later")
-  dir.create("debug")
-  save(snakemake, file = file.path("debug","snakemake_create_summary_stats.rdata"))
+mydebug <- FALSE
+if (is.null(snakemake@config$DEBUG)) {
+  message("DEBUG not set in config.yaml")
+} else {
+  if (snakemake@config$DEBUG == "True") {
+    message("In debug mode: saving R objects to inspect later")
+    mydebug <- TRUE
+    # dir.create("debug")
+    # save(snakemake, file = file.path("debug","snakemake_create_summary_stats.rdata"))
+  } else {
+    message("DEBUG flat not set to True. No debugging")
+  }
 }
+
 ####/debug
 
 library(dplyr) # Dataframe manipulation
@@ -65,17 +74,21 @@ gini_index <- function (x, weights = rep(1, length = length(x))) {
 #median calculator
 stats_post <- meta.data %>%
   group_by(orig.ident) %>%
-  summarise(mean_number_genes       = round(mean(nGene),2),
-            sum_Counts              = sum(nCounts),
-            sum_UMIs                = sum(nUMI),
-            mean_Counts_per_STAMP   = round(mean(nCounts),2),
-            mean_UMIs_per_STAMP     = round(mean(nUMI),2),
-            mean_UMI_per_Gene       = round(mean(umi.per.gene),2),
-            mean_Ribo_pct           = round(100 * mean(pct.Ribo),2),
-            mean_Mito_pct           = round(100 * mean(pct.mito),2),
-            read_length             = mean(read_length), # should be all the same anyway..
-            expected_cells          = mean(expected_cells), # should be all the same anyway..
-            actual_number_barcodes  = n())
+  summarise(
+            Total_nb_reads                 = sum(nCounts),
+            Nb_STAMPS                      = mean(expected_cells), # should be all the same anyway..
+            Median_reads_per_STAMP         = round(median(nCounts),2),
+            Mean_reads_per_STAMP           = round(mean(nCounts),2),
+            Total_nb_UMIs                  = sum(nUMI),
+            Median_UMIs_per_STAMP          = round(median(nUMI),2),
+            Mean_UMIs_per_STAMP            = round(mean(nUMI),2),
+            Mean_UMIs_per_Gene             = round(mean(umi.per.gene),2),
+            Median_number_genes_per_STAMP  = round(median(nGene),2),
+            Mean_number_genes_per_STAMP    = round(mean(nGene),2),
+            Mean_Ribo_pct                  = round(100 * mean(pct.Ribo),2),
+            Mean_Mito_pct                  = round(100 * mean(pct.mito),2),
+            Read_length                    = mean(read_length), # should be all the same anyway..
+            Number_barcodes_used_for_debug = n())
 
 
 
@@ -101,7 +114,7 @@ stats_pre <- data.frame(matrix(nrow=length(samples), ncol=10))
 colnames(stats_pre) <- c(
                     "Sample",
                     "Batch",
-                    "Total_reads",
+                    "Total_raw_reads",
                     "Nr_barcodes_total",
                     "Nr_barcodes_more_than_1_reads",
                     "Nr_barcodes_more_than_10_reads",
@@ -126,7 +139,7 @@ for (i in 1:length(samples)){
   reads_cumsum <- cumsum(reads)
   reads_cumsum_perc <- (reads_cumsum/total_reads)
   # reporting stats
-  stats_pre[i, "Total_reads"] <-  total_reads
+  stats_pre[i, "Total_raw_reads"] <-  total_reads
   stats_pre[i, "Nr_barcodes_total"] <-  length(barcodes)
   stats_pre[i, "percentile99"] <-  which.min(reads_cumsum_perc<0.99)
   stats_pre[i, "percentile95"] <-  which.min(reads_cumsum_perc<0.95)
@@ -134,8 +147,8 @@ for (i in 1:length(samples)){
   stats_pre[i, "Nr_barcodes_more_than_1_reads"]  <-  sum(reads > 1)
   stats_pre[i, "Nr_barcodes_more_than_10_reads"] <-  sum(reads > 10)
   stats_pre[i, "Gini-index"] <-  round(gini_index(reads),2)
-  stats_post[i,"Pct_reads_after_filter"] <- round(100 * (stats_post[i, "sum_Counts"]  /
-                                                              stats_pre [i, "Total_reads"]), 2)
+  stats_post[i,"Pct_reads_after_filter"] <- round(100 * (stats_post[i, "Total_nb_reads"]  /
+                                                              stats_pre [i, "Total_raw_reads"]), 2)
 }
 
 # output
@@ -143,6 +156,6 @@ write.csv(stats_pre, file.path(snakemake@output$stats_pre))
 write.csv(stats_post, file.path(snakemake@output$stats_post)) #writes table for excel
 
 
-if (snakemake@config$DEBUG) {
+if (mydebug) {
  save.image(file = file.path("debug", "R_image_create_summary_stats.rdata"))
 }

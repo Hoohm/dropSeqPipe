@@ -6,10 +6,10 @@ dependencies:
   - r=3.4.1
   - r-ggplot2=2.2.1
   - r-gridextra
-  - r-reshape2
   - r-viridis
   - r-stringdist
   - r-dplyr=0.7.4
+  - r-rlang=0.2.1
   - r-mvtnorm
   - r-seurat
   - r-hmisc
