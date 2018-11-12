@@ -83,7 +83,8 @@ rule MergeBamAlignment:
 		PAIRED_RUN=false\
 		OUTPUT={output}
 		"""
-rule TagReadWithGeneExon:
+
+rule TagReadWithGeneFunction:
 	input:
 		data='data/{sample}.Aligned.merged.bam',
 		refFlat='{}.refFlat'.format(annotation_prefix)
@@ -94,36 +95,59 @@ rule TagReadWithGeneExon:
 		temp('data/{sample}_gene_exon_tagged.bam')
 	conda: '../envs/dropseq_tools.yaml'
 	shell:
-		"""export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && TagReadWithGeneExon -m {params.memory}\
+		"""export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && TagReadWithGeneFunction -m {params.memory}\
 		INPUT={input.data}\
 		OUTPUT={output}\
-		ANNOTATIONS_FILE={input.refFlat}\
-		TAG=GE\
-		CREATE_INDEX=true
+		ANNOTATIONS_FILE={input.refFlat}
 		"""
 
+rule DetectBeadSubstitutionErrors:
+    input:
+        'data/{sample}_gene_exon_tagged.bam'
+    output:
+        data=temp('data/{sample}_gene_exon_tagged_bead_sub.bam'),
+        report='logs/{sample}_beadSubstitutionReport.txt',
+        stats='logs/{sample}_beadSubstitutionStats.txt',
+        summary='logs/{sample}_beadSubstitutionSummary.txt'
+    params:
+        SmartAdapter=config['FILTER']['5-prime-smart-adapter'],
+        memory=config['LOCAL']['memory'],
+        temp_directory=config['LOCAL']['temp-directory']
+    conda: '../envs/dropseq_tools.yaml'
+    shell:
+        """
+        export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && DetectBeadSynthesisErrors -m {params.memory}\
+        I={input}\
+        O={output.data}\
+        REPORT={output.report}\
+        OUTPUT_STATS={output.stats}\
+        SUMMARY={output.summary}\
+        PRIMER_SEQUENCE={params.SmartAdapter}
+        """
+
 rule bead_errors_metrics:
-	input:
-		'data/{sample}_gene_exon_tagged.bam'
-	output:
-		'data/{sample}_final.bam'
-	params:
-		out_stats='logs/{sample}_synthesis_stats.txt',
-		summary='logs/{sample}_synthesis_stats_summary.txt',
-		barcodes=lambda wildcards: int(samples.loc[wildcards.sample,'expected_cells']) * 2,
-		memory =config['LOCAL']['memory'],
-		SmartAdapter=config['FILTER']['5-prime-smart-adapter'],
-		temp_directory=config['LOCAL']['temp-directory']
-	conda: '../envs/dropseq_tools.yaml'
-	shell:
-		"""export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && DetectBeadSynthesisErrors -m {params.memory}\
-		INPUT={input}\
-		OUTPUT={output}\
-		OUTPUT_STATS={params.out_stats}\
-		SUMMARY={params.summary}\
-		NUM_BARCODES={params.barcodes}\
-		PRIMER_SEQUENCE={params.SmartAdapter}
-		"""
+    input:
+        'data/{sample}_gene_exon_tagged_bead_sub.bam'
+    output:
+        'data/{sample}_final.bam'
+    params:
+        out_stats='logs/{sample}_synthesis_stats.txt',
+        summary='logs/{sample}_synthesis_stats_summary.txt',
+        barcodes=lambda wildcards: int(samples.loc[wildcards.sample,'expected_cells']) * 2,
+        memory =config['LOCAL']['memory'],
+        SmartAdapter=config['FILTER']['5-prime-smart-adapter'],
+        temp_directory=config['LOCAL']['temp-directory']
+    conda: '../envs/dropseq_tools.yaml'
+    shell:
+        """export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && DetectBeadSynthesisErrors -m {params.memory}\
+        INPUT={input}\
+        OUTPUT={output}\
+        OUTPUT_STATS={params.out_stats}\
+        SUMMARY={params.summary}\
+        NUM_BARCODES={params.barcodes}\
+        PRIMER_SEQUENCE={params.SmartAdapter}
+        """
+
 
 rule bam_hist:
 	input:

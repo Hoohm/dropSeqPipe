@@ -10,14 +10,15 @@
 # save.image(file="R_workspace_debug.rdata")
 # load("R_workspace_debug.rdata")
 ####/debug
-library(plyr)
-library(dplyr) # Dataframe manipulation
-library(Matrix) # Sparse matrices
-library(stringr)
-library(RColorBrewer)
-library(devtools)
-library(Seurat)
-library(plotly)
+options(warn=-1)
+library(plyr, quietly=TRUE, warn.conflicts = FALSE)
+library(dplyr, quietly=TRUE, warn.conflicts = FALSE) # Dataframe manipulation
+library(Matrix, quietly=TRUE, warn.conflicts = FALSE) # Sparse matrices
+library(stringr, quietly=TRUE, warn.conflicts = FALSE)
+library(RColorBrewer, quietly=TRUE, warn.conflicts = FALSE)
+library(devtools, quietly=TRUE, warn.conflicts = FALSE)
+library(Seurat, quietly=TRUE, warn.conflicts = FALSE)
+library(plotly, quietly=TRUE, warn.conflicts = FALSE)
 
 # rule map in Snakefile
 # rule map:
@@ -39,7 +40,6 @@ umi_matrix   <- read.csv(snakemake@input$UMIs,
 design       <- read.csv(snakemake@input$design, stringsAsFactors = TRUE,
                          header = TRUE,
                          row.names = NULL)
-
 metaData <- data.frame(cellNames = colnames(umi_matrix)) %>%
   mutate(samples = factor(str_replace(cellNames,"_[^_]*$",""))) %>%
   mutate(barcode = factor(str_replace(cellNames,".+_",""))) %>%
@@ -57,7 +57,7 @@ mycount <- CreateSeuratObject(raw.data = count_matrix, meta.data = metaData)
 mycount <- SetAllIdent(object = mycount, id = "samples")
 mycount@meta.data$orig.ident <- mycount@meta.data$samples
 # turn off filtering
-
+save(snakemake,file='test.RData')
 # note, the @meta.data slot contains usefull summary stuff
 # head(mycount@meta.data,2)
 #                              nGene nUMI expected_cells read_length      barcode
@@ -83,7 +83,7 @@ theme_set(mytheme)
 
 # predefined ggplot layers for subsequent plots
 gglayers <- list(
-  geom_smooth(),
+  geom_smooth(method='loess'),
   geom_point(size = .5),
   scale_y_continuous(labels = scales::unit_format(unit = "", scale = 1e-3, digits = 2),
                      breaks = scales::pretty_breaks(n = 8)),

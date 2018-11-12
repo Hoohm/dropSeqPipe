@@ -54,6 +54,12 @@ rule all:
         expand('data/{sample}_final.bam', sample=samples.index),
         expand('logs/{sample}_hist_out_cell.txt', sample=samples.index),
         expand('plots/{sample}_knee_plot.pdf', sample=samples.index),
+        'plots/violinplots_comparison_UMI.pdf',
+        'plots/UMI_vs_counts.pdf',
+        'plots/UMI_vs_gene.pdf',
+        'plots/Count_vs_gene.pdf',
+        'summary/R_Seurat_objects.rdata',
+        
         'reports/star.html',
         'plots/yield.pdf',
         #extract
@@ -136,6 +142,11 @@ include: "rules/generate_meta.smk"
 include: "rules/fastqc.smk"
 include: "rules/filter.smk"
 include: "rules/map.smk"
-include: "rules/extract_expression_single.smk"
+
+if(os.path.exists('barcodes.csv')):
+    include: "rules/extract_expression_whitelist.smk"
+else:
+    include: "rules/extract_expression_top_cells.smk"
+
 include: "rules/split_species.smk"
 include: "rules/extract_expression_species.smk"
