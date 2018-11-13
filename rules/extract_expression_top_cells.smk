@@ -8,8 +8,8 @@ rule extract_umi_expression:
     input:
         data='data/{sample}_final.bam'
     output:
-        dense='summary/{sample}_umi_expression_matrix.tsv',
-        sparse='summary/{sample}_umi_expression_matrix.mtx'
+        dense='summary/{sample}_umi_expression.tsv',
+        sparse='summary/{sample}_umi_expression.long'
     params:
         summary='summary/{sample}_dge.summary.txt',
         count_per_umi=config['EXTRACTION']['minimum-counts-per-UMI'],
@@ -34,8 +34,8 @@ rule extract_counts_expression:
     input:
         data='data/{sample}_final.bam'
     output:
-        dense='summary/{sample}_counts_expression_matrix.tsv',
-        sparse='summary/{sample}_counts_expression_matrix.mtx'
+        dense='summary/{sample}_counts_expression.tsv',
+        sparse='summary/{sample}_counts_expression.long'
     params:
         summary='summary/{sample}_dge.summary.txt',
         count_per_umi=config['EXTRACTION']['minimum-counts-per-UMI'],
@@ -86,25 +86,3 @@ rule plot_rna_metrics:
         pdf='plots/{sample}_rna_metrics.pdf',
     script:
         '../scripts/plot_rna_metrics.R'
-
-rule merge_umi:
-    input:
-        expand('summary/{sample}_umi_expression_matrix.tsv', sample=samples.index)
-    params:
-        sample_names=lambda wildcards: samples.index
-    conda: '../envs/merge.yaml'
-    output:
-        'summary/umi_expression_matrix.tsv'
-    script:
-        "../scripts/merge_counts_single.R"
-
-rule merge_counts:
-    input:
-        expand('summary/{sample}_counts_expression_matrix.tsv', sample=samples.index)
-    params:
-        sample_names=lambda wildcards: samples.index
-    conda: '../envs/merge.yaml'
-    output:
-        'summary/counts_expression_matrix.tsv'
-    script:
-        "../scripts/merge_counts_single.R"

@@ -211,24 +211,3 @@ rule plot_knee_plot_whitelist:
 		pdf='plots/{sample}_knee_plot.pdf'
 	script:
 		'../scripts/plot_knee_plot.R'
-
-rule violine_plots:
-	input:
-		UMIs='summary/umi_expression_matrix.tsv',
-		counts='summary/counts_expression_matrix.tsv',
-		design='samples.csv'
-#	params:
-#		cells=lambda wildcards: samples.loc[wildcards.sample,'expected_cells'],
-#		edit_distance=config['EXTRACTION']['UMI-edit-distance']
-	conda: '../envs/plots_ext.yaml'
-	output:
-		pdf_violine='plots/violinplots_comparison_UMI.pdf',
-#		html_umivscounts='plots/UMI_vs_counts.html',
-		pdf_umivscounts='plots/UMI_vs_counts.pdf',
-#		html_umi_vs_gene='plots/UMI_vs_gene.html',
-		pdf_umi_vs_gene='plots/UMI_vs_gene.pdf',
-#		html_count_vs_gene='plots/Count_vs_gene.html',
-		pdf_count_vs_gene='plots/Count_vs_gene.pdf',
-		R_objects='summary/R_Seurat_objects.rdata'
-	script:
-		'../scripts/plot_violine.R'

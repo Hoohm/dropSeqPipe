@@ -65,8 +65,12 @@ rule all:
         #extract
         expand('logs/{sample}_umi_per_gene.tsv', sample=samples.index),
         expand('plots/{sample}_rna_metrics.pdf', sample=samples.index),
-        'summary/umi_expression_matrix.tsv',
-        'summary/counts_expression_matrix.tsv'
+        expand('summary/{sample}_{type}_expression.long', sample=samples.index, type=['umi','counts']),
+        #merge
+        expand('summary/{sample}/{type}/expression.mtx', sample=samples.index, type=['umi','counts']),
+        #'summary/umi_expression_matrix.tsv',
+        #'summary/counts_expression_matrix.tsv',
+        expand('summary/experiment/{type}/expression.mtx', type=['umi','counts'])
 
 
 rule meta:
@@ -115,6 +119,7 @@ rule extract:
     input:
         expand('logs/{sample}_umi_per_gene.tsv', sample=samples.index),
         expand('plots/{sample}_rna_metrics.pdf', sample=samples.index),
+        expand('plots/{sample}_{type}_expression.long', sample=samples.index, type=['umi','counts']),
         'summary/umi_expression_matrix.tsv',
         'summary/counts_expression_matrix.tsv'
         
@@ -136,6 +141,13 @@ rule extract_species:
         expand('summary/Experiment_{species}_umi_expression_matrix.tsv', species=config['META']['species']),
         expand('plots/{species}/{sample}_rna_metrics.pdf', sample=samples.index, species=config['META']['species'])
         
+rule merge:
+    input:
+        #merge
+        expand('summary/{sample}/{type}/expression.mtx', sample=samples.index, type=['umi','counts']),
+        'summary/umi_expression_matrix.tsv',
+        'summary/counts_expression_matrix.tsv'
+
 
 
 include: "rules/generate_meta.smk"
@@ -148,5 +160,6 @@ if(os.path.exists('barcodes.csv')):
 else:
     include: "rules/extract_expression_top_cells.smk"
 
+include: "rules/merge.smk"
 include: "rules/split_species.smk"
 include: "rules/extract_expression_species.smk"
