@@ -28,15 +28,28 @@ library(plotly, quietly=TRUE, warn.conflicts = FALSE)
 
 # importing UMI
 # importing counts ( summary/counts_expression_matrix.tsv )
-count_matrix <- read.csv(snakemake@input$counts, sep = "\t",
-                         header = TRUE, row.names = 1,
-                         check.names = FALSE)
+
+ReadMTX = function(mtx_path){
+  data_dir = dirname(mtx_path)
+  files =  list.files(data_dir)
+  #Find files
+  barcodes = grep('barcodes', files, value = TRUE)
+  features = grep(pattern='genes|features', x=files, value = TRUE)
+  mtx = grep('mtx', files, value=TRUE)
+  #load the data
+  data = readMM(file.path(data_dir,mtx))
+  barcodes = read.csv(file.path(data_dir,barcodes), header = FALSE)$V1
+  features = read.csv(file.path(data_dir,features), header = FALSE)$V1
+  
+  colnames(data) = barcodes
+  rownames(data) = features
+  return(data)
+}
+
+count_matrix <- ReadMTX(snakemake@input$counts)
 # importing UMIs ( summary/umi_expression_matrix.tsv )
-umi_matrix   <- read.csv(snakemake@input$UMIs,
-                         sep = "\t",
-                         header = TRUE,
-                         row.names = 1,
-                         check.names = FALSE)
+umi_matrix   <- ReadMTX(snakemake@input$UMIs)
+
 design       <- read.csv(snakemake@input$design, stringsAsFactors = TRUE,
                          header = TRUE,
                          row.names = NULL)
@@ -57,7 +70,6 @@ mycount <- CreateSeuratObject(raw.data = count_matrix, meta.data = metaData)
 mycount <- SetAllIdent(object = mycount, id = "samples")
 mycount@meta.data$orig.ident <- mycount@meta.data$samples
 # turn off filtering
-save(snakemake,file='test.RData')
 # note, the @meta.data slot contains usefull summary stuff
 # head(mycount@meta.data,2)
 #                              nGene nUMI expected_cells read_length      barcode

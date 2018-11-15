@@ -34,8 +34,8 @@ rule extract_counts_expression:
     input:
         data='data/{sample}_final.bam'
     output:
-        dense='summary/{sample}_counts_expression.tsv',
-        sparse='summary/{sample}_counts_expression.long'
+        dense='summary/{sample}_reads_expression.tsv',
+        sparse='summary/{sample}_reads_expression.long'
     params:
         summary='summary/{sample}_dge.summary.txt',
         count_per_umi=config['EXTRACTION']['minimum-counts-per-UMI'],

@@ -1,3 +1,7 @@
+#Converts the long format given by the dropseqtools v2.0.0 into the sparse mtx format.
+#Output provides features, cell barcodes and counts in seperate files.
+# Can handle one or multiple samples at a time
+
 import os
 import subprocess
 
@@ -18,10 +22,10 @@ barcode_index = 1
 feature_index = 1
 
 with open(temp_mtx,'w') as mtx_stream:
-	for i,sample in enumerate(samples):
-		if sample not in snakemake.input[i]:
+	for i,sample in enumerate(snakemake.input):
+		if samples[i] not in sample:
 			sys.exit("Sample name not found in file path")
-		with open(snakemake.input[i],'r') as input_file:
+		with open(sample,'r') as input_file:
 			next(input_file) # skip first line
 			for line in input_file:
 				barcode,feature,count = line.strip().split('\t')

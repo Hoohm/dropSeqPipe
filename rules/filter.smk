@@ -18,9 +18,10 @@ rule fastq_to_sam:
 	conda: '../envs/picard.yaml'
 	shell:
 		"""java -Djava.io.tmpdir={params.temp_directory} -Xmx{params.memory} -jar {params.picard} FastqToSam\
-		F1={input[0]}\
-		F2={input[1]}\
+		F1={input.R1}\
+		F2={input.R2}\
 		SM=DS O={output}"""
+
 
 rule BC_tags:
 	input:
