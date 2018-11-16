@@ -1,4 +1,4 @@
 channels:
   - bioconda
 dependencies:
-  - dropseq_tools=1.13
+  - dropseq_tools=2.0.0

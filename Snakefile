@@ -8,6 +8,8 @@ configfile: "config.yaml"
 # Get sample names from samples.csv
 samples = pd.read_table("samples.csv", header=0, sep=',', index_col=0)
 
+
+types = ['umi','reads'] 
 # Get read_lengths from samples.csv
 read_lengths = list(samples.loc[:,'read_length'])
 
@@ -54,13 +56,22 @@ rule all:
         expand('data/{sample}_final.bam', sample=samples.index),
         expand('logs/{sample}_hist_out_cell.txt', sample=samples.index),
         expand('plots/{sample}_knee_plot.pdf', sample=samples.index),
+        'plots/violinplots_comparison_UMI.pdf',
+        'plots/UMI_vs_counts.pdf',
+        'plots/UMI_vs_gene.pdf',
+        'plots/Count_vs_gene.pdf',
+        'summary/R_Seurat_objects.rdata',
+        
         'reports/star.html',
         'plots/yield.pdf',
         #extract
-        expand('logs/{sample}_umi_per_gene.tsv', sample=samples.index),
         expand('plots/{sample}_rna_metrics.pdf', sample=samples.index),
-        'summary/umi_expression_matrix.tsv',
-        'summary/counts_expression_matrix.tsv'
+        expand('summary/{sample}_{type}_expression.long', sample=samples.index, type=types),
+        #merge
+        expand('summary/{sample}/{type}/expression.mtx', sample=samples.index, type=types),
+        #'summary/umi_expression_matrix.tsv',
+        #'summary/counts_expression_matrix.tsv',
+        expand('summary/experiment/{type}/expression.mtx', type=types)
 
 
 rule meta:
@@ -95,20 +106,13 @@ rule map:
         expand('logs/{sample}_hist_out_cell.txt', sample=samples.index),
         expand('plots/{sample}_knee_plot.pdf', sample=samples.index),
         'reports/star.html',
-        'plots/violinplots_comparison_UMI.pdf',
-        # 'plots/UMI_vs_counts.html',
-        'plots/UMI_vs_counts.pdf',
-        # 'plots/UMI_vs_gene.html',
-        'plots/UMI_vs_gene.pdf',
-        # 'plots/Count_vs_gene.html',
-        'plots/Count_vs_gene.pdf',
-        'summary/R_Seurat_objects.rdata',
         'plots/yield.pdf'
         
 rule extract:
     input:
         expand('logs/{sample}_umi_per_gene.tsv', sample=samples.index),
         expand('plots/{sample}_rna_metrics.pdf', sample=samples.index),
+        expand('plots/{sample}_{type}_expression.long', sample=samples.index, type=types),
         'summary/umi_expression_matrix.tsv',
         'summary/counts_expression_matrix.tsv'
         
@@ -118,7 +122,9 @@ rule split_species:
         expand('summary/{species}/{sample}_barcodes.csv', sample=samples.index, species=config['META']['species']),
         expand('plots/{sample}_species_plot_genes.pdf', sample=samples.index),
         expand('plots/{sample}_species_plot_transcripts.pdf', sample=samples.index),
-        expand('data/{species}/{sample}_unfiltered.bam', sample=samples.index, species=config['META']['species'])
+        expand('data/{species}/{sample}_unfiltered.bam', sample=samples.index, species=config['META']['species']),
+        expand('plots/{sample}_knee_plot.pdf', sample=samples.index)
+        
 
 
 rule extract_species:
@@ -130,12 +136,32 @@ rule extract_species:
         expand('summary/Experiment_{species}_umi_expression_matrix.tsv', species=config['META']['species']),
         expand('plots/{species}/{sample}_rna_metrics.pdf', sample=samples.index, species=config['META']['species'])
         
+rule merge:
+    input:
+        #merge
+        expand('summary/{sample}/{type}/expression.mtx', sample=samples.index, type=types),
+        'summary/umi_expression_matrix.tsv',
+        'summary/counts_expression_matrix.tsv',
+        'plots/violinplots_comparison_UMI.pdf',
+        'plots/UMI_vs_counts.pdf',
+        'plots/UMI_vs_gene.pdf',
+        'plots/Count_vs_gene.pdf',
+        'summary/R_Seurat_objects.rdata'
+
 
 
 include: "rules/generate_meta.smk"
 include: "rules/fastqc.smk"
 include: "rules/filter.smk"
 include: "rules/map.smk"
-include: "rules/extract_expression_single.smk"
-include: "rules/split_species.smk"
-include: "rules/extract_expression_species.smk"
+
+if(os.path.exists('barcodes.csv')):
+    include: "rules/extract_expression_whitelist.smk"
+else:
+    include: "rules/extract_expression_top_cells.smk"
+
+if(config['META']['mixed']):
+    include: "rules/split_species.smk"
+    include: "rules/extract_expression_species.smk"
+
+include: "rules/merge.smk"
