@@ -19,17 +19,20 @@ barcodes_struct = {
 	'UMI_end':snakemake.params['UMI_end']
 	}
 
+
 def parse_barcodes(fastq_parser, query_name, read_barcodes, barcodes_struct):
 	for fastq_R1 in fastq_parser:
 		read_barcodes[fastq_R1.id]['XC'] = str(fastq_R1.seq)[barcodes_struct['BC_start']:barcodes_struct['BC_end']]
 		read_barcodes[fastq_R1.id]['XM'] = str(fastq_R1.seq)[barcodes_struct['UMI_start']:barcodes_struct['UMI_end']]
+		if(read_barcodes[fastq_R1.id]['XM']==''):
+			sys.SystemExit('UMI empty for read {}.\n The barcode is: {}.\nWhole entry is:{}'.format(fastq_R1.id, fastq_R1.seq,fastq_R1))
 		if (fastq_R1.id == query_name):
 			return(fastq_parser,read_barcodes)
+	return(fastq_parser,read_barcodes)
 	
 infile_bam = pysam.AlignmentFile(snakemake.input[0], "rb")
 
 fastq_parser = SeqIO.parse(gzip.open(snakemake.input[1], "rt"), "fastq")
-#fastq_R1 = next(fastq_parser)
 
 outfile = pysam.AlignmentFile(snakemake.output[0], "wb", template=infile_bam)
 

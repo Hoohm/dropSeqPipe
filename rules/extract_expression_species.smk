@@ -5,10 +5,10 @@ localrules: plot_rna_metrics_species, merge_umi_species, merge_counts_species
 
 rule extract_umi_expression_species:
 	input:
-		data='data/{species}/{sample}_unfiltered.bam',
+		data='data/{species}/{sample}/unfiltered.bam',
 		barcode_whitelist='summary/{species}/{sample}_barcodes.csv'
 	output:
-		'summary/{species}/{sample}_umi_expression_matrix.txt'
+		'data/{species}/{sample}/umi_expression_matrix.txt'
 	params:
 		count_per_umi=config['EXTRACTION']['minimum-counts-per-UMI'],	
 		memory=config['LOCAL']['memory'],
@@ -23,13 +23,13 @@ rule extract_umi_expression_species:
 
 rule extract_reads_expression_species:
 	input:
-		data='data/{species}/{sample}_unfiltered.bam',
+		data='data/{species}/{sample}/unfiltered.bam',
 		barcode_whitelist='summary/{species}/{sample}_barcodes.csv'
 	params:
 		memory=config['LOCAL']['memory'],
 		temp_directory=config['LOCAL']['temp-directory']
 	output:
-		'summary/{species}/{sample}_counts_expression_matrix.txt'
+		'data/{species}/{sample}/counts_expression_matrix.txt'
 	conda: '../envs/dropseq_tools.yaml'
 	shell:
 		"""export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && DigitalExpression -m {params.memory}\
@@ -41,7 +41,7 @@ rule extract_reads_expression_species:
 
 rule extract_umi_per_gene_species:
 	input:
-		data='data/{species}/{sample}_unfiltered.bam',
+		data='data/{species}/{sample}/unfiltered.bam',
 		barcode_whitelist='summary/{species}/{sample}_barcodes.csv'
 	params:	
 		memory=config['LOCAL']['memory'],
@@ -57,7 +57,7 @@ rule extract_umi_per_gene_species:
 
 rule SingleCellRnaSeqMetricsCollector_whitelist_species:
 	input:
-		data='data/{species}/{sample}_unfiltered.bam',
+		data='data/{species}/{sample}/unfiltered.bam',
 		barcode_whitelist='summary/{species}/{sample}_barcodes.csv',
 		refFlat='{}.refFlat'.format(annotation_prefix),
 		rRNA_intervals='{}.rRNA.intervals'.format(reference_prefix)
@@ -78,18 +78,18 @@ rule SingleCellRnaSeqMetricsCollector_whitelist_species:
 		"""
 rule plot_rna_metrics_species:
 	input:
-		rna_metrics='logs/{species}/{sample}_rna_metrics.txt',
+		rna_metrics='logs/dropseq_tools/{species}/{sample}_rna_metrics.txt',
 		barcode='summary/{species}/{sample}_barcodes.csv'
 	conda: '../envs/plots.yaml'
 	output:
-		pdf='plots/{species}/{sample}_rna_metrics.pdf'
+		pdf='plots/{species}/rna_metrics/{sample}_rna_metrics.pdf'
 	script:
 		'../scripts/plot_rna_metrics.R'
 
 
 rule merge_umi_species:
 	input:
-		expand('summary/{{species}}/{sample}_umi_expression_matrix.txt', sample=samples.index)
+		expand('data/{{species}}/{sample}/umi_expression_matrix.txt', sample=samples.index)
 	conda: '../envs/merge.yaml'
 	output:
 		'summary/Experiment_{species}_umi_expression_matrix.tsv'
@@ -100,7 +100,7 @@ rule merge_umi_species:
 
 rule merge_counts_species:
 	input:
-		expand('summary/{{species}}/{sample}_counts_expression_matrix.txt', sample=samples.index)
+		expand('data/{{species}}/{sample}/counts_expression_matrix.txt', sample=samples.index)
 	conda: '../envs/merge.yaml'
 	output:
 		'summary/Experiment_{species}_counts_expression_matrix.tsv'

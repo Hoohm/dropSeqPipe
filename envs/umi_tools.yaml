@@ -1,0 +1,5 @@
+channels:
+  - bioconda
+dependencies:
+  - umi_tools
+  - scipy=1.1.0

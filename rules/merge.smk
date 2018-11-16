@@ -1,12 +1,13 @@
 
+localrules: convert_long_to_mtx, merge_long, violine_plots
 
 rule convert_long_to_mtx:
     input:
-        'summary/{sample}_{type}_expression.long'
+        'data/{sample}/{type}/expression.long'
     output:
-        barcodes='summary/{sample}/{type}/barcodes.tsv',
-        features='summary/{sample}/{type}/features.tsv',
-        mtx='summary/{sample}/{type}/expression.mtx'
+        barcodes='data/{sample}/{type}/barcodes.tsv',
+        features='data/{sample}/{type}/features.tsv',
+        mtx='data/{sample}/{type}/expression.mtx'
     params:
         samples=lambda wildcards: wildcards.sample
     script:
@@ -14,11 +15,11 @@ rule convert_long_to_mtx:
 
 rule merge_long:
     input:
-        expand('summary/{sample}_{{type}}_expression.long', sample=samples.index)
+        expand('data/{sample}/{{type}}/expression.long', sample=samples.index)
     output:
-        mtx='summary/experiment/{type}/expression.mtx',
-        barcodes='summary/experiment/{type}/barcodes.tsv',
-        features='summary/experiment/{type}/features.tsv',
+        mtx='summary/{type}/expression.mtx',
+        barcodes='summary/{type}/barcodes.tsv',
+        features='summary/{type}/features.tsv',
     params:
         samples=lambda wildcards: samples.index
     script:
@@ -27,8 +28,8 @@ rule merge_long:
 
 rule violine_plots:
     input:
-        UMIs='summary/experiment/umi/expression.mtx',
-        counts='summary/experiment/reads/expression.mtx',
+        UMIs='summary/umi/expression.mtx',
+        counts='summary/reads/expression.mtx',
         design='samples.csv'
     conda: '../envs/plots_ext.yaml'
     output:

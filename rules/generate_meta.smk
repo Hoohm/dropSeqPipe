@@ -77,19 +77,46 @@ rule create_intervals:
 		O={params.reference_directory}\
 		PREFIX={params.reference_prefix}
 		"""
+
+rule get_genomeChrBinNbits:
+	input:
+		reference_file=reference_file
+	params:
+		samples_file='samples.csv',
+		reference_directory=config['META']['reference-directory']
+	output:
+		'{params.reference_directory}/index_params.txt'
+	run:
+		"""
+		from math import log2
+		from platform import system
+		if (system() == 'Darwin'):
+			genomeLength = shell("wc -c {} | cut -d' ' -f2".format(snakemake.reference_file), iterable=True)
+		else:
+			genomeLength = shell("wc -c {} | cut -d' ' -f1".format(snakemake.reference_file), iterable=True)
+		genomeLength = int(next(genomeLength))
+		referenceNumber = shell('grep "^>" {} | wc -l'.format(snakemake.reference_file), iterable=True)
+		referenceNumber = int(next(referenceNumber))
+		value = min([18,int(log2(genomeLength/referenceNumber))])
+		"""
+
 def get_sjdbOverhang(wildcards):
 	return(int(wildcards.read_length)-1)
 
-def get_genomeChrBinNbits(file):
-	if (platform.system() == 'Darwin'):
-		genomeLength = shell("wc -c {} | cut -d' ' -f2".format(file), iterable=True)
-	else:
-		genomeLength = shell("wc -c {} | cut -d' ' -f1".format(file), iterable=True)
-	genomeLength = int(next(genomeLength))
-	referenceNumber = shell('grep "^>" {} | wc -l'.format(file), iterable=True)
-	referenceNumber = int(next(referenceNumber))
-	return(min([18,int(math.log2(genomeLength/referenceNumber))]))
 
+rule prep_star_index:
+	input:
+		reference_file=reference_file,
+		config_file='config.yaml'
+	output:
+		'{reference_directory}/star_ref_config.txt'
+	conda:
+		'../envs/pyyaml.yaml'
+	script:
+		'../scripts/prep_star.py'
+
+
+	
 
 rule create_star_index:
 	input:
@@ -98,7 +125,7 @@ rule create_star_index:
 	params:
 		sjdbOverhang=lambda wildcards: get_sjdbOverhang(wildcards),
 		genomeDir='{star_index_prefix}_{read_length}',
-		genomeChrBinNbits=get_genomeChrBinNbits(reference_file)
+		genomeChrBinNbits=config['MAPPING']['STAR']['genomeChrBinNbits']
 	output:
 		'{star_index_prefix}_{read_length}/SA'
 	threads: 12
@@ -114,3 +141,14 @@ rule create_star_index:
 		--sjdbOverhang {params.sjdbOverhang}\
 		--genomeChrBinNbits {params.genomeChrBinNbits}
 		"""
+
+# rule create_salmon_index:
+# 	input:
+# 		fa=reference_file
+# 	params:
+# 		reference_directory=config['META']['reference-directory']
+# 	output:
+# 		'{salmon_index}'
+# 	conda: '../envs/salmon.yaml'
+# 	shell:
+# 		"""salmon index -t {input.fa} -i {output} --type quasi -k 31"""

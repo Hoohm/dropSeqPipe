@@ -6,10 +6,11 @@ localrules: multiqc_fastqc_reads, multiqc_fastqc_barcodes
 rule fastqc_barcodes:
 	"""Create fastqc report"""
 	input: 
-		'data/{sample}_R1.fastq.gz'
+		get_R1_files,
+		log_folder = 'logs/cluster'
 	output:
-		html='logs/{sample}_R1_fastqc.html',
-		zip='logs/{sample}_R1_fastqc.zip'
+		html='logs/fastqc/{sample}_R1_fastqc.html',
+		zip='logs/fastqc/{sample}_R1_fastqc.zip'
 	params: '--extract'
 	wrapper:
 		'0.27.1/bio/fastqc'
@@ -17,10 +18,11 @@ rule fastqc_barcodes:
 rule fastqc_reads:
 	"""Create fastqc report"""
 	input: 
-		'data/{sample}_R2.fastq.gz'
+		get_R2_files,
+		log_folder = 'logs/cluster'
 	output:
-		html='logs/{sample}_R2_fastqc.html',
-		zip='logs/{sample}_R2_fastqc.zip'
+		html='logs/fastqc/{sample}_R2_fastqc.html',
+		zip='logs/fastqc/{sample}_R2_fastqc.zip'
 	params: '--extract'
 	wrapper:
 		'0.27.1/bio/fastqc'
@@ -28,7 +30,7 @@ rule fastqc_reads:
 
 rule multiqc_fastqc_barcodes:
 	input:
-		expand('logs/{sample}_R1_fastqc.html', sample=samples.index)
+		expand('logs/fastqc/{sample}_R1_fastqc.html', sample=samples.index)
 	output:
 		html='reports/fastqc_barcodes.html'
 	params: '-m fastqc --ignore *_R2*'
@@ -37,10 +39,9 @@ rule multiqc_fastqc_barcodes:
 
 rule multiqc_fastqc_reads:
 	input: 
-		expand('logs/{sample}_R2_fastqc.html', sample=samples.index)
+		expand('logs/fastqc/{sample}_R2_fastqc.html', sample=samples.index)
 	output:
-		html='reports/fastqc_reads.html',
-		txt='reports/fastqc_reads_data/multiqc_general_stats.txt'
+		html='reports/fastqc_reads.html'
 	params: '-m fastqc --ignore *_R1*'
 	wrapper:
 		'0.27.1/bio/multiqc'
