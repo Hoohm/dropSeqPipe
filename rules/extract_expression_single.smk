@@ -15,7 +15,8 @@ rule extract_umi_expression:
         num_cells=lambda wildcards: int(samples.loc[wildcards.sample,'expected_cells']),
         umiBarcodeEditDistance=config['EXTRACTION']['UMI-edit-distance'],
         temp_directory=config['LOCAL']['temp-directory'],
-        memory=config['LOCAL']['memory']
+        memory=config['LOCAL']['memory'],
+        locus_list=','.join(config['EXTRACTION']['LOCUS'])
     conda: '../envs/dropseq_tools.yaml'
     shell:
         """export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && DigitalExpression -m {params.memory}\
@@ -25,7 +26,7 @@ rule extract_umi_expression:
         OUTPUT_LONG_FORMAT={output.sparse}\
         STRAND_STRATEGY=SENSE\
         OUTPUT_READS_INSTEAD=false\
-        LOCUS_FUNCTION_LIST={{CODING,INTRONIC,UTR}}\
+        LOCUS_FUNCTION_LIST={{{params.locus_list}}}\
         MIN_BC_READ_THRESHOLD={params.count_per_umi}\
         CELL_BC_FILE={input.barcode_whitelist}"""
 
@@ -41,7 +42,8 @@ rule extract_reads_expression:
         num_cells=lambda wildcards: int(samples.loc[wildcards.sample,'expected_cells']),
         umiBarcodeEditDistance=config['EXTRACTION']['UMI-edit-distance'],
         temp_directory=config['LOCAL']['temp-directory'],
-        memory=config['LOCAL']['memory']
+        memory=config['LOCAL']['memory'],
+        locus_list=','.join(config['EXTRACTION']['LOCUS'])
     conda: '../envs/dropseq_tools.yaml'
     shell:
         """export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && DigitalExpression -m {params.memory}\
@@ -51,7 +53,7 @@ rule extract_reads_expression:
         OUTPUT_LONG_FORMAT={output.sparse}\
         STRAND_STRATEGY=SENSE\
         OUTPUT_READS_INSTEAD=true\
-        LOCUS_FUNCTION_LIST={{CODING,INTRONIC,UTR}}\
+        LOCUS_FUNCTION_LIST={{{params.locus_list}}}\
         MIN_BC_READ_THRESHOLD={params.count_per_umi}\
         CELL_BC_FILE={input.barcode_whitelist}"""
 

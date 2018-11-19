@@ -101,35 +101,31 @@ rule map:
         expand('data/{sample}/final.bam', sample=samples.index),
         expand('logs/dropseq_tools/{sample}_hist_out_cell.txt', sample=samples.index),
         expand('plots/knee_plots/{sample}_knee_plot.pdf', sample=samples.index),
-        #expand('data/{sample}/salmon/mapping.tsv', sample=samples.index),
         'plots/yield.pdf',        
         'reports/star.html'
         
 rule extract:
     input:
         expand('plots/rna_metrics/{sample}_rna_metrics.pdf', sample=samples.index),
-        #expand('data/{sample}/{type}/expression_matrix.mtx', sample=samples.index, type=types),
         expand('plots/{sample}_{type}_expression.long', sample=samples.index, type=types),
         
 
 rule split_species:
     input:
-        expand('summary/{species}/{sample}_barcodes.csv', sample=samples.index, species=config['META']['species']),
-        expand('plots/{sample}_species_plot_genes.pdf', sample=samples.index),
-        expand('plots/{sample}_species_plot_transcripts.pdf', sample=samples.index),
-        expand('data/{species}/{sample}_unfiltered.bam', sample=samples.index, species=config['META']['species']),
-        expand('plots/{sample}_knee_plot.pdf', sample=samples.index)
-        
+        expand('plots/knee_plots/{sample}_knee_plot.pdf', sample=samples.index),
+        expand('data/{sample}/{species}/barcodes.csv', sample=samples.index, species=config['META']['species']),
+        expand('plots/barnyard/{sample}_genes.pdf', sample=samples.index),
+        expand('plots/barnyard/{sample}_transcripts.pdf', sample=samples.index),
+        expand('data/{sample}/{species}/unfiltered.bam', sample=samples.index, species=config['META']['species'])
 
 
 rule extract_species:
     input:
-        expand('summary/{species}/{sample}_umi_expression_matrix.txt', sample=samples.index, species=config['META']['species']),
-        expand('summary/{species}/{sample}_counts_expression_matrix.txt', sample=samples.index, species=config['META']['species']),
-        expand('logs/{species}/{sample}_umi_per_gene.tsv', sample=samples.index, species=config['META']['species']),
+        expand('data/{sample}/{species}/umi_expression_matrix.txt', sample=samples.index, species=config['META']['species']),
+        expand('data/{sample}/{species}/counts_expression_matrix.txt', sample=samples.index, species=config['META']['species']),
         expand('summary/Experiment_{species}_counts_expression_matrix.tsv', species=config['META']['species']),
         expand('summary/Experiment_{species}_umi_expression_matrix.tsv', species=config['META']['species']),
-        expand('plots/{species}/rna_metrics/{sample}_rna_metrics.pdf', sample=samples.index, species=config['META']['species'])
+        expand('plots/rna_metrics/{sample}_{species}_rna_metrics.pdf', sample=samples.index, species=config['META']['species'])
         
 rule merge:
     input:

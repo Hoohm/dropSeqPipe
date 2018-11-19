@@ -15,8 +15,7 @@ rule create_log_folder:
 rule cutadapt_R1:
     input:
         R1=get_R1_files,
-        adapters=config['FILTER']['cutadapt']['adapters-file'],
-        log_folder = 'logs/cluster'
+        adapters=config['FILTER']['cutadapt']['adapters-file']
     output:
         fastq=temp("data/{sample}/trimmmed_R1.fastq.gz")
     params:
@@ -44,8 +43,7 @@ rule cutadapt_R1:
 rule cutadapt_R2:
     input:
         R2=get_R2_files,
-        adapters=config['FILTER']['cutadapt']['adapters-file'],
-        log_folder = 'logs/cluster'
+        adapters=config['FILTER']['cutadapt']['adapters-file']
     output:
         fastq=temp("data/{sample}/trimmmed_R2.fastq.gz")
     params:
@@ -82,8 +80,8 @@ rule repair:
         R1='data/{sample}/trimmmed_R1.fastq.gz',
         R2='data/{sample}/trimmmed_R2.fastq.gz'
     output:
-        R1='data/{sample}/trimmmed_repaired_R1.fastq.gz',
-        R2='data/{sample}/trimmmed_repaired_R2.fastq.gz'
+        R1=temp('data/{sample}/trimmmed_repaired_R1.fastq.gz'),
+        R2=temp('data/{sample}/trimmmed_repaired_R2.fastq.gz')
     log:
         'logs/bbmap/{sample}_repair.txt'
     params:
@@ -91,7 +89,14 @@ rule repair:
     conda: '../envs/bbmap.yaml'
     threads: 2
     shell:
-        """repair.sh -Xmx{params.memory} in={input.R1} in2={input.R2} out1={output.R1} out2={output.R2} repair=t threads={threads} 2> {log}"""
+        """repair.sh\
+        -Xmx{params.memory}\
+        in={input.R1}\
+        in2={input.R2}\
+        out1={output.R1}\
+        out2={output.R2}\
+        repair=t\
+        threads={threads} 2> {log}"""
 
 rule detect_barcodes:
     input:
