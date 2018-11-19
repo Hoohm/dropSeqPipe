@@ -40,5 +40,8 @@ MAPPING:
         outFilterMatchNminOverLread: 0.66
         outFilterScoreMinOverLread: 0.66
 EXTRACTION:
+    LOCUS:
+        - CODING
+        - UTR
     UMI-edit-distance: 1
     minimum-counts-per-UMI: 0
