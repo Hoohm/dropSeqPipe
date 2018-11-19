@@ -25,6 +25,7 @@ rule extract_umi_expression:
         OUTPUT_LONG_FORMAT={output.sparse}\
         STRAND_STRATEGY=SENSE\
         OUTPUT_READS_INSTEAD=false\
+        LOCUS_FUNCTION_LIST={{CODING,INTRONIC,UTR}}\
         MIN_BC_READ_THRESHOLD={params.count_per_umi}\
         CELL_BC_FILE={input.barcode_whitelist}"""
 
@@ -50,9 +51,17 @@ rule extract_reads_expression:
         OUTPUT_LONG_FORMAT={output.sparse}\
         STRAND_STRATEGY=SENSE\
         OUTPUT_READS_INSTEAD=true\
+        LOCUS_FUNCTION_LIST={{CODING,INTRONIC,UTR}}\
         MIN_BC_READ_THRESHOLD={params.count_per_umi}\
         CELL_BC_FILE={input.barcode_whitelist}"""
 
+rule rny_velocity:
+    input:
+        'data/{sample}/final.bam'
+    output:
+        'data/{sample}/test.txt'
+    shell:
+        """velocyto run10x -m repeat_msk.gtf mypath/sample01 somepath/refdata-cellranger-mm10-1.2.0/genes/genes.gtf"""
 
 rule SingleCellRnaSeqMetricsCollector:
     input:

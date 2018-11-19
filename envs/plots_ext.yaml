@@ -9,7 +9,7 @@ dependencies:
   - r-reshape2
   - r-viridis
   - r-stringdist
-  - r-dplyr=0.7.4
+  - r-dplyr=0.7.6
   - r-mvtnorm
   - r-seurat
   - r-hmisc

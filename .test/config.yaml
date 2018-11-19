@@ -3,6 +3,7 @@ LOCAL:
     dropseq-wrapper: data/Drop-seq_tools-1.13/drop-seq-tools-wrapper.sh
     memory: 4g
 META:
+    mixed: False
     species:
         - SPECIES_ONE
         - SPECIES_TWO
