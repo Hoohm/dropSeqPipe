@@ -32,13 +32,12 @@ rule reduce_gtf:
 		'{}.reduced.gtf'.format(annotation_prefix)
 	conda: '../envs/dropseq_tools.yaml'
 	shell:
-		"""export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && ReduceGTF -m {params.memory}\
+		"""export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && ReduceGtf -m {params.memory}\
 		GTF={input.annotation}\
 		OUTPUT={output}\
 		SEQUENCE_DICTIONARY={input.reference_dict}\
 		IGNORE_FUNC_TYPE='null'\
-		ENHANCE_GTF='false'
-		"""
+		ENHANCE_GTF='false'"""
 
 rule create_refFlat:
 	input:
