@@ -117,6 +117,7 @@ rule DetectBeadSubstitutionErrors:
         memory=config['LOCAL']['memory'],
         temp_directory=config['LOCAL']['temp-directory']
     conda: '../envs/dropseq_tools.yaml'
+    threads: 5
     shell:
         """
         export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && DetectBeadSynthesisErrors -m {params.memory}\
@@ -125,7 +126,8 @@ rule DetectBeadSubstitutionErrors:
         REPORT={output.report}\
         OUTPUT_STATS={output.stats}\
         SUMMARY={output.summary}\
-        PRIMER_SEQUENCE={params.SmartAdapter}
+        PRIMER_SEQUENCE={params.SmartAdapter}\
+        NUM_THREADS={threads}
         """
 
 rule bead_errors_metrics:
@@ -141,6 +143,7 @@ rule bead_errors_metrics:
         SmartAdapter=config['FILTER']['5-prime-smart-adapter'],
         temp_directory=config['LOCAL']['temp-directory']
     conda: '../envs/dropseq_tools.yaml'
+    threads: 5
     shell:
         """export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && DetectBeadSynthesisErrors -m {params.memory}\
         INPUT={input}\
@@ -148,7 +151,8 @@ rule bead_errors_metrics:
         OUTPUT_STATS={params.out_stats}\
         SUMMARY={params.summary}\
         NUM_BARCODES={params.barcodes}\
-        PRIMER_SEQUENCE={params.SmartAdapter}
+        PRIMER_SEQUENCE={params.SmartAdapter}\
+        NUM_THREADS={threads}
         """
 
 

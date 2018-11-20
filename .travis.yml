@@ -25,7 +25,6 @@ install:
 script:
   # run the workflow
   - snakemake --use-conda --directory .test -p
-  - snakemake --use-conda --directory .test -p split_species extract_species
 
 after_success:
   - cd docs && snakemake --use-conda build_docs
