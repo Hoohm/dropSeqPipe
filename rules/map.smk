@@ -162,7 +162,7 @@ rule bam_hist:
 		'logs/dropseq_tools/{sample}_hist_out_cell.txt'
 	conda: '../envs/dropseq_tools.yaml'
 	shell:
-		"""export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && BAMTagHistogram -m {params.memory}\
+		"""export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && BamTagHistogram -m {params.memory}\
 		TAG=XC\
 		I={input}\
 		READ_QUALITY=10\
