@@ -165,7 +165,7 @@ rule bam_hist:
 		"""export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && BamTagHistogram -m {params.memory}\
 		TAG=XC\
 		I={input}\
-		READ_QUALITY=10\
+		READ_MQ=10\
 		O={output}
 		"""
 		
