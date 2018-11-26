@@ -7,19 +7,19 @@ multi_lane_pattern = re.compile("../data\/(.*)_(L[0-9]{3})_(R[1-2])_001.fastq.gz
 
 
 def get_input_files(wildcards):
-    samples = [f for f in glob.glob("../data/*.fastq.gz") if re.match(multi_lane_pattern,f)]
+    samples = [f for f in glob.glob("../{results_dir}/samples/*.fastq.gz") if re.match(multi_lane_pattern,f)]
     return(samples)
 
-lanes = sorted(list(set([re.findall(multi_lane_pattern,f)[0][1] for f in glob.glob("../data/*.fastq.gz") if re.match(multi_lane_pattern,f)])))
-samples = [re.findall(multi_lane_pattern,f)[0][0] for f in glob.glob("../data/*.fastq.gz") if re.match(multi_lane_pattern,f)]
+lanes = sorted(list(set([re.findall(multi_lane_pattern,f)[0][1] for f in glob.glob("../{results_dir}/samples/*.fastq.gz") if re.match(multi_lane_pattern,f)])))
+samples = [re.findall(multi_lane_pattern,f)[0][0] for f in glob.glob("../{results_dir}/samples/*.fastq.gz") if re.match(multi_lane_pattern,f)]
 
 
 
 
 rule all:
     input:
-        expand('data/{sample}_R1.fastq.gz',sample=samples),
-        expand('data/{sample}_R2.fastq.gz',sample=samples)
+        expand('{results_dir}/samples/{sample}_R1.fastq.gz',sample=samples),
+        expand('{results_dir}/samples/{sample}_R2.fastq.gz',sample=samples)
 
 
 
@@ -45,11 +45,11 @@ rule generate_samples:
 
 rule concat_lanes:
     input:
-        R1=expand('data/{{sample}}_{lane}_R1_001.fastq.gz', lane=lanes),
-        R2=expand('data/{{sample}}_{lane}_R2_001.fastq.gz', lane=lanes),
+        R1=expand('{results_dir}/samples/{{sample}}_{lane}_R1_001.fastq.gz', lane=lanes),
+        R2=expand('{results_dir}/samples/{{sample}}_{lane}_R2_001.fastq.gz', lane=lanes),
         lanes='samples.csv'
     output:
-        R1='data/{sample}_R1.fastq.gz',
-        R2='data/{sample}_R2.fastq.gz'
+        R1='{results_dir}/samples/{sample}_R1.fastq.gz',
+        R2='{results_dir}/samples/{sample}_R2.fastq.gz'
     shell:
         """cat {input.R1} > {output.R1};cat {input.R2} > {output.R2}"""

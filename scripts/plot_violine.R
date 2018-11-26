@@ -33,13 +33,13 @@ ReadMTX = function(mtx_path){
   data_dir = dirname(mtx_path)
   files =  list.files(data_dir)
   #Find files
-  barcodes = grep('barcodes', files, value = TRUE)
-  features = grep(pattern='genes|features', x=files, value = TRUE)
+  barcodes_file = grep('barcodes', files, value = TRUE)
+  features_file = grep(pattern='genes|features', x=files, value = TRUE)
   mtx = grep('mtx', files, value=TRUE)
   #load the data
   data = readMM(file.path(data_dir,mtx))
-  barcodes = read.csv(file.path(data_dir,barcodes), header = FALSE)$V1
-  features = read.csv(file.path(data_dir,features), header = FALSE)$V1
+  barcodes = read.csv(file.path(data_dir,barcodes_file), header = FALSE)$V1
+  features = read.csv(file.path(data_dir,features_file), header = FALSE)$V1
   
   colnames(data) = barcodes
   rownames(data) = features

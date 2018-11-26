@@ -5,11 +5,11 @@ localrules: plot_rna_metrics
 
 rule extract_umi_expression:
     input:
-        data='data/{sample}/final.bam',
-        barcode_whitelist='data/{sample}/barcodes.csv'
+        data='{results_dir}samples/{sample}/final.bam',
+        barcode_whitelist='{results_dir}samples/{sample}/barcodes.csv'
     output:
-        sparse='data/{sample}/umi/expression.long',
-        dense=temp('data/{sample}/umi/expression.tsv')
+        sparse='{results_dir}samples/{sample}/umi/expression.long',
+        dense=temp('{results_dir}samples/{sample}/umi/expression.tsv')
     params:
         count_per_umi=config['EXTRACTION']['minimum-counts-per-UMI'],
         num_cells=lambda wildcards: int(samples.loc[wildcards.sample,'expected_cells']),
@@ -32,11 +32,11 @@ rule extract_umi_expression:
 
 rule extract_reads_expression:
     input:
-        data='data/{sample}/final.bam',
-        barcode_whitelist='data/{sample}/barcodes.csv'
+        data='{results_dir}samples/{sample}/final.bam',
+        barcode_whitelist='{results_dir}samples/{sample}/barcodes.csv'
     output:
-        sparse='data/{sample}/reads/expression.long',
-        dense=temp('data/{sample}/reads/expression.tsv')
+        sparse='{results_dir}samples/{sample}/reads/expression.long',
+        dense=temp('{results_dir}samples/{sample}/reads/expression.tsv')
     params:
         count_per_umi=config['EXTRACTION']['minimum-counts-per-UMI'],
         num_cells=lambda wildcards: int(samples.loc[wildcards.sample,'expected_cells']),
@@ -59,23 +59,23 @@ rule extract_reads_expression:
 
 rule rny_velocity:
     input:
-        'data/{sample}/final.bam'
+        '{results_dir}samples/{sample}/final.bam'
     output:
-        'data/{sample}/test.txt'
+        '{results_dir}samples/{sample}/test.txt'
     shell:
         """velocyto run10x -m repeat_msk.gtf mypath/sample01 somepath/refdata-cellranger-mm10-1.2.0/genes/genes.gtf"""
 
 rule SingleCellRnaSeqMetricsCollector:
     input:
-        data='data/{sample}/final.bam',
-        barcode_whitelist='data/{sample}/barcodes.csv',
+        data='{results_dir}samples/{sample}/final.bam',
+        barcode_whitelist='{results_dir}samples/{sample}/barcodes.csv',
         refFlat="{}.refFlat".format(annotation_prefix),
         rRNA_intervals="{}.rRNA.intervals".format(reference_prefix)
     params:     
         temp_directory=config['LOCAL']['temp-directory'],
         memory=config['LOCAL']['memory']
     output:
-        rna_metrics='logs/dropseq_tools/{sample}_rna_metrics.txt',
+        rna_metrics='{results_dir}logs/dropseq_tools/{sample}_rna_metrics.txt',
     conda: '../envs/dropseq_tools.yaml'
     shell:
         """export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && SingleCellRnaSeqMetricsCollector -m {params.memory}\
@@ -88,10 +88,23 @@ rule SingleCellRnaSeqMetricsCollector:
 
 rule plot_rna_metrics:
     input:
-        rna_metrics='logs/dropseq_tools/{sample}_rna_metrics.txt',
-        barcodes='data/{sample}/barcodes.csv'
+        rna_metrics='{results_dir}logs/dropseq_tools/{sample}_rna_metrics.txt',
+        barcodes='{results_dir}samples/{sample}/barcodes.csv'
     conda: '../envs/plots.yaml'
     output:
-        pdf='plots/rna_metrics/{sample}_rna_metrics.pdf'
+        pdf='{results_dir}plots/rna_metrics/{sample}_rna_metrics.pdf'
     script:
         '../scripts/plot_rna_metrics.R'
+
+
+rule convert_long_to_mtx:
+    input:
+        '{results_dir}samples/{sample}/{type}/expression.long'
+    output:
+        barcodes='{results_dir}samples/{sample}/{type}/barcodes.tsv',
+        features='{results_dir}samples/{sample}/{type}/features.tsv',
+        mtx='{results_dir}samples/{sample}/{type}/expression.mtx'
+    params:
+        samples=lambda wildcards: wildcards.sample
+    script:
+        "../scripts/convert_mtx.py"

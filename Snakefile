@@ -3,14 +3,14 @@ import os
 import re
 import glob
 
-ruleorder: extend_barcode_whitelist > extend_barcode_top
 
 # Load configuration file
 configfile: "config.yaml"
 
+
 # Get sample names from samples.csv
 samples = pd.read_table("samples.csv", header=0, sep=',', index_col=0)
-types=['counts','umi']
+types=['reads','umi']
 # Get read_lengths from samples.csv
 read_lengths = list(samples.loc[:,'read_length'])
 
@@ -19,16 +19,25 @@ wildcard_constraints:
     sample="({})".format("|".join(samples.index))
 
 
+results_dir = config['LOCAL']['results']
+raw_data_dir = config['LOCAL']['raw_data']
+
+
+
 def get_R1_files(wildcards):
-    samples = [f for f in glob.glob("data/*.fastq.gz") if (re.search('R1', re.sub(wildcards.sample,'',f)) and re.search(wildcards.sample,f))]
-    if len(samples)!=1:
+    samples = [f for f in glob.glob("{}/*.fastq.gz".format(raw_data_dir)) if (re.search('R1', re.sub(wildcards.sample,'',f)) and re.search(wildcards.sample,f))]
+    if len(samples)>1 & isinstance(samples,list):
         exit('Multiple read files for one sample. Please check file names or run snakemake -s rules/prepare.smk for multilane samples first.')
+    if samples == []:
+        exit('\tNo sample files found in the {}/ directory.\n\t\tPlease check that the path for the raw data is set properly in config.yaml'.format(raw_data_dir))
     return(samples)
 
 def get_R2_files(wildcards):
-    samples = [f for f in glob.glob("data/*.fastq.gz") if (re.search('R2', re.sub(wildcards.sample,'',f)) and re.search(wildcards.sample,f))]
-    if len(samples)!=1:
+    samples = [f for f in glob.glob("{}/*.fastq.gz".format(raw_data_dir)) if (re.search('R2', re.sub(wildcards.sample,'',f)) and re.search(wildcards.sample,f))]
+    if len(samples)>1 & isinstance(samples,list):
         exit('Multiple read files for one sample. Please check file names or run snakemake -s rules/prepare.smk for multilane samples first.')
+    if samples == []:
+        exit('\tNo sample files found in the {} directory.\n\t\tPlease check that the path for the raw data is set properly in config.yaml'.format(raw_data_dir))
     return(samples)
 
 
@@ -49,96 +58,130 @@ starttrim_length = config['FILTER']['cell-barcode']['end'] - config['FILTER']['c
 rule all:
     input:
         #meta
-        '{}.refFlat'.format(annotation_prefix),
-        '{}.reduced.gtf'.format(annotation_prefix),
-        '{}.dict'.format(reference_prefix),
-        '{}.rRNA.intervals'.format(reference_prefix),
-        expand('{star_index_prefix}_{read_length}/SA', star_index_prefix=star_index_prefix, read_length=read_lengths),
+        expand(
+        ['{annotation_prefix}.refFlat',
+        '{annotation_prefix}.reduced.gtf',
+        '{reference_prefix}.dict',
+        '{reference_prefix}.rRNA.intervals',
+        '{star_index_prefix}_{read_length}/SA',
         #qc
-        'reports/fastqc_reads.html',
-        'reports/fastqc_barcodes.html',
+        '{results_dir}reports/fastqc_reads.html',
+        '{results_dir}reports/fastqc_barcodes.html',
         #filter
-        'plots/adapter_content.pdf',
-        'reports/barcode_filtering.html',
-        'reports/RNA_filtering.html',
+        '{results_dir}plots/adapter_content.pdf',
+        '{results_dir}reports/barcode_filtering.html',
+        '{results_dir}reports/RNA_filtering.html',
         #mapping
-        expand('plots/knee_plots/{sample}_knee_plot.pdf', sample=samples.index),
-        'reports/star.html',
-        'plots/yield.pdf',
-        'plots/UMI_vs_counts.pdf',
-        'plots/UMI_vs_gene.pdf',
-        'plots/Count_vs_gene.pdf',
-        #expand('data/{sample}/salmon/mapping.tsv', sample=samples.index),
+        '{results_dir}plots/knee_plots/{sample}_knee_plot.pdf',
+        '{results_dir}reports/star.html',
+        '{results_dir}plots/yield.pdf',
         #extract
-        'summary/umi/expression.mtx',
-        'summary/reads/expression.mtx',
-        'summary/R_Seurat_objects.rdata',
-        expand('plots/rna_metrics/{sample}_rna_metrics.pdf', sample=samples.index),
-        #expand('data/{sample}/{type}/expression_matrix.mtx', sample=samples.index, type=types),
-
+        '{results_dir}plots/rna_metrics/{sample}_rna_metrics.pdf',
+        '{results_dir}summary/{type}/expression.mtx',
+        '{results_dir}samples/{sample}/{type}/expression.mtx',
+        #merge
+        '{results_dir}plots/UMI_vs_counts.pdf',
+        '{results_dir}plots/UMI_vs_gene.pdf',
+        '{results_dir}plots/Count_vs_gene.pdf',
+        '{results_dir}summary/R_Seurat_objects.rdata',
+        '{results_dir}plots/violinplots_comparison_UMI.pdf'],
+            annotation_prefix=annotation_prefix,
+            reference_prefix=reference_prefix,
+            star_index_prefix=star_index_prefix,
+            read_length=read_lengths,
+            sample=samples.index,
+            type=types,
+            results_dir=results_dir)
+        
+rule test:
+    input:
+        expand("samples/{sample}/trimmmed_R1.fastq.gz", sample=samples.index)
+        
 rule meta:
     input:
-        '{}.refFlat'.format(annotation_prefix),
-        '{}.reduced.gtf'.format(annotation_prefix),
-        '{}.dict'.format(reference_prefix),
-        '{}.rRNA.intervals'.format(reference_prefix),
-        expand('{star_index_prefix}_{read_length}/SA', star_index_prefix=star_index_prefix, read_length=read_lengths)
+        expand(
+        ['{annotation_prefix}.refFlat',
+        '{annotation_prefix}.reduced.gtf',
+        '{reference_prefix}.dict',
+        '{reference_prefix}.rRNA.intervals',
+        '{star_index_prefix}_{read_length}/SA'],
+        star_index_prefix=star_index_prefix,
+        read_length=read_lengths,
+        reference_prefix=reference_prefix,
+        annotation_prefix=annotation_prefix)
 
 rule qc:
     input:
-        'reports/fastqc_reads.html',
-        'reports/fastqc_barcodes.html'
+        expand(
+        ['{results_dir}reports/fastqc_reads.html',
+        '{results_dir}reports/fastqc_barcodes.html'],
+        results_dir=results_dir)
 
 rule filter:
     input:
-        expand('data/{sample}/trimmmed_repaired_R1.fastq.gz', sample=samples.index),
-        'reports/barcode_filtering.html',
-        'reports/RNA_filtering.html',
-        'plots/adapter_content.pdf'
+        expand(
+        ['{results_dir}plots/adapter_content.pdf',
+        '{results_dir}reports/barcode_filtering.html',
+        '{results_dir}reports/RNA_filtering.html',
+        '{results_dir}samples/{sample}/trimmmed_repaired_R1.fastq.gz'],
+        results_dir=results_dir,
+        sample=samples.index)
         
 rule map:
     input:  
-        expand('data/{sample}/final.bam', sample=samples.index),
-        expand('logs/dropseq_tools/{sample}_hist_out_cell.txt', sample=samples.index),
-        expand('plots/knee_plots/{sample}_knee_plot.pdf', sample=samples.index),
-        'plots/yield.pdf',        
-        'reports/star.html'
-        
+        expand(
+        ['{results_dir}plots/knee_plots/{sample}_knee_plot.pdf',
+        '{results_dir}reports/star.html',
+        '{results_dir}plots/yield.pdf',
+        '{results_dir}samples/{sample}/final.bam'],
+        sample=samples.index,
+        results_dir=results_dir)
+
 rule extract:
     input:
-        expand('plots/rna_metrics/{sample}_rna_metrics.pdf', sample=samples.index),
-        expand('plots/{sample}_{type}_expression.long', sample=samples.index, type=types),
-        
+        expand(
+        ['{results_dir}plots/rna_metrics/{sample}_rna_metrics.pdf',
+        '{results_dir}summary/{type}/expression.mtx',
+        '{results_dir}samples/{sample}/{type}/expression.mtx'],
+        results_dir=results_dir,
+        sample=samples.index,
+        type=types)
 
 rule split_species:
     input:
-        expand('plots/knee_plots/{sample}_knee_plot.pdf', sample=samples.index),
-        expand('data/{sample}/{species}/barcodes.csv', sample=samples.index, species=config['META']['species']),
-        expand('plots/barnyard/{sample}_genes.pdf', sample=samples.index),
-        expand('plots/barnyard/{sample}_transcripts.pdf', sample=samples.index),
-        expand('data/{sample}/{species}/unfiltered.bam', sample=samples.index, species=config['META']['species'])
+        expand(
+        ['{results_dir}samples/{sample}/{species}/barcodes.csv',
+        '{results_dir}plots/barnyard/{sample}_genes.pdf',
+        '{results_dir}plots/barnyard/{sample}_transcripts.pdf',
+        '{results_dir}samples/{sample}/{species}/unfiltered.bam'],
+        sample=samples.index,
+        species=config['META']['species'],
+        results_dir=results_dir)
 
 
 rule extract_species:
     input:
-        expand('data/{sample}/{species}/umi_expression_matrix.txt', sample=samples.index, species=config['META']['species']),
-        expand('data/{sample}/{species}/counts_expression_matrix.txt', sample=samples.index, species=config['META']['species']),
-        expand('summary/Experiment_{species}_counts_expression_matrix.tsv', species=config['META']['species']),
-        expand('summary/Experiment_{species}_umi_expression_matrix.tsv', species=config['META']['species']),
-        expand('plots/rna_metrics/{sample}_{species}_rna_metrics.pdf', sample=samples.index, species=config['META']['species'])
+        expand(
+        ['{results_dir}samples/{sample}/{species}/umi_expression_matrix.txt',
+        '{results_dir}samples/{sample}/{species}/counts_expression_matrix.txt',
+        '{results_dir}summary/Experiment_{species}_counts_expression_matrix.tsv',
+        '{results_dir}summary/Experiment_{species}_umi_expression_matrix.tsv',
+        '{results_dir}plots/rna_metrics/{sample}_{species}_rna_metrics.pdf'],
+        sample=samples.index,
+        species=config['META']['species'],
+        results_dir=results_dir)
         
 rule merge:
     input:
         #merge
-        expand('summary/{sample}/{type}/expression.mtx', sample=samples.index, type=types),
-        'summary/umi_expression_matrix.tsv',
-        'summary/counts_expression_matrix.tsv',
-        'plots/violinplots_comparison_UMI.pdf',
-        'plots/UMI_vs_counts.pdf',
-        'plots/UMI_vs_gene.pdf',
-        'plots/Count_vs_gene.pdf',
-        'summary/R_Seurat_objects.rdata'
-
+        expand(
+        ['{results_dir}plots/UMI_vs_counts.pdf',
+        '{results_dir}plots/UMI_vs_gene.pdf',
+        '{results_dir}plots/Count_vs_gene.pdf',
+        '{results_dir}summary/R_Seurat_objects.rdata',
+        '{results_dir}plots/violinplots_comparison_UMI.pdf'],
+        results_dir=results_dir)
+        
 
 
 include: "rules/generate_meta.smk"
@@ -146,11 +189,7 @@ include: "rules/fastqc.smk"
 include: "rules/filter.smk"
 include: "rules/cell_barcodes.smk"
 include: "rules/map.smk"
-
 include: "rules/extract_expression_single.smk"
-
-if(config['META']['mixed']):
-    include: "rules/split_species.smk"
-    include: "rules/extract_expression_species.smk"
-
+include: "rules/split_species.smk"
+include: "rules/extract_expression_species.smk"
 include: "rules/merge.smk"

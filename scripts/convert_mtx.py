@@ -29,8 +29,8 @@ with open(temp_mtx,'w') as mtx_stream:
 			next(input_file) # skip first line
 			for line in input_file:
 				barcode,feature,count = line.strip().split('\t')
-				if(len(samples) !=1):
-					barcode = sample + '_' + barcode
+				if(not isinstance(samples,str)):
+					barcode = samples[i] + '_' + barcode
 				if(barcode not in barcodes):
 					barcodes[barcode] = barcode_index
 					barcode_index += 1

@@ -1,6 +1,8 @@
 LOCAL:
     temp-directory:
     memory: 4g
+    results: .
+    raw_data: data
 META:
     species:
         - SPECIES_ONE
