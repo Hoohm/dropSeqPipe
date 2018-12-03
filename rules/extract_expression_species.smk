@@ -44,8 +44,8 @@ rule SingleCellRnaSeqMetricsCollector_species:
 	input:
 		data='{results_dir}/samples/{sample}/{species}/unfiltered.bam',
 		barcode_whitelist='{results_dir}/samples/{sample}/{species}/barcodes.csv',
-		refFlat='{}.refFlat'.format(annotation_prefix),
-		rRNA_intervals='{}.rRNA.intervals'.format(reference_prefix)
+		refFlat="{ref_path}/{species}_{release}_curated_annotation.refFlat",
+		rRNA_intervals="{ref_path}/{species}_genome.rRNA.intervals"
 	params:
 		cells=lambda wildcards: int(samples.loc[wildcards.sample,'expected_cells']),		
 		memory=config['LOCAL']['memory'],
@@ -74,7 +74,7 @@ rule plot_rna_metrics_species:
 
 rule merge_umi_species:
 	input:
-		expand('{results_dir}/samples/{sample}/{{species}}/umi_expression_matrix.txt', sample=samples.index)
+		expand('{results_dir}/samples/{sample}/{{species}}/umi_expression_matrix.txt', sample=samples.index, results_dir=results_dir)
 	conda: '../envs/merge.yaml'
 	output:
 		'{results_dir}/summary/Experiment_{species}_umi_expression_matrix.tsv'
@@ -85,7 +85,7 @@ rule merge_umi_species:
 
 rule merge_counts_species:
 	input:
-		expand('{results_dir}/samples/{sample}/{{species}}/counts_expression_matrix.txt', sample=samples.index)
+		expand('{results_dir}/samples/{sample}/{{species}}/counts_expression_matrix.txt', sample=samples.index, results_dir=results_dir)
 	conda: '../envs/merge.yaml'
 	output:
 		'{results_dir}/summary/Experiment_{species}_counts_expression_matrix.tsv'

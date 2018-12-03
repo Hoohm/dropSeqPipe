@@ -50,7 +50,6 @@ rule plot_barnyard:
 	input:
 		expand('{results_dir}samples/{{sample}}/{species}/dge.summary.txt',species=config['META']['species'], results_dir=results_dir)
 	output: 
-		barcodes_species=expand('{results_dir}samples/{{sample}}/{species}/barcodes.csv', species=config['META']['species'], results_dir=results_dir),
 		genes_pdf='{results_dir}plots/barnyard/{sample}_genes.pdf',
 		transcripts_pdf='{results_dir}plots/barnyard/{sample}_transcripts.pdf'
 	params:

@@ -69,8 +69,16 @@ rule SingleCellRnaSeqMetricsCollector:
     input:
         data='{results_dir}samples/{sample}/final.bam',
         barcode_whitelist='{results_dir}samples/{sample}/barcodes.csv',
-        refFlat="{}.refFlat".format(annotation_prefix),
-        rRNA_intervals="{}.rRNA.intervals".format(reference_prefix)
+        refFlat=expand("{ref_path}/{species}_{build}_{release}/annotation_curated.refFlat",
+            ref_path=config['META']['reference-directory'],
+            species=species,
+            release=release,
+            build=build),
+        rRNA_intervals=expand("{ref_path}/{species}_{build}_{release}/annotation.rRNA.intervals",
+            ref_path=config['META']['reference-directory'],
+            species=species,
+            release=release,
+            build=build)
     params:     
         temp_directory=config['LOCAL']['temp-directory'],
         memory=config['LOCAL']['memory']

@@ -8,7 +8,11 @@ localrules: multiqc_star, plot_yield, plot_knee_plot
 rule STAR_align:
 	input:
 		fq1="{results_dir}samples/{sample}/trimmmed_repaired_R2.fastq.gz",
-		index=lambda wildcards: star_index_prefix + '_' + str(samples.loc[wildcards.sample,'read_length']) + '/SA'
+		index=lambda wildcards: '{}/{}_{}_{}/STAR_INDEX/SA'.format(
+			config['META']['reference-directory'],
+			species,
+			build,
+			release) + '_' + str(samples.loc[wildcards.sample,'read_length']) + '/SA'
 	output:
 		temp('{results_dir}samples/{sample}/Aligned.out.bam')
 	log:
@@ -27,7 +31,11 @@ rule STAR_align:
 				config['MAPPING']['STAR']['outFilterMatchNmin'],
 				config['MAPPING']['STAR']['outFilterMatchNminOverLread'],
 				config['MAPPING']['STAR']['outFilterScoreMinOverLread'],),
-		index=lambda wildcards: star_index_prefix + '_' + str(samples.loc[wildcards.sample,'read_length']) + '/'	
+		index=lambda wildcards: '{}/{}_{}_{}/STAR_INDEX/SA'.format(
+			config['META']['reference-directory'],
+			species,
+			build,
+			release) + '_' + str(samples.loc[wildcards.sample,'read_length']) + '/'
 	threads: 24
 	wrapper:
 		"0.27.1/bio/star/align"
@@ -90,7 +98,11 @@ rule MergeBamAlignment:
 rule TagReadWithGeneExon:
 	input:
 		data=temp('{results_dir}samples/{sample}/Aligned.repaired.bam'),
-		refFlat='{}.refFlat'.format(annotation_prefix)
+		refFlat=expand("{ref_path}/{species}_{build}_{release}/annotation_curated.refFlat",
+			ref_path=config['META']['reference-directory'],
+			species=species,
+			release=release,
+			build=build)
 	params:
 		memory=config['LOCAL']['memory'],
 		temp_directory=config['LOCAL']['temp-directory']
