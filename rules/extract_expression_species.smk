@@ -16,10 +16,10 @@ rule extract_umi_expression_species:
 	conda: '../envs/dropseq_tools.yaml'
 	shell:
 		"""export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && DigitalExpression -m {params.memory}\
-		-I {input.data}\
-		-O {output}\
-		-MIN_BC_READ_THRESHOLD {params.count_per_umi}\
-		-CELL_BC_FILE {input.barcode_whitelist}"""
+		I={input.data}\
+		O={output}\
+		MIN_BC_READ_THRESHOLD={params.count_per_umi}\
+		CELL_BC_FILE={input.barcode_whitelist}"""
 
 rule extract_reads_expression_species:
 	input:
@@ -33,10 +33,10 @@ rule extract_reads_expression_species:
 	conda: '../envs/dropseq_tools.yaml'
 	shell:
 		"""export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && DigitalExpression -m {params.memory}\
-		-I {input.data}\
-		-O {output}\
-		-CELL_BC_FILE {input.barcode_whitelist}\
-		-OUTPUT_READS_INSTEAD true"""
+		I={input.data}\
+		O={output}\
+		CELL_BC_FILE={input.barcode_whitelist}\
+		OUTPUT_READS_INSTEAD=true"""
 
 
 
@@ -44,8 +44,16 @@ rule SingleCellRnaSeqMetricsCollector_species:
 	input:
 		data='{results_dir}/samples/{sample}/{species}/unfiltered.bam',
 		barcode_whitelist='{results_dir}/samples/{sample}/{species}/barcodes.csv',
-		refFlat="{ref_path}/{species}_{release}_curated_annotation.refFlat",
-		rRNA_intervals="{ref_path}/{species}_genome.rRNA.intervals"
+		refFlat=expand("{ref_path}/{species}_{build}_{release}/curated_annotation.refFlat",
+			ref_path=ref_path,
+			release=release,
+			species=species,
+			build=build),
+		rRNA_intervals=expand("{ref_path}/{species}_{build}_{release}/annotation.rRNA.intervals",
+			ref_path=ref_path,
+			release=release,
+			build=build,
+			species=species)
 	params:
 		cells=lambda wildcards: int(samples.loc[wildcards.sample,'expected_cells']),		
 		memory=config['LOCAL']['memory'],
@@ -67,7 +75,7 @@ rule plot_rna_metrics_species:
 		barcode='{results_dir}/samples/{sample}/{species}/barcodes.csv'
 	conda: '../envs/plots.yaml'
 	output:
-		pdf='plots/rna_metrics/{sample}_{species}_rna_metrics.pdf'
+		pdf='{results_dir}/plots/rna_metrics/{sample}_{species}_rna_metrics.pdf'
 	script:
 		'../scripts/plot_rna_metrics.R'
 

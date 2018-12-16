@@ -5,9 +5,9 @@ localrules: extend_barcode_whitelist, extend_barcode_top
 
 rule get_top_barcodes:
 	input:
-		"{results_dir}samples/{sample}/trimmmed_repaired_R1.fastq.gz"
+		'{results_dir}/samples/{sample}/trimmmed_repaired_R1.fastq.gz'
 	output:
-		'{results_dir}samples/{sample}/top_barcodes.csv'
+		'{results_dir}/samples/{sample}/top_barcodes.csv'
 	conda: '../envs/umi_tools.yaml'
 	params:
 		cell_barcode_length=(config['FILTER']['cell-barcode']['end'] - config['FILTER']['cell-barcode']['start'] + 1),
@@ -23,9 +23,9 @@ rule get_top_barcodes:
 
 rule get_cell_whitlist:
 	input:
-		'{results_dir}samples/{sample}/top_barcodes.csv'
+		'{results_dir}/samples/{sample}/top_barcodes.csv'
 	output:
-		'{results_dir}samples/{sample}/barcodes.csv'
+		'{results_dir}/samples/{sample}/barcodes.csv'
 	shell:
 		"""cat {input} | cut -f 1 > {output}"""
 
@@ -33,10 +33,10 @@ rule extend_barcode_whitelist:
 	input:
 		whitelist='barcodes.csv'
 	output:
-		barcodes='{results_dir}samples/{sample}/barcodes.csv',
-		barcode_ref='{results_dir}samples/{sample}/barcode_ref.pkl',
-		barcode_ext_ref='{results_dir}samples/{sample}/barcode_ext_ref.pkl',
-		barcode_mapping='{results_dir}samples/{sample}/empty_barcode_mapping.pkl'
+		barcodes='{results_dir}/samples/{sample}/barcodes.csv',
+		barcode_ref='{results_dir}/samples/{sample}/barcode_ref.pkl',
+		barcode_ext_ref='{results_dir}/samples/{sample}/barcode_ext_ref.pkl',
+		barcode_mapping='{results_dir}/samples/{sample}/empty_barcode_mapping.pkl'
 	script:
 		'../scripts/generate_extended_ref.py'
 
@@ -44,24 +44,24 @@ rule extend_barcode_whitelist:
 
 rule extend_barcode_top:
 	input:
-		whitelist='{results_dir}samples/{sample}/top_barcodes.csv'
+		whitelist='{results_dir}/samples/{sample}/top_barcodes.csv'
 	output:
-		barcode_ref='{results_dir}samples/{sample}/barcode_ref.pkl',
-		barcode_ext_ref='{results_dir}samples/{sample}/barcode_ext_ref.pkl',
-		barcode_mapping='{results_dir}samples/{sample}/empty_barcode_mapping.pkl'
+		barcode_ref='{results_dir}/samples/{sample}/barcode_ref.pkl',
+		barcode_ext_ref='{results_dir}/samples/{sample}/barcode_ext_ref.pkl',
+		barcode_mapping='{results_dir}/samples/{sample}/empty_barcode_mapping.pkl'
 	script:
 		'../scripts/umi_tools_extended_ref.py'
 
 
 rule repair_barcodes:
 	input:
-		bam='{results_dir}samples/{sample}/Aligned.merged.bam',
-		barcode_ref='{results_dir}samples/{sample}/barcode_ref.pkl',
-		barcode_ext_ref='{results_dir}samples/{sample}/barcode_ext_ref.pkl',
-		barcode_mapping='{results_dir}samples/{sample}/empty_barcode_mapping.pkl'
+		bam='{results_dir}/samples/{sample}/Aligned.merged.bam',
+		barcode_ref='{results_dir}/samples/{sample}/barcode_ref.pkl',
+		barcode_ext_ref='{results_dir}/samples/{sample}/barcode_ext_ref.pkl',
+		barcode_mapping='{results_dir}/samples/{sample}/empty_barcode_mapping.pkl'
 	conda: '../envs/merge_bam.yaml'
 	output:
-		bam=temp('{results_dir}samples/{sample}/Aligned.repaired.bam'),
-		barcode_mapping_counts='{results_dir}samples/{sample}/barcode_mapping_counts.pkl'
+		bam=temp('{results_dir}/samples/{sample}/Aligned.repaired.bam'),
+		barcode_mapping_counts='{results_dir}/samples/{sample}/barcode_mapping_counts.pkl'
 	script:
 		'../scripts/repair_barcodes.py'

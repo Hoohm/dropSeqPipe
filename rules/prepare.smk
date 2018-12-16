@@ -18,8 +18,8 @@ samples = [re.findall(multi_lane_pattern,f)[0][0] for f in glob.glob("../{result
 
 rule all:
     input:
-        expand('{results_dir}/samples/{sample}_R1.fastq.gz',sample=samples),
-        expand('{results_dir}/samples/{sample}_R2.fastq.gz',sample=samples)
+        expand('{results_dir}//samples/{sample}_R1.fastq.gz',sample=samples),
+        expand('{results_dir}//samples/{sample}_R2.fastq.gz',sample=samples)
 
 
 
@@ -45,11 +45,11 @@ rule generate_samples:
 
 rule concat_lanes:
     input:
-        R1=expand('{results_dir}/samples/{{sample}}_{lane}_R1_001.fastq.gz', lane=lanes),
-        R2=expand('{results_dir}/samples/{{sample}}_{lane}_R2_001.fastq.gz', lane=lanes),
+        R1=expand('{results_dir}//samples/{{sample}}_{lane}_R1_001.fastq.gz', lane=lanes),
+        R2=expand('{results_dir}//samples/{{sample}}_{lane}_R2_001.fastq.gz', lane=lanes),
         lanes='samples.csv'
     output:
-        R1='{results_dir}/samples/{sample}_R1.fastq.gz',
-        R2='{results_dir}/samples/{sample}_R2.fastq.gz'
+        R1='{results_dir}//samples/{sample}_R1.fastq.gz',
+        R2='{results_dir}//samples/{sample}_R2.fastq.gz'
     shell:
         """cat {input.R1} > {output.R1};cat {input.R2} > {output.R2}"""

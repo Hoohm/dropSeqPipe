@@ -92,13 +92,17 @@ digitalExpressionFileO1 = snakemake@input[[1]][1]
 digitalExpressionFileO2 = snakemake@input[[2]][1]
 
 num_cells = snakemake@params$expected_cells
+
+organismOne=names(snakemake@config$META$species)[1]
+organismTwo=names(snakemake@config$META$species)[2]
+
 par(mar=c(5,4,4,2)+0.5)
 
 pdf(snakemake@output$genes_pdf, height=8, width=8)
 df_temp=categorizeCellsUsingKneeKnownNumCellsPaper(digitalExpressionFileO1,
                                            digitalExpressionFileO2,
-                                           snakemake@config$META$species[1],
-                                           snakemake@config$META$species[2],
+                                           organismOne=organismOne,
+                                           organismTwo=organismTwo,
                                            pureRatio = snakemake@config$META$ratio,
                                            numCells = num_cells,
                                            numBeads = num_cells * 2,
@@ -111,16 +115,18 @@ dev.off()
 pdf(snakemake@output$transcripts_pdf, height=8, width=8)
 df=categorizeCellsUsingKneeKnownNumCellsPaper(digitalExpressionFileO1,
                                               digitalExpressionFileO2,
-                                              snakemake@config$META$species[1],
-                                              snakemake@config$META$species[2],
+                                              organismOne=organismOne,
+                                              organismTwo=organismTwo,
                                               pureRatio = snakemake@config$META$ratio,
                                               numCells = num_cells,
                                               numBeads = num_cells * 2,
                                               point.cex= 1,
                                               category = 'transcripts')
 dev.off()
+print(df)
+organism1 = subset(df, df$organism == organismOne)
+organism2 = subset(df, df$organism == organismTwo)
+print(organism1)
 
-organism1 = subset(df, df$organism == snakemake@config$META$species[1])
-organism2 = subset(df, df$organism == snakemake@config$META$species[2])
 write.table(organism1$tag, snakemake@output$barcodes_species[1], row.names=F, col.names=F, quote=F)
 write.table(organism2$tag, snakemake@output$barcodes_species[2], row.names=F, col.names=F, quote=F)

@@ -10,7 +10,7 @@ rule cutadapt_R1:
         R1=get_R1_files,
         adapters=config['FILTER']['cutadapt']['adapters-file']
     output:
-        fastq=temp("{results_dir}samples/{sample}/trimmmed_R1.fastq.gz")
+        fastq=temp('{results_dir}/samples/{sample}/trimmmed_R1.fastq.gz')
     params:
         cell_barcode_length=round((config['FILTER']['cell-barcode']['end'] - config['FILTER']['cell-barcode']['start'] + 1) * 1.3),
         barcode_length=config['FILTER']['UMI-barcode']['end'] - config['FILTER']['cell-barcode']['start'] + 1,
@@ -19,7 +19,7 @@ rule cutadapt_R1:
         barcode_quality=config['FILTER']['cutadapt']['R1']['quality-filter']
     threads: 10
     log:
-        qc="{results_dir}logs/cutadapt/{sample}_R1.qc.txt"
+        qc='{results_dir}/logs/cutadapt/{sample}_R1.qc.txt'
     conda: '../envs/cutadapt.yaml' 
     shell:
         """cutadapt\
@@ -38,7 +38,7 @@ rule cutadapt_R2:
         R2=get_R2_files,
         adapters=config['FILTER']['cutadapt']['adapters-file']
     output:
-        fastq=temp("{results_dir}samples/{sample}/trimmmed_R2.fastq.gz")
+        fastq=temp('{results_dir}/samples/{sample}/trimmmed_R2.fastq.gz')
     params:
         extra_params=config['FILTER']['cutadapt']['R2']['extra-params'],
         read_quality=config['FILTER']['cutadapt']['R2']['quality-filter'],
@@ -46,7 +46,7 @@ rule cutadapt_R2:
         adapters_minimum_overlap=config['FILTER']['cutadapt']['R2']['minimum-adapters-overlap'],
     threads: 10
     log:
-        qc="{results_dir}logs/cutadapt/{sample}_R2.qc.txt"
+        qc='{results_dir}/logs/cutadapt/{sample}_R2.qc.txt'
     conda: '../envs/cutadapt.yaml' 
     shell:
         """cutadapt\
@@ -61,22 +61,22 @@ rule cutadapt_R2:
 
 rule clean_cutadapt:
     input:
-        R1="{results_dir}logs/cutadapt/{sample}_R1.qc.txt",
-        R2="{results_dir}logs/cutadapt/{sample}_R2.qc.txt"
+        R1='{results_dir}/logs/cutadapt/{sample}_R1.qc.txt',
+        R2='{results_dir}/logs/cutadapt/{sample}_R2.qc.txt'
     output:
-        "{results_dir}logs/cutadapt/{sample}.clean_qc.csv"
+        '{results_dir}/logs/cutadapt/{sample}.clean_qc.csv'
     script:
         '../scripts/clean_cutadapt.py'
 
 rule repair:
     input:
-        R1='{results_dir}samples/{sample}/trimmmed_R1.fastq.gz',
-        R2='{results_dir}samples/{sample}/trimmmed_R2.fastq.gz'
+        R1='{results_dir}/samples/{sample}/trimmmed_R1.fastq.gz',
+        R2='{results_dir}/samples/{sample}/trimmmed_R2.fastq.gz'
     output:
-        R1=temp('{results_dir}samples/{sample}/trimmmed_repaired_R1.fastq.gz'),
-        R2=temp('{results_dir}samples/{sample}/trimmmed_repaired_R2.fastq.gz')
+        R1=temp('{results_dir}/samples/{sample}/trimmmed_repaired_R1.fastq.gz'),
+        R2=temp('{results_dir}/samples/{sample}/trimmmed_repaired_R2.fastq.gz')
     log:
-        '{results_dir}logs/bbmap/{sample}_repair.txt'
+        '{results_dir}/logs/bbmap/{sample}_repair.txt'
     params:
         memory='{}g'.format(int(config['LOCAL']['memory'].rstrip('g')) * 10)
     conda: '../envs/bbmap.yaml'
@@ -93,16 +93,16 @@ rule repair:
 
 rule detect_barcodes:
     input:
-        R1='{results_dir}samples/{sample}/trimmmed_repaired_R1.fastq.gz'
+        R1='{results_dir}/samples/{sample}/trimmmed_repaired_R1.fastq.gz'
     output:
-        positions='{results_dir}samples/{sample}/test.csv'
+        positions='{results_dir}/samples/{sample}/test.csv'
     conda: '../envs/merge_bam.yaml'
     script:
         '../scripts/detect_barcodes.py'
 
 rule plot_adapter_content:
     input:
-        expand('{results_dir}logs/cutadapt/{sample}.clean_qc.csv', sample=samples.index, results_dir=results_dir)
+        expand('{results_dir}/logs/cutadapt/{sample}.clean_qc.csv', sample=samples.index, results_dir=results_dir)
     params:
         Cell_length=config['FILTER']['cell-barcode']['end'] - config['FILTER']['cell-barcode']['start'] + 1,
         UMI_length=config['FILTER']['UMI-barcode']['end'] - config['FILTER']['UMI-barcode']['start'] + 1,
@@ -110,24 +110,24 @@ rule plot_adapter_content:
         batches=lambda wildcards: samples.loc[samples.index, 'batch']
     conda: '../envs/plots.yaml'
     output:
-        pdf='{results_dir}plots/adapter_content.pdf'
+        pdf='{results_dir}/plots/adapter_content.pdf'
     script:
         '../scripts/plot_adapter_content.R'
 
 rule multiqc_cutadapt_barcodes:
     input:
-        expand('{results_dir}logs/cutadapt/{sample}_R1.qc.txt', sample=samples.index, results_dir=results_dir)
+        expand('{results_dir}/logs/cutadapt/{sample}_R1.qc.txt', sample=samples.index, results_dir=results_dir)
     params: '-m cutadapt --ignore *_R2*'
     output:
-        html='{results_dir}reports/barcode_filtering.html'
+        html='{results_dir}/reports/barcode_filtering.html'
     wrapper:
         '0.21.0/bio/multiqc'
 
 rule multiqc_cutadapt_RNA:
     input:
-        expand('{results_dir}logs/cutadapt/{sample}_R2.qc.txt', sample=samples.index, results_dir=results_dir)
+        expand('{results_dir}/logs/cutadapt/{sample}_R2.qc.txt', sample=samples.index, results_dir=results_dir)
     params: '-m cutadapt --ignore *_R1*'
     output:
-        html='{results_dir}reports/RNA_filtering.html'
+        html='{results_dir}/reports/RNA_filtering.html'
     wrapper:
         '0.21.0/bio/multiqc'

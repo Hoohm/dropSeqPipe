@@ -6,9 +6,9 @@ localrules: plot_barnyard
 
 rule split_bam_species:
 	input:
-		'{results_dir}samples/{sample}/final.bam'
+		'{results_dir}/samples/{sample}/final.bam'
 	output:
-		'{results_dir}samples/{sample}/{species}/unfiltered.bam'
+		'{results_dir}/samples/{sample}/{species}/unfiltered.bam'
 	params:
 		species=lambda wildcards: wildcards.species,
 		memory=config['LOCAL']['memory'],
@@ -23,11 +23,11 @@ rule split_bam_species:
 
 rule extract_all_umi_expression:
 	input: 
-		data='{results_dir}samples/{sample}/{species}/unfiltered.bam',
-		barcode_whitelist='{results_dir}samples/{sample}/barcodes.csv'
+		data='{results_dir}/samples/{sample}/{species}/unfiltered.bam',
+		barcode_whitelist='{results_dir}/samples/{sample}/barcodes.csv'
 	output:
-		umi_matrix=temp('{results_dir}samples/{sample}/{species}/unfiltered_umi_expression_matrix.tsv'),
-		summary='{results_dir}samples/{sample}/{species}/dge.summary.txt'
+		umi_matrix=temp('{results_dir}/samples/{sample}/{species}/unfiltered_umi_expression_matrix.tsv'),
+		summary='{results_dir}/samples/{sample}/{species}/dge.summary.txt'
 	params:
 		count_per_umi=config['EXTRACTION']['minimum-counts-per-UMI'],
 		cellBarcodeEditDistance=config['EXTRACTION']['UMI-edit-distance'],
@@ -48,10 +48,11 @@ rule extract_all_umi_expression:
 
 rule plot_barnyard:
 	input:
-		expand('{results_dir}samples/{{sample}}/{species}/dge.summary.txt',species=config['META']['species'], results_dir=results_dir)
+		expand('{results_dir}/samples/{{sample}}/{species}/dge.summary.txt',species=config['META']['species'], results_dir=results_dir)
 	output: 
-		genes_pdf='{results_dir}plots/barnyard/{sample}_genes.pdf',
-		transcripts_pdf='{results_dir}plots/barnyard/{sample}_transcripts.pdf'
+		genes_pdf='{results_dir}/plots/barnyard/{sample}_genes.pdf',
+		transcripts_pdf='{results_dir}/plots/barnyard/{sample}_transcripts.pdf',
+		barcodes_species=expand('{{results_dir}}samples/{{sample}}/{species}/barcodes.csv', species=species_list)
 	params:
 		expected_cells=lambda wildcards: int(samples.loc[wildcards.sample,'expected_cells'])
 	script: 

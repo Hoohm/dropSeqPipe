@@ -14,18 +14,6 @@ import platform
 #     curate_annotation
 
 
-def find_genome(wildcards):
-    print("{ref_path}/{species}_{build}_{release}/genome.fa".format(
-        config['META']['reference-directory'],
-        species,
-        build,
-        release))
-    return("{ref_path}/{species}_{build}_{release}/genome.fa".format(
-        config['META']['reference-directory'],
-        species,
-        build,
-        release))
-
 rule curate_annotation:
     input:
         biotypes=config['META']['gtf_biotypes'],
@@ -40,7 +28,7 @@ rule curate_annotation:
 
 rule create_dict:
     input:
-        find_genome
+        "{ref_path}/{species}_{build}_{release}/genome.fa"
     output:
         "{ref_path}/{species}_{build}_{release}/genome.dict"
     threads:1

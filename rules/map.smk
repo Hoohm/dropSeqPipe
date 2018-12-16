@@ -7,16 +7,16 @@ localrules: multiqc_star, plot_yield, plot_knee_plot
 
 rule STAR_align:
 	input:
-		fq1="{results_dir}samples/{sample}/trimmmed_repaired_R2.fastq.gz",
+		fq1='{results_dir}/samples/{sample}/trimmmed_repaired_R2.fastq.gz',
 		index=lambda wildcards: '{}/{}_{}_{}/STAR_INDEX/SA'.format(
 			config['META']['reference-directory'],
 			species,
 			build,
 			release) + '_' + str(samples.loc[wildcards.sample,'read_length']) + '/SA'
 	output:
-		temp('{results_dir}samples/{sample}/Aligned.out.bam')
+		temp('{results_dir}/samples/{sample}/Aligned.out.bam')
 	log:
-		'{results_dir}samples/{sample}/Log.final.out'
+		'{results_dir}/samples/{sample}/Log.final.out'
 	params:
 		extra="""--outReadsUnmapped Fastx\
 			 	--outFilterMismatchNmax {}\
@@ -68,9 +68,9 @@ rule STAR_align:
 
 rule multiqc_star:
 	input:
-		expand('{results_dir}samples/{sample}/Log.final.out', sample=samples.index, results_dir=results_dir)
+		expand('{results_dir}/samples/{sample}/Log.final.out', sample=samples.index, results_dir=results_dir)
 	output:
-		html='{results_dir}reports/star.html'
+		html='{results_dir}/reports/star.html'
 	params: '-m star'
 	wrapper:
 		'0.21.0/bio/multiqc'
@@ -79,10 +79,10 @@ rule multiqc_star:
 
 rule MergeBamAlignment:
 	input:
-		mapped='{results_dir}samples/{sample}/Aligned.out.bam',
-		R1_ref = "{results_dir}samples/{sample}/trimmmed_repaired_R1.fastq.gz"
+		mapped='{results_dir}/samples/{sample}/Aligned.out.bam',
+		R1_ref = '{results_dir}/samples/{sample}/trimmmed_repaired_R1.fastq.gz'
 	output:
-		temp('{results_dir}samples/{sample}/Aligned.merged.bam')
+		temp('{results_dir}/samples/{sample}/Aligned.merged.bam')
 	params:
 		BC_start=config['FILTER']['cell-barcode']['start']-1,
 		BC_end=config['FILTER']['cell-barcode']['end'],
@@ -97,8 +97,8 @@ rule MergeBamAlignment:
 
 rule TagReadWithGeneExon:
 	input:
-		data=temp('{results_dir}samples/{sample}/Aligned.repaired.bam'),
-		refFlat=expand("{ref_path}/{species}_{build}_{release}/annotation_curated.refFlat",
+		data='{results_dir}/samples/{sample}/Aligned.repaired.bam',
+		refFlat=expand("{ref_path}/{species}_{build}_{release}/curated_annotation.refFlat",
 			ref_path=config['META']['reference-directory'],
 			species=species,
 			release=release,
@@ -107,7 +107,7 @@ rule TagReadWithGeneExon:
 		memory=config['LOCAL']['memory'],
 		temp_directory=config['LOCAL']['temp-directory']
 	output:
-		temp('{results_dir}samples/{sample}/gene_exon_tagged.bam')
+		temp('{results_dir}/samples/{sample}/gene_exon_tagged.bam')
 	conda: '../envs/dropseq_tools.yaml'
 	shell:
 		"""export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && TagReadWithGeneFunction -m {params.memory}\
@@ -118,12 +118,12 @@ rule TagReadWithGeneExon:
 
 rule DetectBeadSubstitutionErrors:
     input:
-        '{results_dir}samples/{sample}/gene_exon_tagged.bam'
+        '{results_dir}/samples/{sample}/gene_exon_tagged.bam'
     output:
-        data=temp('{results_dir}samples/{sample}/gene_exon_tagged_bead_sub.bam'),
-        report='{results_dir}logs/{sample}_beadSubstitutionReport.txt',
-        stats='{results_dir}logs/{sample}_beadSubstitutionStats.txt',
-        summary='{results_dir}logs/{sample}_beadSubstitutionSummary.txt'
+        data=temp('{results_dir}/samples/{sample}/gene_exon_tagged_bead_sub.bam'),
+        report='{results_dir}/logs/dropseq_tools/{sample}_beadSubstitutionReport.txt',
+        stats='{results_dir}/logs/dropseq_tools/{sample}_beadSubstitutionStats.txt',
+        summary='{results_dir}/logs/dropseq_tools{sample}_beadSubstitutionSummary.txt'
     params:
         SmartAdapter=config['FILTER']['5-prime-smart-adapter'],
         memory=config['LOCAL']['memory'],
@@ -144,12 +144,12 @@ rule DetectBeadSubstitutionErrors:
 
 rule bead_errors_metrics:
     input:
-        '{results_dir}samples/{sample}/gene_exon_tagged_bead_sub.bam'
+        '{results_dir}/samples/{sample}/gene_exon_tagged_bead_sub.bam'
     output:
-        '{results_dir}samples/{sample}/final.bam'
+        '{results_dir}/samples/{sample}/final.bam'
     params:
-        out_stats='{results_dir}logs/{sample}_synthesis_stats.txt',
-        summary='{results_dir}logs/{sample}_synthesis_stats_summary.txt',
+        out_stats='{results_dir}/logs/dropseq_tools/{sample}_synthesis_stats.txt',
+        summary='{results_dir}/logs/dropseq_tools/{sample}_synthesis_stats_summary.txt',
         barcodes=lambda wildcards: int(samples.loc[wildcards.sample,'expected_cells']) * 2,
         memory =config['LOCAL']['memory'],
         SmartAdapter=config['FILTER']['5-prime-smart-adapter'],
@@ -170,12 +170,12 @@ rule bead_errors_metrics:
 
 rule bam_hist:
 	input:
-		'{results_dir}samples/{sample}/final.bam'
+		'{results_dir}/samples/{sample}/final.bam'
 	params:
 		memory=config['LOCAL']['memory'],
 		temp_directory=config['LOCAL']['temp-directory']
 	output:
-		'{results_dir}logs/dropseq_tools/{sample}_hist_out_cell.txt'
+		'{results_dir}/logs/dropseq_tools/{sample}_hist_out_cell.txt'
 	conda: '../envs/dropseq_tools.yaml'
 	shell:
 		"""export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && BamTagHistogram -m {params.memory}\
@@ -188,10 +188,10 @@ rule bam_hist:
 
 rule plot_yield:
 	input:
-		R1_filtered=expand('{results_dir}logs/cutadapt/{sample}_R1.qc.txt', sample=samples.index, results_dir=results_dir),
-		R2_filtered=expand('{results_dir}logs/cutadapt/{sample}_R2.qc.txt', sample=samples.index, results_dir=results_dir),
-		repaired=expand('{results_dir}logs/bbmap/{sample}_repair.txt', sample=samples.index, results_dir=results_dir),
-		STAR_output=expand('{results_dir}samples/{sample}/Log.final.out', sample=samples.index, results_dir=results_dir),
+		R1_filtered=expand('{results_dir}/logs/cutadapt/{sample}_R1.qc.txt', sample=samples.index, results_dir=results_dir),
+		R2_filtered=expand('{results_dir}/logs/cutadapt/{sample}_R2.qc.txt', sample=samples.index, results_dir=results_dir),
+		repaired=expand('{results_dir}/logs/bbmap/{sample}_repair.txt', sample=samples.index, results_dir=results_dir),
+		STAR_output=expand('{results_dir}/samples/{sample}/Log.final.out', sample=samples.index, results_dir=results_dir),
 	params:
 		BC_length=config['FILTER']['cell-barcode']['end'] - config['FILTER']['cell-barcode']['start']+1,
 		UMI_length=config['FILTER']['UMI-barcode']['end'] - config['FILTER']['UMI-barcode']['start']+1,
@@ -199,19 +199,19 @@ rule plot_yield:
 		batches=lambda wildcards: samples.loc[samples.index, 'batch']
 	conda: '../envs/plots.yaml'
 	output:
-		pdf='{results_dir}plots/yield.pdf'
+		pdf='{results_dir}/plots/yield.pdf'
 	script:
 		'../scripts/plot_yield.R'
 
 
 rule plot_knee_plot:
 	input:
-		data='{results_dir}logs/dropseq_tools/{sample}_hist_out_cell.txt',
-		barcodes='{results_dir}samples/{sample}/barcodes.csv'
+		data='{results_dir}/logs/dropseq_tools/{sample}_hist_out_cell.txt',
+		barcodes='{results_dir}/samples/{sample}/barcodes.csv'
 	params: 
 		cells=lambda wildcards: int(samples.loc[wildcards.sample,'expected_cells'])
 	conda: '../envs/plots.yaml'
 	output:
-		pdf='{results_dir}plots/knee_plots/{sample}_knee_plot.pdf'
+		pdf='{results_dir}/plots/knee_plots/{sample}_knee_plot.pdf'
 	script:
 		'../scripts/plot_knee_plot.R'

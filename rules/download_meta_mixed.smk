@@ -1,6 +1,10 @@
 from snakemake.remote.FTP import RemoteProvider as FTPRemoteProvider
 FTP = FTPRemoteProvider()
 
+ruleorder: merge_genomes > download_genome
+ruleorder: merge_annotations > download_annotation
+
+
 def get_annotation(wildcards):
     return FTP.remote("ftp.ensembl.org/pub/release-{0}/gtf/{1}/{2}.GRC{3}{4}.{0}.gtf.gz".format(
         wildcards.release,
@@ -25,7 +29,7 @@ rule download_annotation:
     input:
         get_annotation
     output:
-        "{ref_path}/{species}_{build}_{release}/original_annotation.gtf"
+        "{ref_path}/{species}_{build}_{release}/annotation.gtf"
     shell:
         "gunzip -c -d {input} > {output}"
 
@@ -33,16 +37,16 @@ rule download_genome:
     input:
         get_genome
     output:
-        "{ref_path}/{species}_{build}_{release}/original_genome.fa"
+        "{ref_path}/{species}_{build}_{release}/genome.fa"
     shell:
         "gunzip -d -c {input} > {output}"
 
 
 rule rename_genome:
     input:
-        temp("{ref_path}/{species}_{build}_{release}/original_genome.fa")
+        "{ref_path}/{species}_{build}_{release}/genome.fa"
     output:
-        temp("{ref_path}/{species}_{build}_{release}/renamed_genome.fa")
+       temp("{ref_path}/{species}_{build}_{release}/renamed_genome.fa")
     params:
         species= lambda wildcards: wildcards.species
     shell:
@@ -70,14 +74,14 @@ rule merge_genomes:
     shell:
         """cat {input.genome1} {input.genome2} > {output}"""
 
-rule merge_annotation:
+rule merge_annotations:
     input:
-        annotation1=expand("{ref_path}/{species}_{build}_{release}/original_annotation.gtf",
+        annotation1=expand("{ref_path}/{species}_{build}_{release}/annotation.gtf",
             species=species_list[0],
             build=build_list[0],
             release=release_list[0],
             ref_path=config['META']['reference-directory']),
-        annotation2=expand("{ref_path}/{species}_{build}_{release}/original_annotation.gtf",
+        annotation2=expand("{ref_path}/{species}_{build}_{release}/annotation.gtf",
             species=species_list[1],
             build=build_list[1],
             release=release_list[1],
@@ -118,3 +122,5 @@ rule merge_annotation:
                     for line in annotation2:
                         if(not line.startswith('#!')):
                             outfile.write(re.sub('^',species_list[1],line))
+
+
