@@ -7,10 +7,10 @@ import glob
 # Load configuration files
 
 try:
-    configfile: config['configfile']
+    configfile_path = config['configfile_path']
 except:
-    configfile: "config.yaml"    
-
+    configfile_path = "config.yaml"    
+configfile: configfile_path
 
 
 #Include the gtf biotypes yaml
@@ -240,6 +240,9 @@ rule merge:
                 results_dir=results_dir,
                 type=types)
         
+rule make_report:
+    input:
+        expand('{results_dir}/reports/publication_text.html', results_dir=results_dir)
 
 if len(config['META']['species'].keys()) == 2:
     include: "rules/download_meta_mixed.smk"
@@ -255,3 +258,4 @@ include: "rules/extract_expression_single.smk"
 include: "rules/split_species.smk"
 include: "rules/extract_expression_species.smk"
 include: "rules/merge.smk"
+include: "rules/report.smk"
