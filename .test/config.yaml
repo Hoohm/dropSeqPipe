@@ -6,7 +6,6 @@ LOCAL:
     memory: 4g
     raw_data: data
     results: results
-    gtf_biotypes: gtf_biotypes.yaml
 META:
     species:
         mus_musculus:
@@ -14,6 +13,7 @@ META:
             release: 91
     ratio: 0.2
     reference-directory: data/ref
+    gtf_biotypes: gtf_biotypes.yaml
 
 FILTER:
     barcode_whitelist: ''
