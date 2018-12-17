@@ -1,17 +1,22 @@
+CONTACT:
+  email: user.name@provider.com
+  person: John Doe
 LOCAL:
     temp-directory: /tmp
-    dropseq-wrapper: data/Drop-seq_tools-1.13/drop-seq-tools-wrapper.sh
     memory: 4g
+    raw_data: data
+    results: results
+    gtf_biotypes: gtf_biotypes.yaml
 META:
-    mixed: False
     species:
-        - SPECIES_ONE
-        - SPECIES_TWO
+        mus_musculus:
+            build: 38
+            release: 91
     ratio: 0.2
-    reference-file: genome.chr19.fa
-    annotation-file: annotation.chr19.gtf
     reference-directory: data/ref
+
 FILTER:
+    barcode_whitelist: ''
     5-prime-smart-adapter: CCTACACGACGCTCTTCCGATCT
     cell-barcode:
         start: 2

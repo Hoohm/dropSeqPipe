@@ -21,7 +21,7 @@ ref_path = config['META']['reference-directory']
 barcode_whitelist = config['FILTER']['barcode_whitelist']
 results_dir = config['LOCAL']['results']
 raw_data_dir = config['LOCAL']['raw_data']
-
+config['version'] = '2.0'
 # In order to deal with single species or mixed species experiment
 # we define the same variables for each case.
 

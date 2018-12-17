@@ -33,18 +33,18 @@ umi_distance=snakemake@config$EXTRACTION$`UMI-edit-distance`
 
 Pipeline
 --------------------------
-We used dropSeqPipe v2.0 to process all the raw data. Unmentioned parameters that were used for all steps are provided in the configuration yaml file on the repository GSEXXXX. Rerunning the pipeline can easily be done by following the instructions at this address: https://hoohm.github.io/dropSeqPipe/
+Data was processed using dropSeqPipe `r paste0('v',snakemake@config$version)`. Parameters that were used are provided in the configuration file on the repository XXXXXX. Rerunning the pipeline can easily be done by following the instructions at this address: https://hoohm.github.io/dropSeqPipe/
 
 Trimming and filtering
 --------------------------
-For trimming we used cutadapt `r paste0('v',versions[['cutadapt']])`. Trimming and filtering was done on both fastq files separatly. Reads with a missing pairs were discarded using bbmap `r paste0('v',versions[['bbmap']])`.
+Read trimming and filtering was performed with cutadapt `r paste0('v',versions[['cutadapt']])` on both fastq files separatly. Reads with a missing pairs were discarded using bbmap `r paste0('v',versions[['bbmap']])`.
 
 
 Mapping
 --------------------------
-For mapping we used STAR `r paste0('v',versions[['star']])`. Multimapped reads were discarded. We used release number `r paste0(snakemake@config$META$species[[1]]$release)` and build `r paste0(snakemake@config$META$species[[1]]$build)` from `r paste0(names(snakemake@config$META$species)[1])` downloaded from ensembl.
+Mapping was performed with STAR `r paste0('v',versions[['star']])`. Multimapped reads were discarded. Annotation release number #`r paste0(snakemake@config$META$species[[1]]$release)` and genome build #`r paste0(snakemake@config$META$species[[1]]$build)`  for `r paste0(names(snakemake@config$META$species)[1])` were downloaded from ensembl.
 
 
 Barcodes
 --------------------------
-Demultiplexing as well as file manipulation for single cell have been processed using dropseq_tools `r paste0('v',versions[['dropseq_tools']])`. We used a distance of 1 base for cell barcode and `r paste0(umi_distance)` for umi barcodes.
+Demultiplexing as well as file manipulation have been performed using dropseq_tools `r paste0('v',versions[['dropseq_tools']])`. We used a distance of 1 base for cell barcode and `r paste0(umi_distance)` for umi barcodes.
