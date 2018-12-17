@@ -1,7 +1,8 @@
 """Extract expression fof mixed species"""
 
 #Which rules will be run on the host computer and not sent to nodes
-localrules: plot_rna_metrics_species, merge_umi_species, merge_counts_species
+localrules:
+	plot_rna_metrics_species
 
 rule extract_umi_expression_species:
 	input:
@@ -78,26 +79,3 @@ rule plot_rna_metrics_species:
 		pdf='{results_dir}/plots/rna_metrics/{sample}_{species}_rna_metrics.pdf'
 	script:
 		'../scripts/plot_rna_metrics.R'
-
-
-rule merge_umi_species:
-	input:
-		expand('{results_dir}/samples/{sample}/{{species}}/umi_expression_matrix.txt', sample=samples.index, results_dir=results_dir)
-	conda: '../envs/merge.yaml'
-	output:
-		'{results_dir}/summary/Experiment_{species}_umi_expression_matrix.tsv'
-	params:
-		sample_names=lambda wildcards: samples.index
-	script:
-		"../scripts/merge_counts.R"
-
-rule merge_counts_species:
-	input:
-		expand('{results_dir}/samples/{sample}/{{species}}/counts_expression_matrix.txt', sample=samples.index, results_dir=results_dir)
-	conda: '../envs/merge.yaml'
-	output:
-		'{results_dir}/summary/Experiment_{species}_counts_expression_matrix.tsv'
-	params:
-		sample_names=lambda wildcards: samples.index
-	script:
-		"../scripts/merge_counts.R"

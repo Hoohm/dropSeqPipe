@@ -1,9 +1,12 @@
 from snakemake.remote.FTP import RemoteProvider as FTPRemoteProvider
 FTP = FTPRemoteProvider()
 
-ruleorder: merge_genomes > download_genome
-ruleorder: merge_annotations > download_annotation
-
+localrules:
+    download_annotation,
+    download_genome,
+    rename_genome,
+    merge_genomes,
+    merge_annotations
 
 def get_annotation(wildcards):
     return FTP.remote("ftp.ensembl.org/pub/release-{0}/gtf/{1}/{2}.GRC{3}{4}.{0}.gtf.gz".format(

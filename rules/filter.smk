@@ -2,7 +2,12 @@
 
 
 #Which rules will be run on the host computer and not sent to nodes
-localrules: clean_cutadapt, plot_adapter_content, multiqc_cutadapt_barcodes, multiqc_cutadapt_RNA, detect_barcodes
+localrules:
+	clean_cutadapt,
+	plot_adapter_content,
+	multiqc_cutadapt_barcodes,
+	multiqc_cutadapt_RNA,
+	detect_barcodes
 
 
 rule cutadapt_R1:

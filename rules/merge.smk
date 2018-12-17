@@ -1,5 +1,7 @@
 
-localrules: convert_long_to_mtx, merge_long, violine_plots
+localrules:
+	merge_long,
+	violine_plots
 
 rule merge_long:
     input:

@@ -2,7 +2,10 @@
 
 
 #Which rules will be run on the host computer and not sent to nodes
-localrules: multiqc_star, plot_yield, plot_knee_plot
+localrules:
+	multiqc_star,
+	plot_yield,
+	plot_knee_plot
 
 
 rule STAR_align:

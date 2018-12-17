@@ -1,7 +1,9 @@
 """Extract expression fof single species"""
 
 #Which rules will be run on the host computer and not sent to nodes
-localrules: plot_rna_metrics
+localrules:
+	plot_rna_metrics,
+	convert_long_to_mtx
 
 rule extract_umi_expression:
     input:
@@ -57,13 +59,6 @@ rule extract_reads_expression:
         MIN_BC_READ_THRESHOLD={params.count_per_umi}\
         CELL_BC_FILE={input.barcode_whitelist}"""
 
-rule rny_velocity:
-    input:
-        '{results_dir}/samples/{sample}/final.bam'
-    output:
-        '{results_dir}/samples/{sample}/test.txt'
-    shell:
-        """velocyto run10x -m repeat_msk.gtf mypath/sample01 somepath/refdata-cellranger-mm10-1.2.0/genes/genes.gtf"""
 
 rule SingleCellRnaSeqMetricsCollector:
     input:

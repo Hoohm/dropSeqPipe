@@ -1,17 +1,14 @@
-
-
-
 import math
 import platform
 """Generate all the meta data files"""
 
 #Which rules will be run on the host computer and not sent to nodes
-# localrules:
-#     create_dict,
-#     reduce_gtf,
-#     create_refFlat,
-#     create_intervals,
-#     curate_annotation
+localrules:
+     create_dict,
+     reduce_gtf,
+     create_refFlat,
+     create_intervals,
+     curate_annotation
 
 
 rule curate_annotation:
@@ -160,14 +157,3 @@ rule create_star_index:
         --sjdbOverhang {params.sjdbOverhang}\
         --genomeChrBinNbits {params.genomeChrBinNbits}
         """
-
-# rule create_salmon_index:
-#   input:
-#       fa=reference_file
-#   params:
-#       reference_directory=config['META']['reference-directory']
-#   output:
-#       '{salmon_index}'
-#   conda: '../envs/salmon.yaml'
-#   shell:
-#       """salmon index -t {input.fa} -i {output} --type quasi -k 31"""

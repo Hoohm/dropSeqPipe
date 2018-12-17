@@ -1,7 +1,9 @@
 """Get fastqc reports"""
 
 #Which rules will be run on the host computer and not sent to nodes
-localrules: multiqc_fastqc_reads, multiqc_fastqc_barcodes
+localrules:
+	multiqc_fastqc_reads,
+	multiqc_fastqc_barcodes
 
 rule fastqc_barcodes:
 	"""Create fastqc report"""

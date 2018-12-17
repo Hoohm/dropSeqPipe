@@ -52,7 +52,7 @@ rule plot_barnyard:
 	output: 
 		genes_pdf='{results_dir}/plots/barnyard/{sample}_genes.pdf',
 		transcripts_pdf='{results_dir}/plots/barnyard/{sample}_transcripts.pdf',
-		barcodes_species=expand('{{results_dir}}samples/{{sample}}/{species}/barcodes.csv', species=species_list)
+		barcodes_species=expand('{{results_dir}}/samples/{{sample}}/{species}/barcodes.csv', species=species_list)
 	params:
 		expected_cells=lambda wildcards: int(samples.loc[wildcards.sample,'expected_cells'])
 	script: 

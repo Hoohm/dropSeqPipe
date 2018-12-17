@@ -1,7 +1,25 @@
 
 
-ruleorder: extend_barcode_whitelist > get_top_barcodes
-localrules: extend_barcode_whitelist, extend_barcode_top
+ruleorder: extend_barcode_whitelist > extend_barcode_top
+ruleorder: extend_barcode_whitelist > get_cell_whitelist
+
+
+localrules:
+	get_cell_whitelist,
+	extend_barcode_whitelist,
+	extend_barcode_top
+
+print(barcode_whitelist)
+rule extend_barcode_whitelist:
+	input:
+		whitelist=barcode_whitelist
+	output:
+		barcodes='{results_dir}/samples/{sample}/barcodes.csv',
+		barcode_ref='{results_dir}/samples/{sample}/barcode_ref.pkl',
+		barcode_ext_ref='{results_dir}/samples/{sample}/barcode_ext_ref.pkl',
+		barcode_mapping='{results_dir}/samples/{sample}/empty_barcode_mapping.pkl'
+	script:
+		'../scripts/generate_extended_ref.py'
 
 rule get_top_barcodes:
 	input:
@@ -21,25 +39,13 @@ rule get_top_barcodes:
 		--set-cell-number={params.num_cells}\
 		--log2stderr > {output}"""
 
-rule get_cell_whitlist:
+rule get_cell_whitelist:
 	input:
 		'{results_dir}/samples/{sample}/top_barcodes.csv'
 	output:
 		'{results_dir}/samples/{sample}/barcodes.csv'
 	shell:
 		"""cat {input} | cut -f 1 > {output}"""
-
-rule extend_barcode_whitelist:
-	input:
-		whitelist='barcodes.csv'
-	output:
-		barcodes='{results_dir}/samples/{sample}/barcodes.csv',
-		barcode_ref='{results_dir}/samples/{sample}/barcode_ref.pkl',
-		barcode_ext_ref='{results_dir}/samples/{sample}/barcode_ext_ref.pkl',
-		barcode_mapping='{results_dir}/samples/{sample}/empty_barcode_mapping.pkl'
-	script:
-		'../scripts/generate_extended_ref.py'
-
 
 
 rule extend_barcode_top:
