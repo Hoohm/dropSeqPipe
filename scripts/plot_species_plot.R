@@ -123,10 +123,8 @@ df=categorizeCellsUsingKneeKnownNumCellsPaper(digitalExpressionFileO1,
                                               point.cex= 1,
                                               category = 'transcripts')
 dev.off()
-print(df)
 organism1 = subset(df, df$organism == organismOne)
 organism2 = subset(df, df$organism == organismTwo)
-print(organism1)
 
 write.table(organism1$tag, snakemake@output$barcodes_species[1], row.names=F, col.names=F, quote=F)
 write.table(organism2$tag, snakemake@output$barcodes_species[2], row.names=F, col.names=F, quote=F)
