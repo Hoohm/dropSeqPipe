@@ -4,4 +4,4 @@ channels:
   - defaults
 dependencies:
   - python>=3.3
-  - cutadapt==1.16
+  - cutadapt=1.16

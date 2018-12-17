@@ -1,0 +1,50 @@
+---
+title: "Publication_text"
+output: html_document
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+---
+
+```{r libraries, message=FALSE, warning=FALSE, include=FALSE}
+library(yaml)
+```
+
+```{r load_yaml, message=FALSE, warning=FALSE, include=FALSE, paged.print=FALSE}
+versions = list()
+for (yaml_file in snakemake@input$yaml_files){
+  current_env = yaml.load_file(yaml_file)
+  for (package in current_env$dependencies){
+    if(grepl(pattern = 'cutadapt', package)){
+      versions[['cutadapt']] = strsplit(package,'=|==| ==| == ')[[1]][2]
+    }
+    else if(grepl(pattern = 'star', package)){
+      versions[['star']] = strsplit(package,'=|==| ==| == ')[[1]][2]
+    }
+    else if(grepl(pattern = 'dropseq_tools', package)){
+      versions[['dropseq_tools']] = strsplit(package,'=|==| ==| == ')[[1]][2]
+    }
+    else if(grepl(pattern = 'bbmap', package)){
+      versions[['bbmap']] = strsplit(package,'=|==| ==| == ')[[1]][2]
+    }
+  }
+}
+
+umi_distance=snakemake@config$EXTRACTION$`UMI-edit-distance`
+```
+
+Pipeline
+--------------------------
+Data was processed using dropSeqPipe `r paste0('v',snakemake@config$version)`. Parameters that were used are provided in the configuration file on the repository XXXXXX. Rerunning the pipeline can easily be done by following the instructions at this address: https://hoohm.github.io/dropSeqPipe/
+
+Trimming and filtering
+--------------------------
+Read trimming and filtering was performed with cutadapt `r paste0('v',versions[['cutadapt']])` on both fastq files separatly. Reads with a missing pairs were discarded using bbmap `r paste0('v',versions[['bbmap']])`.
+
+
+Mapping
+--------------------------
+Mapping was performed with STAR `r paste0('v',versions[['star']])`. Multimapped reads were discarded. Annotation release number #`r paste0(snakemake@config$META$species[[1]]$release)` and genome build #`r paste0(snakemake@config$META$species[[1]]$build)`  for `r paste0(names(snakemake@config$META$species)[1])` were downloaded from ensembl.
+
+
+Barcodes
+--------------------------
+Demultiplexing as well as file manipulation have been performed using dropseq_tools `r paste0('v',versions[['dropseq_tools']])`. We used a distance of 1 base for cell barcode and `r paste0(umi_distance)` for umi barcodes.
