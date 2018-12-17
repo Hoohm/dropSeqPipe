@@ -20,7 +20,7 @@ rule violine_plots:
     input:
         UMIs='{results_dir}/summary/umi/expression.mtx',
         counts='{results_dir}/summary/reads/expression.mtx',
-        design='config/samples.csv'
+        design='samples.csv'
     conda: '../envs/plots_ext.yaml'
     output:
         pdf_violine='{results_dir}/plots/violinplots_comparison_UMI.pdf',
