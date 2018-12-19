@@ -15,7 +15,7 @@ rule split_bam_species:
         temp_directory=config['LOCAL']['temp-directory']
     conda: '../envs/dropseq_tools.yaml'
     shell:
-        """export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && FilterBAM -m {params.memory}\
+        """export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && FilterBam -m {params.memory}\
         REF_SOFT_MATCHED_RETAINED={params.species}\
         INPUT={input}\
         OUTPUT={output}"""
