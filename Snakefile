@@ -105,6 +105,7 @@ if len(config['META']['species'].keys()) == 2:
                 '{results_dir}/plots/adapter_content.pdf',
                 '{results_dir}/reports/barcode_filtering.html',
                 '{results_dir}/reports/RNA_filtering.html',
+                '{results_dir}/samples/{sample}/trimmmed_repaired_R1.fastq.gz',
                 #mapping
                 '{results_dir}/plots/knee_plots/{sample}_knee_plot.pdf',
                 '{results_dir}/reports/star.html',
