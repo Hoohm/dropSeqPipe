@@ -9,7 +9,6 @@ localrules:
     extend_barcode_whitelist,
     extend_barcode_top
 
-print(barcode_whitelist)
 rule extend_barcode_whitelist:
     input:
         whitelist=barcode_whitelist

@@ -65,12 +65,12 @@ else:
 
 # Get sample names from samples.csv
 samples = pd.read_table("samples.csv", header=0, sep=',', index_col=0)
-types=['reads','umi']
+types=['read','umi']
 # Get read_lengths from samples.csv
 read_lengths = list(samples.loc[:,'read_length'])
 
 wildcard_constraints:
-    sample="({})".format("|".join(samples.index)),
+    sample="({})".format("|".join(samples.index))
 
 
 # Flexible ways to get the R1 and R2 files
@@ -119,8 +119,8 @@ if len(config['META']['species'].keys()) == 2:
                     release=release,
                     species=species),
             expand(
-                ['{results_dir}/samples/{sample}/{species}/umi_expression_matrix.txt',
-                '{results_dir}/samples/{sample}/{species}/counts_expression_matrix.txt',
+                ['{results_dir}/samples/{sample}/{species}/umi/expression.mtx',
+                '{results_dir}/samples/{sample}/{species}/read/expression.mtx',
                 '{results_dir}/plots/rna_metrics/{sample}_{species}_rna_metrics.pdf'],
                 results_dir=results_dir,
                 sample=samples.index,

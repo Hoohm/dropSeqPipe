@@ -9,37 +9,69 @@ rule extract_umi_expression_species:
         data='{results_dir}/samples/{sample}/{species}/unfiltered.bam',
         barcode_whitelist='{results_dir}/samples/{sample}/{species}/barcodes.csv'
     output:
-        '{results_dir}/samples/{sample}/{species}/umi_expression_matrix.txt'
+        dense=temp('{results_dir}/samples/{sample}/{species}/umi/expression.txt'),
+        long='{results_dir}/samples/{sample}/{species}/umi/expression.long'
     params:
-        count_per_umi=config['EXTRACTION']['minimum-counts-per-UMI'],   
+        count_per_umi=config['EXTRACTION']['minimum-counts-per-UMI'],
+        num_cells=lambda wildcards: int(samples.loc[wildcards.sample,'expected_cells']),
+        umiBarcodeEditDistance=config['EXTRACTION']['UMI-edit-distance'],
+        temp_directory=config['LOCAL']['temp-directory'],
         memory=config['LOCAL']['memory'],
-        temp_directory=config['LOCAL']['temp-directory']
+        locus_list=','.join(config['EXTRACTION']['LOCUS']),
+        strand_strategy=config['EXTRACTION']['strand-strategy']
     conda: '../envs/dropseq_tools.yaml'
     shell:
         """export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && DigitalExpression -m {params.memory}\
         I={input.data}\
-        O={output}\
+        O={output.dense}\
+        EDIT_DISTANCE={params.umiBarcodeEditDistance}\
+        OUTPUT_LONG_FORMAT={output.long}\
+        STRAND_STRATEGY={params.strand_strategy}\
+        OUTPUT_READS_INSTEAD=false\
+        LOCUS_FUNCTION_LIST={{{params.locus_list}}}\
         MIN_BC_READ_THRESHOLD={params.count_per_umi}\
         CELL_BC_FILE={input.barcode_whitelist}"""
+
 
 rule extract_reads_expression_species:
     input:
         data='{results_dir}/samples/{sample}/{species}/unfiltered.bam',
         barcode_whitelist='{results_dir}/samples/{sample}/{species}/barcodes.csv'
     params:
+        count_per_umi=config['EXTRACTION']['minimum-counts-per-UMI'],
+        num_cells=lambda wildcards: int(samples.loc[wildcards.sample,'expected_cells']),
+        umiBarcodeEditDistance=config['EXTRACTION']['UMI-edit-distance'],
+        temp_directory=config['LOCAL']['temp-directory'],
         memory=config['LOCAL']['memory'],
-        temp_directory=config['LOCAL']['temp-directory']
+        locus_list=','.join(config['EXTRACTION']['LOCUS']),
+        strand_strategy=config['EXTRACTION']['strand-strategy']
     output:
-        '{results_dir}/samples/{sample}/{species}/counts_expression_matrix.txt'
+        dense=temp('{results_dir}/samples/{sample}/{species}/read/expression.txt'),
+        long='{results_dir}/samples/{sample}/{species}/read/expression.long'
     conda: '../envs/dropseq_tools.yaml'
     shell:
         """export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && DigitalExpression -m {params.memory}\
         I={input.data}\
-        O={output}\
-        CELL_BC_FILE={input.barcode_whitelist}\
-        OUTPUT_READS_INSTEAD=true"""
+        O={output.dense}\
+        EDIT_DISTANCE={params.umiBarcodeEditDistance}\
+        OUTPUT_LONG_FORMAT={output.long}\
+        STRAND_STRATEGY={params.strand_strategy}\
+        OUTPUT_READS_INSTEAD=true\
+        LOCUS_FUNCTION_LIST={{{params.locus_list}}}\
+        MIN_BC_READ_THRESHOLD={params.count_per_umi}\
+        CELL_BC_FILE={input.barcode_whitelist}"""
 
-
+rule convert_long_to_mtx_species:
+    input:
+        '{results_dir}/samples/{sample}/{species}/{type}/expression.long'
+    output:
+        barcodes='{results_dir}/samples/{sample}/{species}/{type}/barcodes.tsv',
+        features='{results_dir}/samples/{sample}/{species}/{type}/features.tsv',
+        mtx='{results_dir}/samples/{sample}/{species}/{type}/expression.mtx'
+    params:
+        samples=lambda wildcards: wildcards.sample
+    script:
+        "../scripts/convert_mtx.py"
 
 rule SingleCellRnaSeqMetricsCollector_species:
     input:

@@ -3,45 +3,37 @@ On of the main purpose of this package is getting information about your data to
 
 Here is a list of plots and reports that you will get from the pipeline.
 
-Fastqc, STAR and trimmomatic reports are now generated as [multiqc reports](http://multiqc.info/docs/#using-multiqc-reports) in the reports folder.
+Fastqc, STAR and cutadapt reports are generated as [multiqc reports](http://multiqc.info/docs/#using-multiqc-reports) in the reports folder.
 
 
-## 1. Knee plot (per sample)
+## 1. Adapter content
+![Adapter content](images/adapter_content.pdf)
+On the x axis are the samples.
+On the y axis are the percentages of total adapters that have been found (and trimmed) in respective fastq files based on the `adapter-file` provided via `config.yaml`.
+
+The top plot is for read1 and the bottom for read2.
+
+This plot provides an idea of the which adapter has been found and in which proportion in each sample.
+
+## 2. Yield (across samples)
+![Yield](images/yield.png)
+On the x axis are the samples.  
+TOP: On the y axis are the number of reads attributed to each category.
+BOTTOM: On the y axis are the percentage of attributed to each category.
+This plot gives you an overview of all the reads from your samples and how they are distributed in all the possible categories. The reads that are uniquely mapped ar the ones you will keep at the end for the UMI count matrix.
+
+## 3. Knee plot (per sample)
 ![Knee plot](images/sample1_knee_plot.png)
 On the x axis is the cumulative fraction of reads per STAMPS (captured cell).  
 On the y axis is the ordered STAMPS (based on total reads).
 This allows you to determine how much of the reads you actually captured with the number of cells you expected.
 The cutting is based on the `expected_cells` parameter in the `samples.csv` file.
+The green `selected cells` are the cells that are going to be in the final expression matrix.
 If you see a clear bend on the plot that is higher in the number of cells than what you expected, you should increase the `expected_cells` value and rerun the `extract` step. If it is under, I would advise to filter out your data with a downstream analysis tool such as Seurat.
 *Note: I advise not to try to discover "real" cells/STAMPS at this stage. I suggest to extract the expected number of cells and filter out later in post-processing with other kind of meta data.* 
 
 
-## 2. Cell barcode Quality trim (per sample)
-![Cell barcode Quality trim](images/sample1_CELL_dropped.png)
-On the x axis are the number of failed bases in the cell barcodes.
-On the y axis are the number of cell barcodes.
-This plot allows you to adjust your filter of minimum quality and number of allowed minimum quality for the filtering process of the cell barcodes.
-
-## 3. UMI Quality trim (per sample)
-![UMI barcode Quality trim](images/sample1_UMI_dropped.png)
-On the x axis are the number of failed bases in the UMI barcode.
-On the y axis are the number of UMI barcodes.
-This plot allows you to adjust your filter of minimum quality and number of allowed minimum quality for the filtering process of the UMIs.
-
-## 4. PolyA trimming of reads (per sample)
-![PolyA trim](images/sample1_polya_trimmed.png)
-On the x axis are the length of the trimmed polyA  
-On the y axis are the number of trimmed polyA.  
-This plot shows you the distribution of the polyA trimming step.
-
-## 5. SMART adapter trimming of reads (per sample)
-![SMART adapter trimming](images/sample1_start_trim.png)
-On the x axis are the length of the trimmed SMART adapter  
-On the y axis are the number of trimmed SMART adapter.  
-This plot shows you the distribution of the SMART adapter trimming step.
-
-
-## 6. RNA metrics (per sample)
+## 4. RNA metrics (per sample)
 ![RNA metrics](images/sample1_rna_metrics.png)
 On the x axis are top barcodes based on your `expected_cells` values or the `barcodes.csv` file.  
 Top plot: On the y axis are the number of bases classified by region of mapping.  
@@ -49,21 +41,9 @@ Bottom plot: On the y axis are the percentage of bases classified by region of m
 This plot gives a lot of different informations. The top plot allows you to quickly compare cells between them in terms of how much has been mapped. This can sometimes help identify outliers or bad runs.
 The bottom plot allows you to find cells that have an "abnormal" mapped base distribution compared to other cells.
 
-## 7. Cell and UMI dropped Barcodes (across samples)
-![BC quality dropped](images/BC_drop.png)
-On the x axis are the samples.  
-TOP: On the y axis are the number of reads discarded.  
-BOTTOM: On the y axis are the percentage of reads discarded.  
-This plot allows you to adjust your filter of minimum quality and number of allowed minimum quality for the filtering process of the UMIs. The `Not_dropped` category is going to be mapped in STAR.
 
-## 8. Yield (across samples)
-![BC quality dropped](images/yield.png)
-On the x axis are the samples.  
-TOP: On the y axis are the number of reads attributed to each category.
-BOTTOM: On the y axis are the percentage of attributed to each category.
-This plot gives you an overview of all the reads from your samples and how they are distributed in all the possible categories. The reads that are uniquely mapped ar the ones you will keep at the end for the UMI count matrix.
 
-## 9. Violine plots for barcode properties (across samples)
+## 5. Violine plots for barcode properties (across samples)
 ![Violine plots](images/mac_violinplots_comparison_UMI.png)
 Various statistic for barcodes that were taken forward as STAMPs as set as `expected_cells` in `config.yaml`.
 Each point represents a barcode augmented by a violine-plot density estimator of barcode distribution along the y-axis.
@@ -83,7 +63,7 @@ BOTTOM:
 - pct.Ribo: Fraction of ribosomal RNA (Note: ribsomal transcripts defined as starting with "^Rpl")
 - pct.mito: Fraction of mitochondrial RNA (Note: mitchondrial transcripts defined as starting with "^mt-")
 
-## 10. Saturation plot: UMI per barcode (across samples)
+## 6. Saturation plot: UMI per barcode (across samples)
 ![umi per barcode](images/mac_UMI_vs_gene.png)
 Number of UMI (x-axis) vs number of Genes (y-axis) for each barcode (points in plot) broken down by sample (different colors). 
 Number of Genes defined as Genes having at least 1 read mapped to them.
@@ -93,14 +73,14 @@ Various statistic for barcodes that were taken forward as STAMPs as set as `expe
 This plot can indicate how many counts per barcode are required on average to find all expressed genes in a cell.
 Given enought coverage, it can also indicate how many genes are expressed for the examined cell type.
 
-## 11 Saturation plot: Counts per barcode (across samples)
+## 7. Saturation plot: Counts per barcode (across samples)
 ![counts per barcode](images/mac_Count_vs_gene.png)
 Number of Counts (x-axis) vs number of Genes (y-axis) for each barcode (points in plot) broken down by sample (different colors). 
 Number of Genes defined as Genes having at least 1 read mapped to them.
 Individual samples are color-coded. A loess regression curve of barcodes for each sample is fitted. 
 Various statistic for barcodes that were taken forward as STAMPs as set as `expected_cells` in `config.yaml`.
 
-## 12 Counts per UMI per barcode (across samples)
+## 8. Counts per UMI per barcode (across samples)
 ![counts per UMI](images/mac_UMI_vs_counts.png)
 Number of UMI (x-axis) vs number of Counts (y-axis) for each barcode (points in plot) broken down by sample (different colors). 
 Individual samples are color-coded. A loess regression curve of barcodes for each sample is fitted. 
@@ -110,7 +90,7 @@ This plots can give an indication on the level of duplication for each sample. T
 
 # Mixed experiment
 
-## 10. Barnyard plot (per sample)
+## 9. Barnyard plot (per sample)
 ![Barnyard plot](images/hum_mus_species_plot_transcripts.png)
 This plot shows you species purity for each STAMPS. Mixed and No call STAMPS are dropped and only single species are kept for extraction.
 You can change the minimum ratio of transcripts to define a STAMP as mixed or not in the configfile with: `species_ratio`

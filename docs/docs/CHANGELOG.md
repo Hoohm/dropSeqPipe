@@ -4,9 +4,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.4] - 2018-12-19
+### Added
+- Top barcode detection using [umi-tools](https://github.com/CGATOxford/UMI-tools) based on number of expected cells.
+- Genome reference and annotation automatically downloaded now base on build and release number from configuration file.
+- On the fly detection of mixed experiment.
+- **beta**: Generation of a report for publication describing tools used in each steps. run `make_report` after the preprocessing is done to get `reports/publication_text.html`. This is a really early stage. Feel free to suggest PR for text modifications.
+- Raw data, results, reference are now independent from the working dir and can be chosen via the configuration file.
+- dropseq_tools v2.0 implemented. This opens up new options such as choosing which locus to use for gene counting. See configuration file.
+- Possibility to edit which biotypes are selected from the annotation file via a gtf_biotypes.yaml file provided.
+- Cell barcodes are now corrected. One hamming distance for known/given whitelists, graphbased correction based on umi-tools for unknown lists. Those corrections are written in the bam files. This makes final bam files compatible for other tools using the XC/XM bam TAGS.
+- UMI are now also corrected based on dropseq_tools v2.0.
+- Possibility to choose SENSE, ANTISENSE or BOTH for read counting.
+- Adapter content for R1 and R2 have now their own plot, `adapter_content.pdf`.
+- New plot called `yield.pdf` makes a summary of total reads and how they are distributed among filtered, trimmed, mapped, etc.
+- Configuration file has now a CONTACT section providing a field for a person and a contact e-mail address.
+
+### Changed
+- Expression matrices output are now sparse (mtx format). This will decrease the size of the output and loading time for downstream analysis.
+- Logfiles, plots and samples output are now grouped together in folders by category. This should make browsing results easier.
+- Fixed most of the packages versions.
+- Summary plots and Seurat object are now in the `all` rule and will be created by default.
+
+### Removed
+- Merging of species expression accross samples. Since the mixed experiments are mostly used to test out the doublet rate of a platform and not for downstream analysis, this last part has not been updated. Single expression matrices are still there.
+- Cell barcodes dropped, umi barcodes dropped, starttrim and polyA trim plots are now gone. BC_drop is also removed. Replacements are adapter_content and yield plots.
+
+
 ## [0.32]
 ### Added
-- Documentation generated from the markdown files directly on travis-ci
+- Documentation generated from the markdown files directly on travis-ci.
 
 
 ## [0.31a]
