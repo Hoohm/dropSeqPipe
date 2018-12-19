@@ -27,6 +27,16 @@
   <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
   <script>hljs.initHighlightingOnLoad();</script> 
   
+  <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-128943644-1', 'auto');
+      ga('send', 'pageview');
+  </script>
+  
 </head>
 
 <body class="wy-body-for-nav" role="document">
@@ -75,6 +85,11 @@
           
             <li class="toctree-l1">
 		
+    <a class="" href="../Clusters/">Clusters</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
     <a class="" href="../Plots/">Plots</a>
 	    </li>
           
@@ -86,6 +101,8 @@
     <li class="toctree-l2"><a href="#change-log">Change Log</a></li>
     
         <ul>
+        
+            <li><a class="toctree-l3" href="#04-2018-12-19">[0.4] - 2018-12-19</a></li>
         
             <li><a class="toctree-l3" href="#032">[0.32]</a></li>
         
@@ -159,28 +176,57 @@
 <p>All notable changes to this project will be documented in this file.</p>
 <p>The format is based on <a href="http://keepachangelog.com/">Keep a Changelog</a>
 and this project adheres to <a href="http://semver.org/">Semantic Versioning</a>.</p>
-<h2 id="032">[0.32]</h2>
+<h2 id="04-2018-12-19">[0.4] - 2018-12-19</h2>
 <h3 id="added">Added</h3>
 <ul>
-<li>Documentation generated from the markdown files directly on travis-ci</li>
+<li>Top barcode detection using <a href="https://github.com/CGATOxford/UMI-tools">umi-tools</a> based on number of expected cells.</li>
+<li>Genome reference and annotation automatically downloaded now base on build and release number from configuration file.</li>
+<li>On the fly detection of mixed experiment.</li>
+<li><strong>beta</strong>: Generation of a report for publication describing tools used in each steps. run <code>make_report</code> after the preprocessing is done to get <code>reports/publication_text.html</code>. This is a really early stage. Feel free to suggest PR for text modifications.</li>
+<li>Raw data, results, reference are now independent from the working dir and can be chosen via the configuration file.</li>
+<li>dropseq_tools v2.0 implemented. This opens up new options such as choosing which locus to use for gene counting. See configuration file.</li>
+<li>Possibility to edit which biotypes are selected from the annotation file via a gtf_biotypes.yaml file provided.</li>
+<li>Cell barcodes are now corrected. One hamming distance for known/given whitelists, graphbased correction based on umi-tools for unknown lists. Those corrections are written in the bam files. This makes final bam files compatible for other tools using the XC/XM bam TAGS.</li>
+<li>UMI are now also corrected based on dropseq_tools v2.0.</li>
+<li>Possibility to choose SENSE, ANTISENSE or BOTH for read counting.</li>
+<li>Adapter content for R1 and R2 have now their own plot, <code>adapter_content.pdf</code>.</li>
+<li>New plot called <code>yield.pdf</code> makes a summary of total reads and how they are distributed among filtered, trimmed, mapped, etc.</li>
+<li>Configuration file has now a CONTACT section providing a field for a person and a contact e-mail address.</li>
+</ul>
+<h3 id="changed">Changed</h3>
+<ul>
+<li>Expression matrices output are now sparse (mtx format). This will decrease the size of the output and loading time for downstream analysis.</li>
+<li>Logfiles, plots and samples output are now grouped together in folders by category. This should make browsing results easier.</li>
+<li>Fixed most of the packages versions.</li>
+<li>Summary plots and Seurat object are now in the <code>all</code> rule and will be created by default.</li>
+</ul>
+<h3 id="removed">Removed</h3>
+<ul>
+<li>Merging of species expression accross samples. Since the mixed experiments are mostly used to test out the doublet rate of a platform and not for downstream analysis, this last part has not been updated. Single expression matrices are still there.</li>
+<li>Cell barcodes dropped, umi barcodes dropped, starttrim and polyA trim plots are now gone. BC_drop is also removed. Replacements are adapter_content and yield plots.</li>
+</ul>
+<h2 id="032">[0.32]</h2>
+<h3 id="added_1">Added</h3>
+<ul>
+<li>Documentation generated from the markdown files directly on travis-ci.</li>
 </ul>
 <h2 id="031a">[0.31a]</h2>
-<h3 id="changed">Changed</h3>
+<h3 id="changed_1">Changed</h3>
 <ul>
 <li>fix on species plot.</li>
 <li>fix on rule STAR_align adding now unmapped read to a fastq file.</li>
 </ul>
-<h3 id="added_1">Added</h3>
+<h3 id="added_2">Added</h3>
 <ul>
 <li>Added travis integration. The pipeline is now automatically getting tested when updated and when pull requests are proposed.</li>
 <li>There is now a small git submodule in .test which will provide a sampled file for testing the pipeline on travis-ci.</li>
 </ul>
-<h3 id="removed">Removed</h3>
+<h3 id="removed_1">Removed</h3>
 <ul>
 <li><code>environment.yaml</code> has been removed. Youjust have to install snakemake now instead of activating the env.</li>
 </ul>
 <h2 id="031">[0.31]</h2>
-<h3 id="changed_1">Changed</h3>
+<h3 id="changed_2">Changed</h3>
 <ul>
 <li>Fixed error for STAR index generation. It crashed saying it couldn't write in folder.</li>
 <li>Fixed a missing plot for plot_knee_plot_whitelist.</li>
@@ -193,7 +239,7 @@ and this project adheres to <a href="http://semver.org/">Semantic Versioning</a>
 <li>Updated all the envs to fix bugs.</li>
 <li>Fixed a bug where the mixed species would not run properly.</li>
 </ul>
-<h3 id="added_2">Added</h3>
+<h3 id="added_3">Added</h3>
 <ul>
 <li>Added ggpubr in environment.yaml file.</li>
 <li>Added a <code>templates</code> folder which will hold <code>config.yaml</code>, <code>samples.csv</code>, <code>cluster.yaml</code> as well as adapters files. This will also help cloning the repository without overwritting your own config.yaml file when updating the pipeline.</li>
@@ -204,12 +250,12 @@ and this project adheres to <a href="http://semver.org/">Semantic Versioning</a>
 <li>genomeChrBinNbits will be calculated automacially for STAR.</li>
 <li>Exposed all variables for trimmomatic in config.yaml under trimming.</li>
 </ul>
-<h3 id="removed_1">Removed</h3>
+<h3 id="removed_2">Removed</h3>
 <ul>
 <li>png plots have been removed. It was causing some issues on clusters with cairo. Usability is more important than png plots to me.</li>
 </ul>
 <h2 id="03">[0.3]</h2>
-<h3 id="changed_2">Changed</h3>
+<h3 id="changed_3">Changed</h3>
 <ul>
 <li>Complete overhaul of how the pipeline is organized to follow the structure proposed for snakemake-workflows. This will allow ease of deployement on any platform having conda installed. It will also help to run on clusters.</li>
 <li>The way to call the pipeline is now simplified. Changes are shown in the <a href="https://github.com/Hoohm/dropSeqPipe/wiki/">WIKI</a></li>
@@ -217,7 +263,7 @@ and this project adheres to <a href="http://semver.org/">Semantic Versioning</a>
 <li>Full compatibility with barcode whitelist. Makes it easier to use for SCRBseq protocols or whitelist from other source (UMI-tools).</li>
 <li>Modified cell and UMI drop plots in order to reflect the option chosen. See <a href="https://github.com/Hoohm/dropSeqPipe/wiki/Plots">plots</a></li>
 </ul>
-<h3 id="removed_2">Removed</h3>
+<h3 id="removed_3">Removed</h3>
 <ul>
 <li>Bulk sequencing compatiblity.</li>
 <li>Fastqc and STAR logs plots are removed and replaced by multiqc.</li>
@@ -225,18 +271,18 @@ and this project adheres to <a href="http://semver.org/">Semantic Versioning</a>
 <li><code>MinCellFraction</code> entry in config.yaml. This parameter wasn't adding much value and was confusing.</li>
 <li>Base frequency plot has been removed. This will come back with autodetermination of the STAMPS.</li>
 </ul>
-<h3 id="added_3">Added</h3>
+<h3 id="added_4">Added</h3>
 <ul>
 <li>Wrapper for Drop-seq tools. Makes it easier to switch temp folder and choose maximum memory heap.</li>
 <li>More parameters for STAR exposed. See <a href="https://github.com/Hoohm/dropSeqPipe/wiki/">WIKI</a></li>
 </ul>
 <h2 id="024">[0.24]</h2>
-<h3 id="changed_3">Changed</h3>
+<h3 id="changed_4">Changed</h3>
 <ul>
 <li>All the QCplots are now generated inside the snakefiles. No more <code>generate-plots</code> mode.</li>
 </ul>
 <h2 id="023a">[0.23a]</h2>
-<h3 id="changed_4">Changed</h3>
+<h3 id="changed_5">Changed</h3>
 <ul>
 <li>Will now allow you to run <code>generate-meta</code> without having a <code>config.yaml</code> file in the reference foder.</li>
 <li>Changed the code for Cell and UMI barcode quality drop (per sample and overall). There was an error in the code not givint the right amount of dropped reads. Updated the images on the wiki accordingly.</li>
@@ -244,12 +290,12 @@ and this project adheres to <a href="http://semver.org/">Semantic Versioning</a>
 <li>Big change in the mapping. From now on the STAR index will be done without a GTF file. This allows to change the overhang option on the fly for each sample based on the mean read length. This also opens up 2-pass mapping. You will have to regenerate your index for it to work.</li>
 <li>Changed <code>generate_meta</code> in order to fit the new STAR index without a GTF. You now have to give the path to the GTF file in the config.yaml</li>
 </ul>
-<h3 id="added_4">Added</h3>
+<h3 id="added_5">Added</h3>
 <ul>
 <li><code>min_count_per_umi</code> in the <code>config.yaml</code> to decide how many times a Gene - UMI has to be found to be counted as one.</li>
 </ul>
 <h2 id="023">[0.23]</h2>
-<h3 id="changed_5">Changed</h3>
+<h3 id="changed_6">Changed</h3>
 <ul>
 <li>pre_align steps will output a fastq.gz instead of a fastq file.</li>
 <li><code>fastqc.R</code> is now compatible with paired and single end data.</li>
@@ -261,7 +307,7 @@ and this project adheres to <a href="http://semver.org/">Semantic Versioning</a>
 <li>Moved part of the <code>README</code>to the wiki.</li>
 <li>Changed the name of the first expression matrix extracted before the species plot to <code>unfiltered_expression.</code></li>
 </ul>
-<h3 id="added_5">Added</h3>
+<h3 id="added_6">Added</h3>
 <ul>
 <li>You can now run Bulk Single or paired end RNAseq data.</li>
 <li>Started a wiki with a FAQ</li>
@@ -270,7 +316,7 @@ and this project adheres to <a href="http://semver.org/">Semantic Versioning</a>
 <li>New plot! BCDrop.pdf is a new plot showing you how many barcode and UMIs you dropped from the raw data before aligning. This helps to track how many samples you might loose because of low quality reads in the barcoding.</li>
 </ul>
 <h2 id="022">[0.22]</h2>
-<h3 id="changed_6">Changed</h3>
+<h3 id="changed_7">Changed</h3>
 <ul>
 <li>all <code>subprocess.call</code> replaced by <code>shell</code> from snakemake</li>
 <li>STAR aligner now not limited to 8 cores or threads but will use the maximum number provided in the local.yaml file</li>
@@ -280,7 +326,7 @@ and this project adheres to <a href="http://semver.org/">Semantic Versioning</a>
 <li>Fixed a bug where the amount of total reads on the knee-plot was overinflated.</li>
 <li>Changed <code>knee-plot</code> mode to <code>generate-plots</code>.</li>
 </ul>
-<h3 id="added_6">Added</h3>
+<h3 id="added_7">Added</h3>
 <ul>
 <li>Temp files have been added in the pipeline. You can turn this off by using the <code>--notemp</code> option</li>
 <li>fastqc mode now available. Generates fastqc reports plus summary plots</li>
@@ -290,24 +336,24 @@ and this project adheres to <a href="http://semver.org/">Semantic Versioning</a>
 <li>Added a new mode: generate_meta. This allows to create all the metadata files needed for the pipeline. You just need a folder with a genome.fa and an annotation.gtf</li>
 </ul>
 <h2 id="021">[0.21]</h2>
-<h3 id="added_7">Added</h3>
+<h3 id="added_8">Added</h3>
 <ul>
 <li>Changelog file to track changes</li>
 <li>--rerun option to force a rerun</li>
 <li>Multiple steps allowd now</li>
 </ul>
 <h2 id="02-2017-03-14">[0.2] - 2017-03-14</h2>
-<h3 id="changed_7">Changed</h3>
+<h3 id="changed_8">Changed</h3>
 <ul>
 <li>The pipeline is now a python package being called as an executable</li>
 <li>Went from json to yaml for config files</li>
 </ul>
-<h3 id="added_8">Added</h3>
+<h3 id="added_9">Added</h3>
 <ul>
 <li>setup.py and dependencies</li>
 <li>Species plot available</li>
 </ul>
-<h3 id="removed_3">Removed</h3>
+<h3 id="removed_4">Removed</h3>
 <ul>
 <li>primer handling, went to default: AAGCAGTGGTATCAACGCAGAGTAC</li>
 </ul>

@@ -27,6 +27,16 @@
   <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
   <script>hljs.initHighlightingOnLoad();</script> 
   
+  <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-128943644-1', 'auto');
+      ga('send', 'pageview');
+  </script>
+  
 </head>
 
 <body class="wy-body-for-nav" role="document">
@@ -92,6 +102,11 @@
           
             <li class="toctree-l1">
 		
+    <a class="" href="../Clusters/">Clusters</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
     <a class="" href="../Plots/">Plots</a>
 	    </li>
           
@@ -142,46 +157,52 @@
               
                 <h1 id="config-file-and-sample-file">Config file and sample file</h1>
 <hr />
-<p>In order to run the pipeline you will need to complete the config.yaml file and the samples.csv file. Both are located in the <code>templates</code> folder and should be moved to the root folder of the experiment.</p>
+<p>In order to run the pipeline you will need to complete the config.yaml file and the samples.csv file. Both are located in the <code>templates</code> folder , should be moved to the root folder of the experiment and filled in for missing entries before running the pipeline.</p>
+<p>The goal for this is to provide the config.yaml when you finally upload the data to a repository for a publication as well as the pipeline version. This provides other users to ability to rerun the processing from scratch exactly as you did. This is possible because snakemake will download and create the exact same environnment for each rule using the envs files provided with the pipeline.</p>
 <h2 id="1-configyaml-executables-system-and-experiment-parameters">1. config.yaml - Executables, system and experiment parameters</h2>
-<p>The config.yaml contains the paths to the the Drop-Seq tools wrapper, paths to references and parameters for each step of the pipeline.</p>
-<pre><code>    :*emp-directory: /path/to/temp/or/scratch/folder
-    r*q-wrapper: /path/to/drop-seq-tools-wrapper.sh
-memory: 4g
+<p>The config.yaml contains all the necessary parameters and paths for the pipeline.</p>
+<pre><code>CONTACT:
+  email: user.name@provider.com
+  person: John Doe
+LOCAL:
+    temp-directory: /tmp
+    memory: 4g
+    raw_data:
+    results:
 META:
-    *cies:
-    *   - SPECIES_ONE
-    *   - SPECIES_TWO
+    species:
+        SPECIES_ONE:
+            build: 
+            release:
+        SPECIES_TWO:
+            build: 
+            release:
     ratio: 0.2
-    reference-file: reference.fasta
-    annotation-file: annotation.gtf
-    reference-directory: /path/references/files/
+    reference-directory: 
+    gtf_biotypes: gtf_biotypes.yaml
 FILTER:
-    5-prime-smart-adapter: DEPENDS ON THE PROTOCOL
+    barcode_whitelist: ''
+    5-prime-smart-adapter:
     cell-barcode:
         start:
         end:
-        min-quality:
-        num-below-quality:
     UMI-barcode:
         start:
         end:
-        min-quality:
-        num-below-quality:
-    trimmomatic:
-        adapters-file: /path/to/adapters.fa
-        LEADING: 3
-        TRAILING: 3
-        SLIDINGWINDOW:
-            windowSize: 4
-            requiredQuality: 20
-        MINLEN: 20
-        ILLUMINACLIP:
-            seedMismatches: 2
-            palindromeClipThreshold: 30
-            simpleClipThreshold: 10
+    cutadapt:
+        adapters-file:
+        R1:
+            quality-filter: 20
+            maximum-Ns: 0
+            extra-params: ''
+        R2:
+            quality-filter: 20
+            minimum-adapters-overlap: 6
+            minimum-length: 15
+            extra-params: ''
 MAPPING:
     STAR:
+        genomeChrBinNbits: 18
         outFilterMismatchNmax: 10
         outFilterMismatchNoverLmax: 0.3
         outFilterMismatchNoverReadLmax: 1
@@ -189,56 +210,48 @@ MAPPING:
         outFilterMatchNminOverLread: 0.66
         outFilterScoreMinOverLread: 0.66
 EXTRACTION:
-    UMI-edit-distance:
-    minimum-counts-per-UMI:
-
-
+    LOCUS:
+        - CODING
+        - UTR
+    strand-strategy: SENSE
+    UMI-edit-distance: 1
+    minimum-counts-per-UMI: 0
 </code></pre>
 
 <p>Please note the "space" after the colon, is needed for the yaml to work.</p>
 <h2 id="subsections">Subsections</h2>
+<h3 id="contact">[CONTACT]</h3>
+<ul>
+<li><code>email</code> and <code>person</code> This is not requested. You can provide the e-mail and name address of the person who processed the data using this configuration. Ideally you should provide the config.yaml with the data repository to allow people to rerun the data using dropSeqPipe.</li>
+</ul>
 <h3 id="local">[LOCAL]</h3>
 <ul>
 <li><code>temp-directory</code> is the temp or scratch folder with enough space to keep temporary files.</li>
-<li><code>dropseq-wrapper</code> is the wrapper that will call all the drop-seq-tools executables.</li>
 <li><code>memory</code> is the maximum memory allocation pool for a Java Virtual Machine.</li>
+<li><code>raw_data</code> is the folder containing all your raw fastq.gz files.</li>
+<li><code>results</code> is the folder that will contain all the results of the pipeline.</li>
 </ul>
 <h3 id="meta">[META]</h3>
 <ul>
-<li><code>species</code> is the species used in the experiment. [Required for mixed species experiment]
-Ex:</li>
-</ul>
-<pre><code> species:
-    - MOUSE
-    - HUMAN
-</code></pre>
-
-<ul>
-<li>
-<p><code>ratio</code> is how much "contamination" from another species you allow to validate them as a species or mixed. 0.2 means you allow a maximum of 20% mixing.
-Note: Those species name must reflect names used in the genome.fasta</p>
-</li>
-<li>
-<p><code>reference-file</code> is the reference file of your genome (fasta).</p>
-</li>
-<li><code>annotation-file</code> is the gene annotation file (GTF).</li>
-<li><code>reference-folder</code> is the folder where both of these files are gonna be stored.</li>
+<li><code>species</code> is where you list the species of your samples. It can be a mixed experiment with two entries. </li>
+<li><code>SPECIES_ONE</code> can be for example: mus_musculus, homo_sapiens, etc... It has to be the name used on ensembl for automatic download to work.</li>
+<li><code>build</code> is the genome build number.</li>
+<li><code>release</code> is the annotation release number.</li>
+<li><code>SPECIES_TWO</code> can be your second species.</li>
+<li><code>ratio</code> is how much "contamination" from another species you allow to validate them as a species or mixed. 0.2 means you allow a maximum of 20% mixing.</li>
+<li><code>reference-directory</code> is where you want to store your references files.</li>
+<li><code>gtf_biotypes</code> is the gtf_biotypes.yaml file containing the selection of biotypes you want to keep for your gene to read attribution. Using less biotypes may decrease your multimapping counts.</li>
 </ul>
 <h3 id="filter">[FILTER]</h3>
 <ul>
+<li><code>barcode_whitelist</code> is the filename of your whitelist fi you have one. Well plate base protocols often have one.</li>
 <li><code>5-prime-smart-adapter</code> is the 5" smart adapter used in your protocol.</li>
-<li>
-<p><code>cell-barcode and UMI-barcode</code>: Is the section for cell/umi barcode filtering.</p>
-<ul>
+<li><code>cell-barcode and UMI-barcode</code>: Is the section for cell/umi barcode filtering.<ul>
 <li><code>start</code> is the first base position of your cell/umi barcode.</li>
-<li><code>end</code> is the last base position of your cell/umi barcode.</li>
-<li><code>min-quality</code> is the minimum quality filtering for bases in your cell barcodes or UMI to discard reads.</li>
-<li><code>num-below-quality</code> is the maximum bases under <code>min_quality</code>. A value of <code>0</code> means all reads that have more than 0 (1 or more) bases under <code>min-quality</code> in the cell/umi barcode are discarded.</li>
+<li><code>end</code> is the last base position of your cell/umi barcode.    </li>
 </ul>
 </li>
-<li>
-<p><code>trimmomatic</code>: Is the section for trimming.</p>
-</li>
+<li><code>cutadapt</code>: Is the section for trimming.</li>
 <li><code>adapters-file</code> is the file containing your list of adapters as fasta. you can choose between 6 files in the <code>templates</code> folder, add any sequence to existing files or provide your own custom one.<ul>
 <li>NexteraPE-PE.fa </li>
 <li>TruSeq2-PE.fa</li>
@@ -250,27 +263,20 @@ Provide the path to the file you want to use for trimming. If you want to add cu
 </ul>
 </li>
 </ul>
-<p>Example: <code>NexteraPE-PE.fa</code></p>
-<ul>
-<li><code>LEADING</code> (default:3) quality: Specifies the minimum quality required to keep a base.</li>
-<li><code>TRAILING</code> (default:3) quality: Specifies the minimum quality required to keep a base.</li>
-<li><code>SLIDINGWINDOW</code>: <ul>
-<li><code>windowSize</code> (default:4) specifies the number of bases to average across.</li>
-<li><code>requiredQuality</code> (default:20) specifies the average quality required.</li>
-</ul>
-</li>
-<li><code>MINLEN</code> (default:20) Specifies the minimum length of reads to be kept.</li>
-<li><code>ILLUMINACLIP</code>:<ul>
-<li><code>seedMismatches</code> (default:2) specifies the maximum mismatch count which will still allow a full match to be performed.</li>
-<li><code>palindromeClipThreshold</code> (default:30) specifies how accurate the match between the two 'adapter ligated' reads must be for PE palindrome read alignment.</li>
-<li><code>simpleClipThreshold</code> (default:10) specifies how accurate the match between any adapter etc. sequence must be against a read.
-All of the values for trimmomatic are the default ones. For details about trimmomatic parameters and what they do, please refer to the <a href="http://www.usadellab.org/cms/?page=trimmomatic">trimmomatic web page</a>.</li>
-</ul>
-</li>
-</ul>
+<p>Example: <code>NexteraPE-PE.fa</code>
+<em> <code>R1</code> lists the options for read1 (cell barcode and umi) filtering/trimming
+    * <code>quality-filter</code> is the minimum mean score of the sliding window for quality filtering.
+    * <code>maximum-Ns</code> how many Ns you allow in the cell barcode and umi barcode. By default it is one because we want to be able to collapse barcodes that have one mismatch.
+    * <code>extra-params</code> if you usually add extra paramters to cutadapt, you can do it here. </em>Only for experienced cutadapt users<em>.
+</em> <code>R2</code> lists the options for read2 (mRNA) filtering/trimming
+that have one mismatch.
+    * <code>maximum-length</code> is the maximum length of your mRNA read before alignement.
+    * <code>extra-params</code> if you usually add extra paramters to cutadapt, you can do it here. <em>Only for experienced cutadapt users</em>.
+For more information about trimming and filtering please visit the <a href="https://cutadapt.readthedocs.io/en/stable/guide.html">cutadapt</a> website.</p>
 <h3 id="mapping">[MAPPING]</h3>
 <ul>
 <li><code>STAR</code><ul>
+<li><code>genomeChrBinNbits</code> is a value used for index generation in STAR. The formula is min(18,int(log2(genomeLength/referenceNumber)))</li>
 <li><code>outFilterMismatchNmax</code> (default:10) is the maximum number of mismatches allowed.</li>
 <li><code>outFilterMismatchNoverLmax</code> (default:0.3) is the maximum ratio of mismatched bases that mapped.</li>
 <li><code>outFilterMismatchNoverReadLmax</code> (default:1.0) is the maximum ratio of mismatched bases of the whole read.</li>
@@ -283,8 +289,10 @@ All of the values for trimmomatic are the default ones. For details about trimmo
 <p>All of the values for STAR are the default ones. For details about STAR parameters and what they do, please refer to the <a href="https://github.com/alexdobin/STAR/tree/master/doc">STAR manual on git</a>.</p>
 <h3 id="extraction">[EXTRACTION]</h3>
 <ul>
+<li><code>LOCUS</code> are the overlapping regions that reads overlap and are counted in the final expression matrix. Possible values are <code>CODING</code>, <code>UTR</code>, <code>INTRON</code></li>
 <li><code>UMI-edit-distance</code> This is the maximum manhattan distance between two UMI barcode when extracting count matrices.</li>
 <li><code>min-count-per-umi</code> is the minimum UMI/Gene pair needed to be counted as one.</li>
+<li><code>strand-strategy</code> <code>SENSE</code> defines that you only count genes where the forward strand mapped to the forward region on the DNA. Other possibilities are <code>ANTISENSE</code> (only count reads that mapped on the opposite strand) or <code>BOTH</code> (count all).</li>
 </ul>
 <h1 id="2-samplescsv-samples-parameters">2. samples.csv - Samples parameters</h1>
 <p>This file holds the sample names, expected cell numbers and read length for each sample.
@@ -300,7 +308,9 @@ sample_name2,500,100,Batch2
 <li><code>batch</code> is the batch of your sample. If you are added new samples to the same experiment, this is typically a good place to add the main batch.</li>
 </ul>
 <p><code>Note:</code> You can add any other column you wish here, it won't affect the pipeline and you can use it later on in your analysis.</p>
-<p>Next step <a href="https://github.com/Hoohm/dropSeqPipe/wiki/Reference-Files">downloading the reference files</a></p>
+<p>Finally, you can now <a href="https://github.com/Hoohm/dropSeqPipe/wiki/Running-dropSeqPipe">run the pipeline</a></p>
+<p>or</p>
+<p>Create a <a href="https://github.com/Hoohm/dropSeqPipe/wiki/Reference-Files">custom reference</a></p>
               
             </div>
           </div>

@@ -27,6 +27,16 @@
   <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
   <script>hljs.initHighlightingOnLoad();</script> 
   
+  <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-128943644-1', 'auto');
+      ga('send', 'pageview');
+  </script>
+  
 </head>
 
 <body class="wy-body-for-nav" role="document">
@@ -63,7 +73,7 @@
     <a class="current" href="./">Reference Files</a>
     <ul class="subnav">
             
-    <li class="toctree-l2"><a href="#reference-files-generation">Reference files generation</a></li>
+    <li class="toctree-l2"><a href="#reference-files">Reference files</a></li>
     
 
     </ul>
@@ -77,6 +87,11 @@
             <li class="toctree-l1">
 		
     <a class="" href="../Running-dropSeqPipe/">Running dropSeqPipe</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../Clusters/">Clusters</a>
 	    </li>
           
             <li class="toctree-l1">
@@ -129,15 +144,27 @@
           <div role="main">
             <div class="section">
               
-                <h2 id="reference-files-generation">Reference files generation</h2>
-<p>Before running the pipeline you will need to download a reference genome as well as the GTF annotation.
-dropSeqPipe is based on multiple files derived from those two files. Those will be automatically generated when you run the pipeline.</p>
-<p>As an example, we use ensembl reference and annotation <a href="http://www.ensembl.org/info/data/ftp/index.html/">located here</a>. The fasta reference is the DNA and the GTF is the gene sets.</p>
-<p>All you need to do is put the reference genome as well as the GTF file in a folder (extentions are crucial. it won't run otherwise):</p>
-<pre><code>genome.fasta
-annotation.gtf
+                <h2 id="reference-files">Reference files</h2>
+<p>From version 0.4 on, reference files are automatically downloaded by the pipeline. Mixed references are also downloaded and merged automatically. Since sometimes you still want to use your own reference you can bypass the download by creating your own <code>genome.fa</code> and <code>annotation.gtf</code> file.</p>
+<p>Snakemake generates file based on paths. If you want to use a custom reference you have to name it properly for snakemake to find it.</p>
+<p>Here is an example:</p>
+<p>Let's assume this is you configuration for the META section:</p>
+<pre><code>META:
+    species:
+        funky_species_name:
+            build: A
+            release: 1
+    ratio: 0.2
+    reference-directory: /absolute/path/to/references
+    gtf_biotypes: gtf_biotypes.yaml
 </code></pre>
 
+<p>You need to provide the following files</p>
+<pre><code>/absolute/path/to/references/funky_species_name_A_1/genome.fa
+/absolute/path/to/references/funky_species_name_A_1/annotation.gtf
+</code></pre>
+
+<p>This will stop dropSeqPipe from downloading a new reference.</p>
 <p>Once the pipeline has run completely, the folder will look like this:</p>
 <pre><code>genome.fa
 annotation.gtf

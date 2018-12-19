@@ -27,6 +27,16 @@
   <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
   <script>hljs.initHighlightingOnLoad();</script> 
   
+  <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-128943644-1', 'auto');
+      ga('send', 'pageview');
+  </script>
+  
 </head>
 
 <body class="wy-body-for-nav" role="document">
@@ -73,7 +83,7 @@
     <a class="current" href="./">Running dropSeqPipe</a>
     <ul class="subnav">
             
-    <li class="toctree-l2"><a href="#context">Context</a></li>
+    <li class="toctree-l2"><a href="#example">Example</a></li>
     
 
     <li class="toctree-l2"><a href="#working-dir-folder-preparation">Working dir folder preparation</a></li>
@@ -105,13 +115,15 @@
     <li class="toctree-l2"><a href="#further-options">Further options</a></li>
     
 
-    <li class="toctree-l2"><a href="#running-on-clusters">Running on clusters</a></li>
-    
-
     <li class="toctree-l2"><a href="#folder-structure">Folder Structure</a></li>
     
 
     </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../Clusters/">Clusters</a>
 	    </li>
           
             <li class="toctree-l1">
@@ -164,26 +176,29 @@
           <div role="main">
             <div class="section">
               
-                <h2 id="context">Context</h2>
-<p>The pipeline is supposed to be cloned once and then run on a folder containing your data as well as the configuration files. The run folder can contain multiple runs (aka batches) as you can easily add new samples when recieving new data and run the same commands. This will simply run the pipeline on the newly added data and recreate reports as well as plots containing all the samples.</p>
+                <h2 id="example">Example</h2>
+<p>The pipeline is to be cloned once and then run on any folder containing the configuration files and your raw data. The workingdir folder can contain multiple runs (aka batches) as you can easily add new samples when recieving new data and run the same commands. This will simply run the pipeline on the newly added data and recreate reports as well as plots containing all the samples.</p>
 <p>Example: You run 2 biological conditions with 2 replicates. This makes up for 4 samples. Assume a simple dropseq protocol with only human cells.
-1. You sequence the data and recieve the 8 files (two files per sample) and set up the pipeline
-2. You run the pipeline with the command: <code>snakemake --use-conda --cores N --directory WORKING_DIR</code> <code>N</code> being the number of cores available and <code>WORKING_DIR</code> being the folder containing your data.
+1. You sequence the data and recieve the 8 files (two files per sample) and download the pipeline
+2. You run the pipeline with the command: <code>snakemake --use-conda --cores N --directory WORKING_DIR</code>. <code>N</code> being the number of cores available and <code>WORKING_DIR</code> being the folder containing your <code>config.yaml</code>, <code>samples.csv</code>, adapter file and <code>gtf_biotypes.yaml</code>.
 3. You see that there is an issue with the protocol and you modify it
 4. You create a new set of libraries and sequence them (same 2x2 design)
 5. You add the new files in the data folder of <code>WORKING_DIR</code> and edit the samples.csv to add missing samples.
 6. You run the pipeline as you did the first time <code>snakemake --use-conda --cores N --directory WORKING_DIR</code>
-7. This will run the new samples only and recreate the reports as well as the BC_drop and yield plots.
+7. This will run the new samples only and recreate the reports as well as the yield plots.
 8. It is now easy to compare the impact of your change in the procotol</p>
 <h2 id="working-dir-folder-preparation">Working dir folder preparation</h2>
-<p>The raw data from the sequencer should be stored in the <code>data</code> folder of <code>WORKING_DIR</code> folder like this:</p>
+<p>The raw data from the sequencer should be stored in the <code>RAW_DATA</code> folder of <code>WORKING_DIR</code> folder like this:</p>
 <pre><code>/path/to/your/WORKING_DIR/
-| -- data/
+| -- RAW_DATA/
 | -- -- sample1_R1.fastq.gz
 | -- -- sample1_R2.fastq.gz
+| -- -- sample2_R1.fastq.gz
+| -- -- sample2_R2.fastq.gz
 | samples.csv
 | config.yaml
 | barcodes.csv
+| adapters.fa
 </code></pre>
 
 <p><em>Note: In DropSeq or ScrbSeq you expect a paired sequencing. R1 will hold the information of your barcode and UMI, R2 will hold the 3' end of the captured mRNA.</em></p>
@@ -203,65 +218,65 @@ I would suggest using the second approach when you work on a new protocol and th
 You can also run multiple modes at the same time if you want: <code>snakemake --cores 8 qc filter --use-conda --directory WORKING_DIR</code></p>
 <h3 id="single-species">Single species:</h3>
 <ul>
-<li><code>meta</code>: Generates all the subsequent references files and STAR index needed to run the pipeline. You can run this alone if you just want to create the meta-data file before running a new set of data.</li>
+<li><code>meta</code>: Downloads and generates all the subsequent references files and STAR index needed to run the pipeline. You can run this alone if you just want to create the meta-data file before running a new set of data.</li>
 <li><code>qc</code>: Creates fastqc reports of your data.    </li>
 <li><code>filter</code>: Go from sample_R1.fastq.gz to sample_filtered.fastq.gz ready to be mapped to the genome.  This step filters out your data for low quality reads and trims adapter you provided in the FILTER section.</li>
 <li><code>map</code>: Go from sample_filtered.fastq.gz to the sample_final.bam read to extract the expression data. This maps the data to the genom.</li>
 <li><code>extract</code>: Extract the expression data. You'll get a umi and a count expression matrix from your whole experiment.</li>
 </ul>
 <h3 id="mixed-species">Mixed species</h3>
-<p>The next two step are only necessary for mixed experiment. Note that you can't just run <code>snakemake --directory WORKING_DIR --use-conda</code> for a mixed experiment but you have to run <code>snakemake extract-species --directory WORKING_DIR</code> instead.
-<em> <code>split_species</code>: Poduces the species plot and the species specific barcode list for extract-species.
-</em> <code>extract_species</code>: Extract the expression data. You'll get a umi and a count expression matrix from your whole experiment/specie in the summary folder.</p>
-<p>If you want all the plots for mixed experiment, you have to call all the modes:  <code>snakemake --cores 8 qc filter map split_species extract_species --use-conda --directory WORKING_DIR</code></p>
+<p>Since v<code>0.4</code> the pipeline detects mixed experiments on the fly. Simply run <code>snakemake --directory WORKING_DIR --use-conda</code>. The stepwise approach is not available for mixed experiments.</p>
 <h2 id="barcode-whitelist">Barcode whitelist</h2>
 <p>In protocols such as SCRBseq, the expected barcodes sequences are known. This pipeline also does allow the use of known barcodes instread of a number of expected cells.
-In order to use this functionnality you just need to add a <code>barcodes.csv</code> file at the root of the working dir and run the pipeline as usual.</p>
+In order to use this functionnality you just need to add a whitelist barcode file and provide the name of the file in the configuration in the section:</p>
+<pre><code>FILTER:
+    barcode_whitelist: name_of_your_whitelist_file
+</code></pre>
+
+<p>The file should be in the WORKING_DIR. Run the pipeline as usual.</p>
 <h2 id="advanced-options">Advanced options</h2>
-<p>If you have some specific adapters that are not present by default in the ones in the <code>templates</code> folder, you can add whatever adapters you want to trim (as many as you need) following the fasta syntax in any fasta files proposed. Be sure to specify it properly in the config.yaml at <code>FILTER:IlluminaClip</code></p>
+<p>If you have some specific adapters that are not present by default in the ones in the <code>templates</code> folder, you can add whatever adapters you want to trim (as many as you need) following the fasta syntax.</p>
+<pre><code>FILTER:
+    cutadapt:
+        adapters-file: name_of_your_adapter_file.fa
+</code></pre>
+
 <h2 id="further-options">Further options</h2>
 <ul>
 <li><code>--cores N</code> Use this argument to use X amunt of cores available.</li>
 <li><code>--notemp</code> Use this to not delete all the temporary files. Without this option, only files between steps are kept. Use this option if you are troobleshooting the pipeline or you want to analyze in between files yourself.</li>
-<li><code>--dryrun</code> Use this to check out what is going to run if you run your command. This is nice to check for potential missing files.</li>
-</ul>
-<h2 id="running-on-clusters">Running on clusters</h2>
-<p>There is a file in the <code>templates</code> called <code>cluster.yaml</code>. This can be used to modify ressources needed for your data. I generally recommand moving the file to the root of the folder so that it doesn't get replaced by updates.</p>
-<p>Bellow is an example of running on a cluster using the template file <code>cluster.yaml</code> on SLURM.</p>
-<pre><code>snakemake --cluster 'sbatch -n {cluster.n}  -t {cluster.time} --clusters=CLUSTERNAME --output={cluster.output}' --jobs N --cluster-config cluster.yaml --use-conda --local-cores C
-</code></pre>
-
-<ul>
-<li>N: is the number of jobs you are allowed to run at the same time</li>
-<li>C: is the local-cores of the host machine. A few simple rules are gonna be run locally (not sent to nodes) because they are not that heavy (mostly plotting)</li>
-<li>CLUSTERNAME: the name of the cluster you want to use</li>
+<li><code>--dryrun</code> or <code>-n</code> Use this to check out what is going to run if you run your command. This is nice to check for potential missing files.</li>
 </ul>
 <h2 id="folder-structure">Folder Structure</h2>
 <p>This is the folder structure you get in the end:</p>
 <pre><code>/path/to/your/WORKING_DIR/
-| -- data/
-| -- logs/
-| -- -- cluster/
-| -- plots/
-| -- reports/
-| -- summary/
-| Snakefile
+| -- RAW_DATA/
+| -- RESULT_DIR/
+| -- -- logs/
+| -- -- -- cluster/
+| -- -- plots/
+| -- -- reports/
+| -- -- summary/
+| -- -- samples/
 | samples.csv
 | config.yaml
 | barcodes.csv
+| adapter.fa
 | .snakemake/
 </code></pre>
 
 <ul>
-<li><code>data/</code> Contains all your samples as well as the intermediary files</li>
-<li><code>logs/</code> Contains all the logfiles generated by the pipeline</li>
-<li><code>logs/cluster</code> Contains all the logfiles generated by the cluster</li>
-<li><code>plots/</code> Contains all the plots generated by the pipeline</li>
-<li><code>reports/</code> Contains all the reports generated by the pipeline</li>
-<li><code>summary/</code> Contains all the files you might use for downstream analysis (contains barcodes selected per sample per species, final umi/counts expression matrix)</li>
+<li><code>RAW_DATA/</code> Contains all your samples as well as the intermediary files</li>
+<li><code>RESULT_DIR/logs/</code> Contains all the logfiles generated by the pipeline</li>
+<li><code>RESULT_DIR/logs/cluster</code> Contains all the logfiles generated by the cluster</li>
+<li><code>RESULT_DIR/plots/</code> Contains all the plots generated by the pipeline</li>
+<li><code>RESULT_DIR/reports/</code> Contains all the reports generated by the pipeline</li>
+<li><code>RESULT_DIR/summary/</code> Contains all the files you might use for downstream analysis (contains barcodes selected per sample per species, final umi/counts expression matrix)</li>
+<li><code>RESULT_DIR/samples/</code> Contains all the sample specific files. Bam files, barcodes used, single sample expression files, etc...</li>
 <li><code>samples.csv</code> File containing sample details</li>
 <li><code>config.yaml</code> File containing pipeline parameters as well as system parameters</li>
-<li><code>.snakemake/</code> Folder that contains all the environements created for the run as well as a lot of other things that I don't know about.</li>
+<li><code>adapters.fa</code> File containing all the adapters you wish to trim from the raw data.</li>
+<li><code>.snakemake/</code> Folder that contains all the environements created for the run as well as a lot of other things.</li>
 </ul>
               
             </div>
@@ -270,7 +285,7 @@ In order to use this functionnality you just need to add a <code>barcodes.csv</c
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../Plots/" class="btn btn-neutral float-right" title="Plots">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../Clusters/" class="btn btn-neutral float-right" title="Clusters">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
         <a href="../Create-config-files/" class="btn btn-neutral" title="Config file and sample file"><span class="icon icon-circle-arrow-left"></span> Previous</a>
@@ -304,7 +319,7 @@ In order to use this functionnality you just need to add a <code>barcodes.csv</c
         <span><a href="../Create-config-files/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../Plots/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../Clusters/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>
