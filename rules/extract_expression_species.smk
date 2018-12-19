@@ -2,7 +2,8 @@
 
 #Which rules will be run on the host computer and not sent to nodes
 localrules:
-    plot_rna_metrics_species
+    plot_rna_metrics_species,
+    convert_long_to_mtx_species
 
 rule extract_umi_expression_species:
     input:

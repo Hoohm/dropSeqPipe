@@ -1,6 +1,6 @@
 CONTACT:
-  email:
-  person:
+  email: ''
+  person: ''
 LOCAL:
     temp-directory:
     memory: 4g
@@ -16,8 +16,8 @@ META:
     gtf_biotypes: gtf_biotypes.yaml
 
 FILTER:
-    barcode_whitelist:
-    5-prime-smart-adapter:
+    barcode_whitelist: ''
+    5-prime-smart-adapter: ''
     cell-barcode:
         start:
         end:

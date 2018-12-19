@@ -3,6 +3,7 @@ import os
 import re
 import glob
 
+#print(os.path.abspath(os.path.dirname(workflow.snakefile)))
 
 # Load configuration files
 
@@ -18,12 +19,12 @@ configfile: config['META']['gtf_biotypes']
 
 # Define a few variables to make them easier to reference
 ref_path = config['META']['reference-directory']
-barcode_whitelist = config['FILTER']['barcode_whitelist']
+barcode_whitelist = config['FILTER']['barcode-whitelist']
 results_dir = config['LOCAL']['results']
 raw_data_dir = config['LOCAL']['raw_data']
 
 # dropSeqPipe version
-config['version'] = '2.0'
+config['version'] = '0.4'
 
 
 # In order to deal with single species or mixed species experiment
@@ -70,7 +71,8 @@ types=['read','umi']
 read_lengths = list(samples.loc[:,'read_length'])
 
 wildcard_constraints:
-    sample="({})".format("|".join(samples.index))
+    sample="({})".format("|".join(samples.index)),
+    type="({})".format("|".join(types))
 
 
 # Flexible ways to get the R1 and R2 files
