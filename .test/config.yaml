@@ -16,7 +16,7 @@ META:
     gtf_biotypes: gtf_biotypes.yaml
 
 FILTER:
-    barcode_whitelist: ''
+    barcode-whitelist: ''
     5-prime-smart-adapter: CCTACACGACGCTCTTCCGATCT
     cell-barcode:
         start: 2
