@@ -78,8 +78,8 @@ rule repair:
         R1='{results_dir}/samples/{sample}/trimmmed_R1.fastq.gz',
         R2='{results_dir}/samples/{sample}/trimmmed_R2.fastq.gz'
     output:
-        R1=temp('{results_dir}/samples/{sample}/trimmmed_repaired_R1.fastq.gz'),
-        R2=temp('{results_dir}/samples/{sample}/trimmmed_repaired_R2.fastq.gz')
+        R1='{results_dir}/samples/{sample}/trimmmed_repaired_R1.fastq.gz',
+        R2='{results_dir}/samples/{sample}/trimmmed_repaired_R2.fastq.gz'
     log:
         '{results_dir}/logs/bbmap/{sample}_repair.txt'
     params:
