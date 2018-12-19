@@ -10,7 +10,7 @@ rule extract_umi_expression:
         data='{results_dir}/samples/{sample}/final.bam',
         barcode_whitelist='{results_dir}/samples/{sample}/barcodes.csv'
     output:
-        sparse='{results_dir}/samples/{sample}/umi/expression.long',
+        long='{results_dir}/samples/{sample}/umi/expression.long',
         dense=temp('{results_dir}/samples/{sample}/umi/expression.tsv')
     params:
         count_per_umi=config['EXTRACTION']['minimum-counts-per-UMI'],
@@ -18,15 +18,16 @@ rule extract_umi_expression:
         umiBarcodeEditDistance=config['EXTRACTION']['UMI-edit-distance'],
         temp_directory=config['LOCAL']['temp-directory'],
         memory=config['LOCAL']['memory'],
-        locus_list=','.join(config['EXTRACTION']['LOCUS'])
+        locus_list=','.join(config['EXTRACTION']['LOCUS']),
+        strand_strategy=config['EXTRACTION']['strand-strategy']
     conda: '../envs/dropseq_tools.yaml'
     shell:
         """export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && DigitalExpression -m {params.memory}\
         I={input.data}\
         O={output.dense}\
         EDIT_DISTANCE={params.umiBarcodeEditDistance}\
-        OUTPUT_LONG_FORMAT={output.sparse}\
-        STRAND_STRATEGY=SENSE\
+        OUTPUT_LONG_FORMAT={output.long}\
+        STRAND_STRATEGY={params.strand_strategy}\
         OUTPUT_READS_INSTEAD=false\
         LOCUS_FUNCTION_LIST={{{params.locus_list}}}\
         MIN_BC_READ_THRESHOLD={params.count_per_umi}\
@@ -37,23 +38,24 @@ rule extract_reads_expression:
         data='{results_dir}/samples/{sample}/final.bam',
         barcode_whitelist='{results_dir}/samples/{sample}/barcodes.csv'
     output:
-        sparse='{results_dir}/samples/{sample}/reads/expression.long',
-        dense=temp('{results_dir}/samples/{sample}/reads/expression.tsv')
+        long='{results_dir}/samples/{sample}/read/expression.long',
+        dense=temp('{results_dir}/samples/{sample}/read/expression.tsv')
     params:
         count_per_umi=config['EXTRACTION']['minimum-counts-per-UMI'],
         num_cells=lambda wildcards: int(samples.loc[wildcards.sample,'expected_cells']),
         umiBarcodeEditDistance=config['EXTRACTION']['UMI-edit-distance'],
         temp_directory=config['LOCAL']['temp-directory'],
         memory=config['LOCAL']['memory'],
-        locus_list=','.join(config['EXTRACTION']['LOCUS'])
+        locus_list=','.join(config['EXTRACTION']['LOCUS']),
+        strand_strategy=config['EXTRACTION']['strand-strategy']
     conda: '../envs/dropseq_tools.yaml'
     shell:
         """export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && DigitalExpression -m {params.memory}\
         I={input.data}\
         O={output.dense}\
         EDIT_DISTANCE={params.umiBarcodeEditDistance}\
-        OUTPUT_LONG_FORMAT={output.sparse}\
-        STRAND_STRATEGY=SENSE\
+        OUTPUT_LONG_FORMAT={output.long}\
+        STRAND_STRATEGY={params.strand_strategy}\
         OUTPUT_READS_INSTEAD=true\
         LOCUS_FUNCTION_LIST={{{params.locus_list}}}\
         MIN_BC_READ_THRESHOLD={params.count_per_umi}\

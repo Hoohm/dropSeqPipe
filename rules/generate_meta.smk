@@ -16,7 +16,7 @@ rule curate_annotation:
         biotypes=config['META']['gtf_biotypes'],
         annotation="{ref_path}/{species}_{build}_{release}/annotation.gtf"
     output:
-        "{ref_path}/{species}_{build}_{release}/curated_annotation.gtf"
+        temp("{ref_path}/{species}_{build}_{release}/curated_annotation.gtf")
     params:
         patterns='|'.join(config['biotypes'])
     shell:
@@ -153,7 +153,6 @@ rule create_star_index:
         --genomeDir {params.genomeDir}\
         --genomeFastaFiles {input.reference_file}\
         --sjdbGTFfile {input.annotation_file}\
-        --limitGenomeGenerateRAM 30000000000\
         --sjdbOverhang {params.sjdbOverhang}\
         --genomeChrBinNbits {params.genomeChrBinNbits}
         """

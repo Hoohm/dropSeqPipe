@@ -1,6 +1,6 @@
 Welcome
 ------------------------------
 
-Welcome to the documentation of dropSeqPipe.
+Welcome to the documentation of dropSeqPipe v`0.4`.
 
-This documentation is under construction
+This documentation is still under construction.

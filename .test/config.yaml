@@ -48,5 +48,6 @@ EXTRACTION:
     LOCUS:
         - CODING
         - UTR
+    strand-strategy: SENSE
     UMI-edit-distance: 1
     minimum-counts-per-UMI: 0

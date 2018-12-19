@@ -42,13 +42,13 @@ All you need to execute this workflow is to install Snakemake via the [Conda pac
 
 Test your configuration by performing a dry-run via
 
-    snakemake --use-conda -n
+    snakemake --use-conda -n --directory $WORKING_DIR
 
 Execute the workflow locally via
 
-    snakemake --use-conda --cores $N
+    snakemake --use-conda --cores $N --directory $WORKING_DIR
 
-using `$N` cores. Alternatively, it can be run in cluster or cloud environments (see [the docs](http://snakemake.readthedocs.io/en/stable/executable.html) for details).
+using `$N` cores on the `$WORKING_DIR`. Alternatively, it can be run in cluster or cloud environments (see [the docs](http://snakemake.readthedocs.io/en/stable/executable.html) for details).
 
 If you not only want to fix the software stack but also the underlying OS, use
 
@@ -74,9 +74,9 @@ I'm actively seeking help to implement the points listed bellow. Don't hesitate 
 * Create a sharing platform where quality plots/logs can be discussed and troubleshooted.
 * Create a full html report for the whole pipeline
 * Multiqc module for drop-seq-tools
-* RData object of all the summary data and plots so that you can create your own report.
 * Implement an elegant "preview" mode where the pipeline would only run on a couple of millions of reads and allow you to have an approximated view before running all of the data. This would dramatically reduce the time needed to get an idea of what filters whould be used.
+* 
 
 I hope it can help you out in your single cell experiments!
 
-Feel free to comment and point out potential improvements.
+Feel free to comment and point out potential improvements via [issues](https://github.com/Hoohm/dropSeqPipe/issues)

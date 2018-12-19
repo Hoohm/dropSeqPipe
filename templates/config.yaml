@@ -1,18 +1,23 @@
+CONTACT:
+  email: ''
+  person: ''
 LOCAL:
     temp-directory:
     memory: 4g
-    results: .
-    raw_data: data
+    raw_data:
+    results: results
 META:
     species:
-        - SPECIES_ONE
-        - SPECIES_TWO
+        SPECIES_ONE:
+            build:
+            release:
     ratio: 0.2
-    reference-file:
-    annotation-file:
     reference-directory:
+    gtf_biotypes: gtf_biotypes.yaml
+
 FILTER:
-    5-prime-smart-adapter: 
+    barcode_whitelist: ''
+    5-prime-smart-adapter: ''
     cell-barcode:
         start:
         end:
@@ -23,7 +28,7 @@ FILTER:
         adapters-file:
         R1:
             quality-filter: 20
-            maximum-Ns: 0
+            maximum-Ns: 1
             extra-params: ''
         R2:
             quality-filter: 20
@@ -40,5 +45,9 @@ MAPPING:
         outFilterMatchNminOverLread: 0.66
         outFilterScoreMinOverLread: 0.66
 EXTRACTION:
-    UMI-edit-distance:
-    minimum-counts-per-UMI:
+    LOCUS:
+        - CODING
+        - UTR
+    strand-strategy: SENSE
+    UMI-edit-distance: 1
+    minimum-counts-per-UMI: 0

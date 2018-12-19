@@ -19,7 +19,7 @@ rule merge_long:
 rule violine_plots:
     input:
         UMIs='{results_dir}/summary/umi/expression.mtx',
-        counts='{results_dir}/summary/reads/expression.mtx',
+        counts='{results_dir}/summary/read/expression.mtx',
         design='samples.csv'
     conda: '../envs/plots_ext.yaml'
     output:

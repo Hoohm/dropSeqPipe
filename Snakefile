@@ -3,6 +3,7 @@ import os
 import re
 import glob
 
+#print(os.path.abspath(os.path.dirname(workflow.snakefile)))
 
 # Load configuration files
 
@@ -18,12 +19,12 @@ configfile: config['META']['gtf_biotypes']
 
 # Define a few variables to make them easier to reference
 ref_path = config['META']['reference-directory']
-barcode_whitelist = config['FILTER']['barcode_whitelist']
+barcode_whitelist = config['FILTER']['barcode-whitelist']
 results_dir = config['LOCAL']['results']
 raw_data_dir = config['LOCAL']['raw_data']
 
 # dropSeqPipe version
-config['version'] = '2.0'
+config['version'] = '0.4'
 
 
 # In order to deal with single species or mixed species experiment
@@ -65,12 +66,13 @@ else:
 
 # Get sample names from samples.csv
 samples = pd.read_table("samples.csv", header=0, sep=',', index_col=0)
-types=['reads','umi']
+types=['read','umi']
 # Get read_lengths from samples.csv
 read_lengths = list(samples.loc[:,'read_length'])
 
 wildcard_constraints:
     sample="({})".format("|".join(samples.index)),
+    type="({})".format("|".join(types))
 
 
 # Flexible ways to get the R1 and R2 files
@@ -119,8 +121,8 @@ if len(config['META']['species'].keys()) == 2:
                     release=release,
                     species=species),
             expand(
-                ['{results_dir}/samples/{sample}/{species}/umi_expression_matrix.txt',
-                '{results_dir}/samples/{sample}/{species}/counts_expression_matrix.txt',
+                ['{results_dir}/samples/{sample}/{species}/umi/expression.mtx',
+                '{results_dir}/samples/{sample}/{species}/read/expression.mtx',
                 '{results_dir}/plots/rna_metrics/{sample}_{species}_rna_metrics.pdf'],
                 results_dir=results_dir,
                 sample=samples.index,
