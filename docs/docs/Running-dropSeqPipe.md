@@ -97,20 +97,6 @@ Further options
 * `--dryrun` or `-n` Use this to check out what is going to run if you run your command. This is nice to check for potential missing files.
 
 
-Running on clusters
-----------------------------------
-There is a file in the `templates` called `cluster.yaml`. This can be used to modify ressources needed for your data. I generally recommand moving the file to the root of the folder so that it doesn't get replaced by updates.
-
-Bellow is an example of running on a cluster using the template file `cluster.yaml` on SLURM.
-
-```
-snakemake --cluster 'sbatch -n {cluster.n}  -t {cluster.time} --clusters=CLUSTERNAME --output={cluster.output}' --jobs N --cluster-config cluster.yaml --use-conda --local-cores C
-```
-
-* N: is the number of jobs you are allowed to run at the same time
-* C: is the local-cores of the host machine. A few simple rules are gonna be run locally (not sent to nodes) because they are not that heavy (mostly plotting)
-* CLUSTERNAME: the name of the cluster you want to use
-
 
 Folder Structure
 -----------------------
@@ -142,4 +128,4 @@ This is the folder structure you get in the end:
 * `samples.csv` File containing sample details
 * `config.yaml` File containing pipeline parameters as well as system parameters
 * `adapters.fa` File containing all the adapters you wish to trim from the raw data.
-* `.snakemake/` Folder that contains all the environements created for the run as well as a lot of other things that I don't know about.
+* `.snakemake/` Folder that contains all the environements created for the run as well as a lot of other things.

@@ -8,6 +8,7 @@ nav:
   - 'Reference-Files.md'
   - 'Create-config-files.md'
   - 'Running-dropSeqPipe.md'
+  - 'Clusters.md'
   - 'Plots.md'
   - 'CHANGELOG.md'
   - 'FAQ.md'
