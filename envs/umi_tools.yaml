@@ -1,4 +1,5 @@
 channels:
   - bioconda
 dependencies:
-  - star=2.6.1b
+  - umi_tools=0.5.5
+  - scipy=1.1.0

@@ -1,17 +1,32 @@
-Reference files generation
+Reference files
 -----------------
-Before running the pipeline you will need to download a reference genome as well as the GTF annotation.
-dropSeqPipe is based on multiple files derived from those two files. Those will be automatically generated when you run the pipeline.
+From version 0.4 on, reference files are automatically downloaded by the pipeline. Mixed references are also downloaded and merged automatically. Since sometimes you still want to use your own reference you can bypass the download by creating your own `genome.fa` and `annotation.gtf` file.
 
-As an example, we use ensembl reference and annotation [located here](http://www.ensembl.org/info/data/ftp/index.html/). The fasta reference is the DNA and the GTF is the gene sets.
+Snakemake generates file based on paths. If you want to use a custom reference you have to name it properly for snakemake to find it.
 
-All you need to do is put the reference genome as well as the GTF file in a folder (extentions are crucial. it won't run otherwise):
+Here is an example:
 
+Let's assume this is you configuration for the META section:
+```
+META:
+    species:
+        funky_species_name:
+            build: A
+            release: 1
+    ratio: 0.2
+    reference-directory: /absolute/path/to/references
+    gtf_biotypes: gtf_biotypes.yaml
+```
+
+You need to provide the following files
 
 ```
-genome.fasta
-annotation.gtf
+/absolute/path/to/references/funky_species_name_A_1/genome.fa
+/absolute/path/to/references/funky_species_name_A_1/annotation.gtf
 ```
+
+This will stop dropSeqPipe from downloading a new reference.
+
 
 Once the pipeline has run completely, the folder will look like this:
 

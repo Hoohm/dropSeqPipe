@@ -2,5 +2,5 @@ channels:
   - bioconda
   - conda-forge
 dependencies:
-  - samtools
-  - ncurses
+  - samtools=1.9
+  - ncurses=6.1

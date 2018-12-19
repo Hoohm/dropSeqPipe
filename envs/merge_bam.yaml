@@ -1,6 +1,6 @@
 channels:
   - bioconda
 dependencies:
-  - pysam
-  - biopython
+  - pysam=0.15.1
+  - biopython=1.72
   - python>=3.6

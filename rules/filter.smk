@@ -2,266 +2,137 @@
 
 
 #Which rules will be run on the host computer and not sent to nodes
-localrules: count_reads, reads_after_trimming, plot_polyA_trim, plot_barcode_start_trim, plot_UMI_filtering, plot_CELL_filtering, plot_BC_drop, multiqc_trimmomatic
-
-rule fastq_to_sam:
-	"""Create an empty bam file linking cell/UMI barcodes to reads"""
-	input:
-		R1='data/{sample}_R1.fastq.gz',
-		R2='data/{sample}_R2.fastq.gz'
-	output:
-		temp('data/{sample}_unaligned.bam')
-	params:
-		temp_directory=config['LOCAL']['temp-directory'],
-		memory=config['LOCAL']['memory'],
-		picard="$CONDA_PREFIX/share/picard-2.14.1-0/picard.jar"
-	conda: '../envs/picard.yaml'
-	shell:
-		"""java -Djava.io.tmpdir={params.temp_directory} -Xmx{params.memory} -jar {params.picard} FastqToSam\
-		F1={input[0]}\
-		F2={input[1]}\
-		SM=DS O={output}"""
-
-rule BC_tags:
-	input:
-		'data/{sample}_unaligned.bam'
-	output: 
-		data=temp('data/{sample}_BC_tagged_unmapped.bam'),
-		BC_summary='logs/{sample}_CELL_barcode.txt'
-	params:
-		BC_start=config['FILTER']['cell-barcode']['start'],
-		BC_end=config['FILTER']['cell-barcode']['end'],
-		BC_minQuality=config['FILTER']['cell-barcode']['min-quality'],
-		BC_minQuality_num=config['FILTER']['cell-barcode']['num-below-quality']+1,
-		memory=config['LOCAL']['memory'],
-		temp_directory=config['LOCAL']['temp-directory']
-	conda: '../envs/dropseq_tools.yaml'
-	shell:
-		"""export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && TagBamWithReadSequenceExtended -m {params.memory}\
-		SUMMARY={output.BC_summary}\
-		BASE_RANGE={params.BC_start}-{params.BC_end}\
-		BASE_QUALITY={params.BC_minQuality}\
-		BARCODED_READ=1\
-		DISCARD_READ=false\
-		TAG_NAME=XC\
-		NUM_BASES_BELOW_QUALITY={params.BC_minQuality_num}\
-		INPUT={input}\
-		OUTPUT={output.data}
-		"""
-
-rule UMI_tags:
-	input:
-		'data/{sample}_BC_tagged_unmapped.bam'
-	output:
-		bam=temp('data/{sample}_BC_UMI_tagged_unmapped.bam'),
-		UMI_summary='logs/{sample}_UMI_barcode.txt'
-	params:
-		UMI_start=config['FILTER']['UMI-barcode']['start'],
-		UMI_end=config['FILTER']['UMI-barcode']['end'],
-		UMI_minQuality=config['FILTER']['UMI-barcode']['min-quality'],
-		UMI_minQuality_num=config['FILTER']['UMI-barcode']['num-below-quality']+1,
-		memory=config['LOCAL']['memory'],
-		temp_directory=config['LOCAL']['temp-directory']
-	conda: '../envs/dropseq_tools.yaml'
-	shell:
-		"""export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && TagBamWithReadSequenceExtended -m {params.memory}\
-		SUMMARY={output.UMI_summary}\
-		BASE_RANGE={params.UMI_start}-{params.UMI_end}\
-		BASE_QUALITY={params.UMI_minQuality}\
-		BARCODED_READ=1\
-		DISCARD_READ=true\
-		TAG_NAME=XM\
-		NUM_BASES_BELOW_QUALITY={params.UMI_minQuality_num}\
-		INPUT={input}\
-		OUTPUT={output.bam}
-		"""
-rule filter_tags:
-	input:
-		'data/{sample}_BC_UMI_tagged_unmapped.bam'
-	output: 
-		temp('data/{sample}_tags_filtered_unmapped.bam')
-	params:		
-		memory=config['LOCAL']['memory'],
-		temp_directory=config['LOCAL']['temp-directory']
-	conda: '../envs/dropseq_tools.yaml'
-	shell:
-		"""export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} &&  FilterBAM -m {params.memory}\
-		TAG_REJECT=XQ\
-		INPUT={input}\
-		OUTPUT={output}
-		"""
-
-rule count_reads:
-	input:
-		'data/{sample}_tags_filtered_unmapped.bam'
-	output:
-		'logs/{sample}_reads_left.txt'
-	conda: '../envs/samtools.yaml'
-	shell:
-		"""samtools view {input} | wc -l > {output}"""
+localrules:
+	clean_cutadapt,
+	plot_adapter_content,
+	multiqc_cutadapt_barcodes,
+	multiqc_cutadapt_RNA,
+	detect_barcodes
 
 
-rule start_trim:
-	input:
-		'data/{sample}_tags_filtered_unmapped.bam'
-	output:
-		data=temp('data/{sample}_tags_start_filtered_unmapped.bam'),
-		trim_summary='logs/{sample}_start_trim.txt'
-	params:
-		SmartAdapter=config['FILTER']['5-prime-smart-adapter'],
-		memory=config['LOCAL']['memory'],
-		temp_directory=config['LOCAL']['temp-directory']
-	conda: '../envs/dropseq_tools.yaml'
-	shell:
-		"""export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && TrimStartingSequence -m {params.memory}\
-		OUTPUT_SUMMARY={output.trim_summary}\
-		SEQUENCE={params.SmartAdapter}\
-		MISMATCHES=1\
-		NUM_BASES=6\
-		INPUT={input}\
-		OUTPUT={output.data}
-		"""
-rule polya_trim:
-	input:
-		'data/{sample}_tags_start_filtered_unmapped.bam'
-	output:
-		data='data/{sample}_trimmed_unmapped.bam',
-		trim_summary='logs/{sample}_polyA_trim.txt'
-	params:		
-		memory=config['LOCAL']['memory'],
-		temp_directory=config['LOCAL']['temp-directory']
-	conda: '../envs/dropseq_tools.yaml'
-	shell:
-		"""export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && PolyATrimmer -m {params.memory}\
-		OUTPUT_SUMMARY={output.trim_summary}\
-		MISMATCHES=0\
-		NUM_BASES=5\
-		INPUT={input}\
-		OUTPUT={output.data}
-		"""
+rule cutadapt_R1:
+    input:
+        R1=get_R1_files,
+        adapters=config['FILTER']['cutadapt']['adapters-file']
+    output:
+        fastq=temp('{results_dir}/samples/{sample}/trimmmed_R1.fastq.gz')
+    params:
+        cell_barcode_length=round((config['FILTER']['cell-barcode']['end'] - config['FILTER']['cell-barcode']['start'] + 1) * 1.3),
+        barcode_length=config['FILTER']['UMI-barcode']['end'] - config['FILTER']['cell-barcode']['start'] + 1,
+        extra_params=config['FILTER']['cutadapt']['R1']['extra-params'],
+        max_n=config['FILTER']['cutadapt']['R1']['maximum-Ns'],
+        barcode_quality=config['FILTER']['cutadapt']['R1']['quality-filter']
+    threads: 10
+    log:
+        qc='{results_dir}/logs/cutadapt/{sample}_R1.qc.txt'
+    conda: '../envs/cutadapt.yaml' 
+    shell:
+        """cutadapt\
+        --max-n {params.max_n}\
+        -a file:{input.adapters}\
+        -g file:{input.adapters}\
+        -q {params.barcode_quality},0\
+        --minimum-length {params.barcode_length}\
+        --cores={threads}\
+        --overlap {params.cell_barcode_length}\
+        -o {output.fastq} {input.R1}\
+        {params.extra_params} > {log.qc}"""
 
-rule sam_to_fastq:
-	input:
-		'data/{sample}_trimmed_unmapped.bam'
-	params:
-		temp_directory=config['LOCAL']['temp-directory'],
-		memory=config['LOCAL']['memory'],
-		picard="$CONDA_PREFIX/share/picard-2.14.1-0/picard.jar"
-	output:
-		temp('data/{sample}_trimmed_unmapped.fastq.gz')
-	conda: '../envs/picard.yaml'
-	shell:
-		"""java -Xmx{params.memory} -jar -Djava.io.tmpdir={params.temp_directory}	{params.picard} SamToFastq\
-		INPUT={input}\
-		FASTQ=/dev/stdout COMPRESSION_LEVEL=0|\
-		gzip > {output}"""
+rule cutadapt_R2:
+    input:
+        R2=get_R2_files,
+        adapters=config['FILTER']['cutadapt']['adapters-file']
+    output:
+        fastq=temp('{results_dir}/samples/{sample}/trimmmed_R2.fastq.gz')
+    params:
+        extra_params=config['FILTER']['cutadapt']['R2']['extra-params'],
+        read_quality=config['FILTER']['cutadapt']['R2']['quality-filter'],
+        minimum_length=config['FILTER']['cutadapt']['R2']['minimum-length'],
+        adapters_minimum_overlap=config['FILTER']['cutadapt']['R2']['minimum-adapters-overlap'],
+    threads: 10
+    log:
+        qc='{results_dir}/logs/cutadapt/{sample}_R2.qc.txt'
+    conda: '../envs/cutadapt.yaml' 
+    shell:
+        """cutadapt\
+        -a file:{input.adapters}\
+        -g file:{input.adapters}\
+        -q {params.read_quality}\
+        --minimum-length {params.minimum_length}\
+        --cores={threads}\
+        --overlap {params.adapters_minimum_overlap}\
+        -o {output.fastq} {input.R2}\
+        {params.extra_params} > {log.qc}"""
 
+rule clean_cutadapt:
+    input:
+        R1='{results_dir}/logs/cutadapt/{sample}_R1.qc.txt',
+        R2='{results_dir}/logs/cutadapt/{sample}_R2.qc.txt'
+    output:
+        '{results_dir}/logs/cutadapt/{sample}.clean_qc.csv'
+    script:
+        '../scripts/clean_cutadapt.py'
 
+rule repair:
+    input:
+        R1='{results_dir}/samples/{sample}/trimmmed_R1.fastq.gz',
+        R2='{results_dir}/samples/{sample}/trimmmed_R2.fastq.gz'
+    output:
+        R1='{results_dir}/samples/{sample}/trimmmed_repaired_R1.fastq.gz',
+        R2='{results_dir}/samples/{sample}/trimmmed_repaired_R2.fastq.gz'
+    log:
+        '{results_dir}/logs/bbmap/{sample}_repair.txt'
+    params:
+        memory='{}g'.format(int(config['LOCAL']['memory'].rstrip('g')) * 10)
+    conda: '../envs/bbmap.yaml'
+    threads: 4
+    shell:
+        """repair.sh\
+        -Xmx{params.memory}\
+        in={input.R1}\
+        in2={input.R2}\
+        out1={output.R1}\
+        out2={output.R2}\
+        repair=t\
+        threads={threads} 2> {log}"""
 
-rule trim_single:
-	input:
-		'data/{sample}_trimmed_unmapped.fastq.gz'
-	output:
-		data='data/{sample}_filtered.fastq.gz'
-	log:
-		'logs/{sample}_trimlog.txt'
-	params:
-		trimmer=['LEADING:{} TRAILING:{} SLIDINGWINDOW:{}:{} MINLEN:{} ILLUMINACLIP:{}:{}:{}:{}'.format(
-			config['FILTER']['trimmomatic']['LEADING'],
-			config['FILTER']['trimmomatic']['TRAILING'],
-			config['FILTER']['trimmomatic']['SLIDINGWINDOW']['windowSize'],
-			config['FILTER']['trimmomatic']['SLIDINGWINDOW']['requiredQuality'],
-			config['FILTER']['trimmomatic']['MINLEN'],
-			config['FILTER']['trimmomatic']['adapters-file'],
-			config['FILTER']['trimmomatic']['ILLUMINACLIP']['seedMismatches'],
-			config['FILTER']['trimmomatic']['ILLUMINACLIP']['palindromeClipThreshold'],
-			config['FILTER']['trimmomatic']['ILLUMINACLIP']['simpleClipThreshold'])],
-		extra='-threads 10'
-	threads: 10
-	wrapper:
-		'0.27.1/bio/trimmomatic/se'
+rule detect_barcodes:
+    input:
+        R1='{results_dir}/samples/{sample}/trimmmed_repaired_R1.fastq.gz'
+    output:
+        positions='{results_dir}/samples/{sample}/test.csv'
+    conda: '../envs/merge_bam.yaml'
+    script:
+        '../scripts/detect_barcodes.py'
 
+rule plot_adapter_content:
+    input:
+        expand('{results_dir}/logs/cutadapt/{sample}.clean_qc.csv', sample=samples.index, results_dir=results_dir)
+    params:
+        Cell_length=config['FILTER']['cell-barcode']['end'] - config['FILTER']['cell-barcode']['start'] + 1,
+        UMI_length=config['FILTER']['UMI-barcode']['end'] - config['FILTER']['UMI-barcode']['start'] + 1,
+        sample_names=lambda wildcards: samples.index,
+        batches=lambda wildcards: samples.loc[samples.index, 'batch']
+    conda: '../envs/plots.yaml'
+    output:
+        pdf='{results_dir}/plots/adapter_content.pdf'
+    script:
+        '../scripts/plot_adapter_content.R'
 
-rule reads_after_trimming:
-	input:
-		'data/{sample}_filtered.fastq.gz'
-	output:
-		'logs/{sample}_reads_left_trim.txt'
-	conda: '../envs/samtools.yaml'
-	shell:
-		"""zcat {input} | wc -l > {output}"""
+rule multiqc_cutadapt_barcodes:
+    input:
+        expand('{results_dir}/logs/cutadapt/{sample}_R1.qc.txt', sample=samples.index, results_dir=results_dir)
+    params: '-m cutadapt --ignore *_R2*'
+    output:
+        html='{results_dir}/reports/barcode_filtering.html'
+    wrapper:
+        '0.21.0/bio/multiqc'
 
-rule plot_polyA_trim:
-	input:
-		'logs/{sample}_polyA_trim.txt'
-	conda: '../envs/plots.yaml'
-	output:
-		pdf='plots/{sample}_polya_trimmed.pdf'
-	script:
-		'../scripts/plot_polyA_trim.R'
-
-rule plot_barcode_start_trim:
-	input:
-		'logs/{sample}_start_trim.txt'
-	conda: '../envs/plots.yaml'
-	output:
-		pdf='plots/{sample}_start_trim.pdf'
-	script:
-		'../scripts/plot_start_trim.R'
-
-
-rule plot_UMI_filtering:
-	input:
-		'logs/{sample}_UMI_barcode.txt'
-	params: 
-		min_quality=config['FILTER']['UMI-barcode']['min-quality'],
-		num_below_quality=config['FILTER']['UMI-barcode']['num-below-quality']
-	conda: '../envs/plots.yaml'
-	output:
-		pdf='plots/{sample}_UMI_dropped.pdf'
-	script:
-		'../scripts/plot_umi_drop.R'
-
-rule plot_CELL_filtering:
-	input:
-		'logs/{sample}_CELL_barcode.txt'
-	params:
-		min_quality=config['FILTER']['cell-barcode']['min-quality'],
-		num_below_quality=config['FILTER']['cell-barcode']['num-below-quality']
-	conda: '../envs/plots.yaml'
-	output:
-		pdf='plots/{sample}_CELL_dropped.pdf'
-
-	script:
-		'../scripts/plot_cell_drop.R'
-
-rule plot_BC_drop:
-	input:
-		Cell_tagged=expand('logs/{sample}_CELL_barcode.txt', sample=samples.index),
-		UMI_tagged=expand('logs/{sample}_UMI_barcode.txt', sample=samples.index),
-		reads_left=expand('logs/{sample}_reads_left.txt', sample=samples.index),
-		trimmomatic_filtered=expand('logs/{sample}_reads_left_trim.txt', sample=samples.index)
-	params:
-		Cell_length=config['FILTER']['cell-barcode']['end'] - config['FILTER']['cell-barcode']['start']+1,
-		UMI_length=config['FILTER']['UMI-barcode']['end'] - config['FILTER']['UMI-barcode']['start']+1,
-		min_num_below_Cell=config['FILTER']['cell-barcode']['num-below-quality'],
-		min_num_below_UMI=config['FILTER']['UMI-barcode']['num-below-quality'],
-		min_Cell_quality=config['FILTER']['cell-barcode']['min-quality'],
-		min_UMI_quality=config['FILTER']['UMI-barcode']['min-quality'],
-		sample_names=lambda wildcards: samples.index,
-		batches=lambda wildcards: samples.loc[samples.index, 'batch']
-		
-	conda: '../envs/plots.yaml'
-	output:
-		pdf='plots/BC_drop.pdf'
-	script:
-		'../scripts/plot_BC_drop.R'
-
-rule multiqc_trimmomatic:
-	input:
-		expand('logs/{sample}_trimlog.txt', sample=samples.index)
-	params: '-m trimmomatic'
-	output:
-		html='reports/filter.html'
-	wrapper:
-		'0.27.1/bio/multiqc'
+rule multiqc_cutadapt_RNA:
+    input:
+        expand('{results_dir}/logs/cutadapt/{sample}_R2.qc.txt', sample=samples.index, results_dir=results_dir)
+    params: '-m cutadapt --ignore *_R1*'
+    output:
+        html='{results_dir}/reports/RNA_filtering.html'
+    wrapper:
+        '0.21.0/bio/multiqc'
