@@ -18,26 +18,26 @@ LOCAL:
     results:
 META:
     species:
-        SPECIES_ONE:
-            build: 
-            release:
-        SPECIES_TWO:
-            build: 
-            release:
+        mus_musculus:
+            build: 38
+            release: 94
+        homo_sapiens:
+            build: 38
+            release: 91
     ratio: 0.2
-    reference-directory: 
+    reference-directory: /path/to/references/
     gtf_biotypes: gtf_biotypes.yaml
 FILTER:
     barcode_whitelist: ''
-    5-prime-smart-adapter:
+    5-prime-smart-adapter: AAAAAAAAAAA
     cell-barcode:
-        start:
-        end:
+        start: 1
+        end: 12
     UMI-barcode:
-        start:
-        end:
+        start: 13
+        end: 20
     cutadapt:
-        adapters-file:
+        adapters-file: 'adapters.fa'
         R1:
             quality-filter: 20
             maximum-Ns: 0
