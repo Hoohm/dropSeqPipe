@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.4.1]
+### Added
+- samples.csv and config.yaml schema validation. This will help users fix missing values.
+
+
 ## [0.4] - 2018-12-19
 ### Added
 - Top barcode detection using [umi-tools](https://github.com/CGATOxford/UMI-tools) based on number of expected cells.
@@ -29,6 +34,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 - Merging of species expression accross samples. Since the mixed experiments are mostly used to test out the doublet rate of a platform and not for downstream analysis, this last part has not been updated. Single expression matrices are still there.
 - Cell barcodes dropped, umi barcodes dropped, starttrim and polyA trim plots are now gone. BC_drop is also removed. Replacements are adapter_content and yield plots.
+- Quality trimming via dropseq_tools has been removed and is now down by cutadapt. Those modifications decrease the running time of the pipeline.
 
 
 ## [0.32]

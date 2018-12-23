@@ -2,6 +2,9 @@ import pandas as pd
 import os
 import re
 import glob
+from snakemake.utils import validate, min_version
+
+min_version("5.1.2")
 
 #print(os.path.abspath(os.path.dirname(workflow.snakefile)))
 
@@ -18,6 +21,7 @@ configfile: configfile_path
 configfile: config['META']['gtf_biotypes']
 
 # Define a few variables to make them easier to reference
+snakefile_root_path = os.path.abspath(os.path.dirname(workflow.snakefile))
 ref_path = config['META']['reference-directory']
 barcode_whitelist = config['FILTER']['barcode-whitelist']
 results_dir = config['LOCAL']['results']
@@ -25,6 +29,7 @@ raw_data_dir = config['LOCAL']['raw_data']
 
 # dropSeqPipe version
 config['version'] = '0.4'
+validate(config, schema=os.path.join(snakefile_root_path,"schemas","config.schema.yaml"))
 
 
 # In order to deal with single species or mixed species experiment
@@ -65,7 +70,8 @@ else:
     exit("Number of species in the config.yaml must be one or two. Exiting")
 
 # Get sample names from samples.csv
-samples = pd.read_table("samples.csv", header=0, sep=',', index_col=0)
+samples = pd.read_table("samples.csv", sep=',').set_index("samples", drop=False)
+validate(samples, schema=os.path.join(snakefile_root_path,"schemas","samples.schema.yaml"))
 types=['read','umi']
 # Get read_lengths from samples.csv
 read_lengths = list(samples.loc[:,'read_length'])
