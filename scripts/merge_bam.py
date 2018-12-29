@@ -49,7 +49,7 @@ for bam_read in infile_bam:
 	else:
 		fastq_parser,read_barcodes = parse_barcodes(fastq_parser, bam_read.query_name, read_barcodes, barcodes_struct)
 		if (bam_read.query_name) not in read_barcodes:
-			raise SystemExit('Read from mapped file is missing in reference fastq file!')
+			raise SystemExit('Read {} from mapped file is missing in reference fastq file!'.format(bam_read.query_name))
 			os.remove(snakemake.output[0])
 		current_barcodes = read_barcodes.pop(bam_read.query_name)
 		bam_read.set_tags([

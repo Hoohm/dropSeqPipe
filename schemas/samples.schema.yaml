@@ -1,0 +1,21 @@
+$schema: "http://json-schema.org/draft-06/schema#"
+description: an entry in the sample sheet
+properties:
+  samples:
+    type: string
+    description: sample name/identifier
+  expected_cells:
+    type: number
+    description: Number of cells expected in an experiment. dropSeqPipe will extract 20% more than the value given.
+  read_length:
+    type: number
+    description: Length of read2 (mRNA). Necessary for generating the STAR index.
+  batch:
+    type: string
+    description: String value that gives a batch id
+
+required:
+  - samples
+  - expected_cells
+  - read_length
+  - batch
