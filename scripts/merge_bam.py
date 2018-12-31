@@ -22,7 +22,7 @@ barcodes_struct = {
 
 def parse_barcodes(fastq_parser, query_name, read_barcodes, barcodes_struct):
 	for fastq_R1 in fastq_parser:
-		# Some sequencers give a /1 and /2 to R1 and R2 read ids respectively. This attempts to solve the issue.
+		# Some sequencers give a /1 and /2 to R1 and R2 read ids respectively. This attempts to solve the issue #69.
 		if '/' in fastq_R1.id:
 			R1_id = fastq_R1.id[:fastq_R1.id.find("/")]
 		else:
