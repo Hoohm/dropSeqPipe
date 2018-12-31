@@ -1,6 +1,8 @@
 channels:
   - bioconda
   - anaconda
+  - conda-forge
 dependencies:
   - dropseq_tools=2.0.0
   - font-ttf-dejavu-sans-mono=2.37
+  - fontconfig=2.13.1
