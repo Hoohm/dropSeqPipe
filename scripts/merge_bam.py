@@ -22,11 +22,13 @@ barcodes_struct = {
 
 def parse_barcodes(fastq_parser, query_name, read_barcodes, barcodes_struct):
 	for fastq_R1 in fastq_parser:
-		read_barcodes[fastq_R1.id]['XC'] = str(fastq_R1.seq)[barcodes_struct['BC_start']:barcodes_struct['BC_end']]
-		read_barcodes[fastq_R1.id]['XM'] = str(fastq_R1.seq)[barcodes_struct['UMI_start']:barcodes_struct['UMI_end']]
-		if(read_barcodes[fastq_R1.id]['XM']==''):
-			sys.SystemExit('UMI empty for read {}.\n The barcode is: {}.\nWhole entry is:{}'.format(fastq_R1.id, fastq_R1.seq,fastq_R1))
-		if (fastq_R1.id == query_name):
+		# Some sequencers give a /1 and /2 to R1 and R2 read ids respectively. This attempts to solve the issue.
+		R1_id = fastq_R1.id[:fastq_R1.id.find("/")]
+		read_barcodes[R1_id]['XC'] = str(fastq_R1.seq)[barcodes_struct['BC_start']:barcodes_struct['BC_end']]
+		read_barcodes[R1_id]['XM'] = str(fastq_R1.seq)[barcodes_struct['UMI_start']:barcodes_struct['UMI_end']]
+		if(read_barcodes[R1_id]['XM']==''):
+			sys.SystemExit('UMI empty for read {}.\n The barcode is: {}.\nWhole entry is:{}'.format(R1_id, fastq_R1.seq,fastq_R1))
+		if (R1_id == query_name):
 			return(fastq_parser,read_barcodes)
 	return(fastq_parser,read_barcodes)
 	
