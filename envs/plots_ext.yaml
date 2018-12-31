@@ -2,6 +2,7 @@ channels:
   - conda-forge
   - bioconda
   - r
+  - anaconda
 dependencies:
   - r=3.4.1
   - r-ggplot2=2.2.1
@@ -16,3 +17,4 @@ dependencies:
   - r-tidyverse
   - r-devtools
   - r-rcolorbrewer
+  - font-ttf-dejavu-sans-mono=2.37
