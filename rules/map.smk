@@ -5,7 +5,8 @@
 localrules:
     multiqc_star,
     plot_yield,
-    plot_knee_plot
+    plot_knee_plot,
+    pigz_unmapped
 
 
 rule STAR_align:
@@ -17,7 +18,9 @@ rule STAR_align:
             build,
             release) + '_' + str(samples.loc[wildcards.sample,'read_length']) + '/SA'
     output:
-        temp('{results_dir}/samples/{sample}/Aligned.out.bam')
+        temp('{results_dir}/samples/{sample}/Aligned.out.bam'),
+        '{results_dir}/samples/{sample}/Unmapped.out.mate1'
+        
     log:
         '{results_dir}/samples/{sample}/Log.final.out'
     params:
@@ -78,7 +81,15 @@ rule multiqc_star:
     wrapper:
         '0.21.0/bio/multiqc'
 
-
+rule pigz_unmapped:
+    input:
+        '{results_dir}/samples/{sample}/Unmapped.out.mate1'
+    output:
+        '{results_dir}/samples/{sample}/Unmapped.out.mate1.gz'
+    threads: 4
+    conda: '../envs/pigz.yaml'
+    shell:
+        """pigz -p 4 {input}"""
 
 rule MergeBamAlignment:
     input:

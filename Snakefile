@@ -116,6 +116,7 @@ if len(config['META']['species'].keys()) == 2:
                 '{results_dir}/plots/knee_plots/{sample}_knee_plot.pdf',
                 '{results_dir}/reports/star.html',
                 '{results_dir}/plots/yield.pdf',
+                '{results_dir}/samples/{sample}/Unmapped.out.mate1.gz',
                 #splitting
                 '{results_dir}/plots/barnyard/{sample}_genes.pdf',
                 '{results_dir}/plots/barnyard/{sample}_transcripts.pdf'],
@@ -152,6 +153,7 @@ elif len(config['META']['species'].keys()) == 1:
                 '{results_dir}/plots/knee_plots/{sample}_knee_plot.pdf',
                 '{results_dir}/reports/star.html',
                 '{results_dir}/plots/yield.pdf',
+                '{results_dir}/samples/{sample}/Unmapped.out.mate1.gz',
                 #extract
                 '{results_dir}/plots/rna_metrics/{sample}_rna_metrics.pdf',
                 '{results_dir}/summary/{type}/expression.mtx',
@@ -204,7 +206,8 @@ rule map:
             ['{results_dir}/plots/knee_plots/{sample}_knee_plot.pdf',
             '{results_dir}/reports/star.html',
             '{results_dir}/plots/yield.pdf',
-            '{results_dir}/samples/{sample}/final.bam'],
+            '{results_dir}/samples/{sample}/final.bam',
+            '{results_dir}/samples/{sample}/Unmapped.out.mate1.gz'],
                 sample=samples.index,
                 results_dir=results_dir)
 

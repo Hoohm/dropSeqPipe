@@ -1,7 +1,7 @@
 import math
 import platform
 """Generate all the meta data files"""
-
+# To add missing fields for an annotation of ERCC: awk -F'[\t|;]' '{printf $0" "; gsub(/id/,"name"); print $9";"$10"; exon_version \"1\";"}'
 #Which rules will be run on the host computer and not sent to nodes
 localrules:
      create_dict,
