@@ -25,10 +25,8 @@ for(i in 1:length(samples)){
   data[which(data$Sample==sample),c(3,4,5)] = cutadapt_clean[,c('Adapter','Pair','Count')]
 }
 
-data$Adapter = factor(data$Adapter)
-data$Pair = factor(data$Pair)
-levels(data$Adapter) = levels(temp$Adapter)
-levels(data$Pair) = levels(temp$Pair)
+data$Adapter <- factor(data$Adapter, levels = unique(temp$Adapter))
+data$Pair    <- factor(data$Pair,    levels = unique(temp$Pair))
 
 #Transform it into percentages
 data = group_by(data, Sample, Pair) %>% mutate(Percentages=Count/sum(Count))
