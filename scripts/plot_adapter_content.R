@@ -40,4 +40,10 @@ p1 = p1 + scale_x_discrete(label=abbreviate)
 p1 = p1 + theme(axis.text.x=element_text(angle = 90, hjust = 0))
 
 
-ggsave(plot=p1, filename=snakemake@output$pdf)
+result = tryCatch({
+  ggsave(plot=p1, filename=snakemake@output$pdf)
+}, error = function(err) {
+  message("Caught error whilst plotting, will continue regardless!:  ", err)
+  save(data, file="R_plot_adapter_content_debug.rdata")
+  message(str(data))
+})
