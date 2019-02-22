@@ -16,8 +16,6 @@ if (!is.null(snakemake@config$DEBUG)) {
     dir.create(path_debug)
     save(snakemake, file = file.path(path_debug, "plot_adapter_content_snakemake.rdata"))
   }
-} else {
-  message("debug flag is not set")
 }
 #------------------------------------ debugging
 
@@ -49,8 +47,7 @@ cutadapt_counts <- group_by(cutadapt_counts, Sample, Pair) %>%
 
 p1 <- ggplot(cutadapt_counts, aes(x=Sample, y = Percentages, fill = Adapter))  +
   geom_bar(stat = "identity") +
-  facet_grid(~Batch, scales = "free") +
-  facet_wrap(~Pair, nrow=2, scales="free") +
+  facet_grid(Pair ~ Batch, scales = "free") +
   theme_minimal() +
   ggtitle("Comparison accross samples of adapter content") +
   scale_x_discrete(label=abbreviate) +
