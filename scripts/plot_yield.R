@@ -19,7 +19,7 @@ for(i in 1:length(samples)){
   bbmap_log = read.table(snakemake@input$repaired[i], sep=':', header=FALSE, skip=6, row.names=1, nrows=4)
   reads_after_filtering = as.numeric(str_match(bbmap_log['Pairs',], pattern = "\t([0-9]{1,20}) reads.*")[,2])/2
   R1_filtered = read.table(snakemake@input$R1_filtered[i], header = FALSE, skip=8, sep=':', nrows=7, row.names=1)
-  total_reads = as.numeric(str_remove_all(R1_filtered['Total reads processed',], pattern = (' |,')))
+  total_reads = as.numeric(str_replace_all(R1_filtered['Total reads processed',], pattern = (' |,'), ""))
   
   # R2_filtered = read.table(snakemake@input$R2_filtered[i], header = FALSE, skip=8, sep=':', nrows=7, row.names=1)
   
