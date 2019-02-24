@@ -1,45 +1,61 @@
+#------------------------------------ for debugging:
+# For debugging add the following line in config.yaml (without the #)
+# DEBUG: True
+# This will create R objects in the debug directory containing the snakemake
+# object R object that can be loaded into a custom R session as below:
+
+debug_flag <- FALSE
+# check if DEBUG flag is set
+if (!is.null(snakemake@config$DEBUG)) {
+  message("debug flag is set")
+  #if set, then check if True
+  if (snakemake@config$DEBUG) {
+    debug_flag <- TRUE
+    message("In debug mode: saving R objects to inspect later")
+    path_debug <- file.path(snakemake@config$LOCAL$results, "debug")
+    dir.create(path_debug)
+    save(snakemake, file = file.path(path_debug, "plot_adapter_content_snakemake.rdata"))
+  }
+}
+#------------------------------------ debugging
+
 library(ggplot2)
-library(reshape2)
-library(stringr)
 library(dplyr)
 
+samples <- snakemake@params$sample_names
+batches <- snakemake@params$batches
 
-
-
-
-samples = snakemake@params$sample_names
-batches = snakemake@params$batches
-temp = read.csv(snakemake@input[[1]][1], header = TRUE)
-data = data.frame(matrix(nrow=length(samples)*nrow(temp), ncol=5))
-colnames(data) = c('Sample','Batch','Adapter','Pair','Count')
-
-data[,'Sample'] = rep(samples, nrow(temp))
-data[,'Batch'] = rep(batches,nrow(temp))
-
-
-
-for(i in 1:length(samples)){
-  sample = samples[i]
-  #Read files
-  cutadapt_clean = read.csv(snakemake@input[[i]][1], header = TRUE)	
-  data[which(data$Sample==sample),c(3,4,5)] = cutadapt_clean[,c('Adapter','Pair','Count')]
+#Read files into a list
+cutadapt_clean_list <- list()
+for (i in seq_along(samples)){
+  cutadapt_clean           <- read.csv(snakemake@input[[i]][1], header = TRUE)
+  cutadapt_clean$Sample    <- samples[i]
+  cutadapt_clean$Batch     <- batches[i]
+  cutadapt_clean_list[[i]] <- cutadapt_clean
 }
 
-data$Adapter = factor(data$Adapter)
-data$Pair = factor(data$Pair)
-levels(data$Adapter) = levels(temp$Adapter)
-levels(data$Pair) = levels(temp$Pair)
+# combining adaptors accross samples
+cutadapt_counts <- Reduce(rbind, cutadapt_clean_list, NULL)
 
 #Transform it into percentages
-data = group_by(data, Sample, Pair) %>% mutate(Percentages=Count/sum(Count))
+cutadapt_counts <- group_by(cutadapt_counts, Sample, Pair) %>%
+  mutate(Percentages=Count/sum(Count))
+#      Adapter                           Sequence Pair Count  Sample  Batch
+# 1 PrefixNX/1                AGATGTGTATAAGAGACAG   R1     7 sample1 Batch1
+# ...
+# 6  Trans2_rc CTGTCTCTTATACACATCTCCGAGCCCACGAGAC   R2     5 sample2 Batch2
 
-p1 = ggplot(data, aes(x=Sample, y = Percentages, fill = Adapter))
-p1 = p1 + geom_bar(stat = 'identity')
-p1 = p1 + facet_grid(Pair ~ Batch, scales = "free") + theme_minimal()
-#p1 = p1 + facet_wrap(~Pair, nrow=2, scales="free") 
-p1 = p1 + ggtitle('Comparison accross samples of adapter content')
-p1 = p1 + scale_x_discrete(label=abbreviate)
-p1 = p1 + theme(axis.text.x=element_text(angle = 90, hjust = 0))
-
+p1 <- ggplot(cutadapt_counts, aes(x=Sample, y = Percentages, fill = Adapter))  +
+  geom_bar(stat = "identity") +
+  facet_grid(Pair ~ Batch, scales = "free") +
+  theme_minimal() +
+  ggtitle("Comparison accross samples of adapter content") +
+  scale_x_discrete(label=abbreviate) +
+  scale_y_continuous(labels = scales::percent) +
+  theme(axis.text.x=element_text(angle = 90, hjust = 0))
 
 ggsave(plot=p1, filename=snakemake@output$pdf)
+
+if (debug_flag) {
+  save.image(file = file.path(path_debug, "plot_adapter_content_workspace.rdata"))
+}

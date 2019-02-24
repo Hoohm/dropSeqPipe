@@ -15,8 +15,8 @@ fastqc_reads:
 STAR_align:
     n: 24
 create_star_index:
-    n: 24
-    time: "02:00:00"
-    mem: 40g
+    n: 1
+    time: "04:00:00"
+    mem: 64g
     output: "logs/cluster/{rule}.out"
     error: "logs/cluster/{rule}.err"

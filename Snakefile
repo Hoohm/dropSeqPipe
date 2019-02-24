@@ -29,7 +29,7 @@ raw_data_dir = config['LOCAL']['raw_data']
 
 # dropSeqPipe version
 config['version'] = '0.4'
-validate(config, schema=os.path.join(snakefile_root_path,"schemas","config.schema.yaml"))
+#validate(config, schema=os.path.join(snakefile_root_path,"schemas","config.schema.yaml"))
 
 
 # In order to deal with single species or mixed species experiment
@@ -71,7 +71,7 @@ else:
 
 # Get sample names from samples.csv
 samples = pd.read_table("samples.csv", sep=',').set_index("samples", drop=False)
-validate(samples, schema=os.path.join(snakefile_root_path,"schemas","samples.schema.yaml"))
+#validate(samples, schema=os.path.join(snakefile_root_path,"schemas","samples.schema.yaml"))
 types=['read','umi']
 # Get read_lengths from samples.csv
 read_lengths = list(samples.loc[:,'read_length'])
@@ -172,16 +172,15 @@ elif len(config['META']['species'].keys()) == 1:
                     build=build,
                     release=release,
                     species=species)
-        
-rule download_meta:
-    input:
-        expand(
-            ["{ref_path}/{species}_{build}_{release}/annotation.gtf",
-            "{ref_path}/{species}_{build}_{release}/genome.fa"],
-                ref_path=config['META']['reference-directory'],
-                species=species_list,
-                release=release,
-                build=build)
+    rule download_meta:
+        input:
+            expand(
+                ["{ref_path}/{species}_{build}_{release}/annotation.gtf",
+                "{ref_path}/{species}_{build}_{release}/genome.fa"],
+                    ref_path=config['META']['reference-directory'],
+                    species=species_list,
+                    release=release,
+                    build=build)
         
 rule qc:
     input:
@@ -236,12 +235,12 @@ rule split_species:
 rule extract_species:
     input:
         expand(
-            ['{results_dir}/samples/{sample}/{species}/umi_expression_matrix.txt',
-            '{results_dir}/samples/{sample}/{species}/counts_expression_matrix.txt',
+            ['{results_dir}/samples/{sample}/{species}/{type}/expression.mtx',
             '{results_dir}/plots/rna_metrics/{sample}_{species}_rna_metrics.pdf'],
                 sample=samples.index,
                 species=config['META']['species'],
-                results_dir=results_dir)
+                results_dir=results_dir,
+                type=types)
             
 rule merge:
     input:

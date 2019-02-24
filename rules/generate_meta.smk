@@ -154,5 +154,6 @@ rule create_star_index:
         --genomeFastaFiles {input.reference_file}\
         --sjdbGTFfile {input.annotation_file}\
         --sjdbOverhang {params.sjdbOverhang}\
-        --genomeChrBinNbits {params.genomeChrBinNbits}
+        --genomeChrBinNbits {params.genomeChrBinNbits}\
+        --genomeSAsparseD 2
         """
