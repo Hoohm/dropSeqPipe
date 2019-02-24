@@ -159,8 +159,7 @@ gg <- ggplot(meta.data, aes(x = nUMI, y = nGene, color=orig.ident)) +
   # dev.new()
 # htmlwidgets::saveWidget(ggplotly(gg),
                         # file.path(getwd(), snakemake@output$html_umi_vs_gene))
-ggsave(gg, file = file.path(getwd(), snakemake@output$pdf_umi_vs_gene),
-       width = 12, height = 7)
+ggsave(gg, file = snakemake@output$pdf_umi_vs_gene, width = 12, height = 7)
 
 
 
@@ -176,8 +175,7 @@ gg <- ggplot(meta.data, aes(x = nCounts, y = nGene, color=orig.ident)) +
 # htmlwidgets::saveWidget(ggplotly(gg),
   #                       file.path(getwd(), snakemake@output$html_count_vs_gene))
 
-ggsave(gg, file = file.path(getwd(), snakemake@output$pdf_count_vs_gene),
-        width = 12, height = 7)
+ggsave(gg, file = snakemake@output$pdf_count_vs_gene, width = 12, height = 7)
 
 
 # head(meta.data,2)
@@ -187,4 +185,4 @@ ggsave(gg, file = file.path(getwd(), snakemake@output$pdf_count_vs_gene),
 
 # exporting R Seurat objects into summary/R_Seurat_objects.rdata
 save(snakemake, seuratobj,
-     file=file.path(getwd(), snakemake@output$R_objects))
+     file=file.path(snakemake@output$R_objects))
