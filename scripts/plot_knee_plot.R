@@ -17,6 +17,7 @@ knee_plot = knee_plot + ggtitle(paste0(snakemake@wildcards$sample, '\nTotal read
 knee_plot = knee_plot + theme(plot.title = element_text(size=10))
 knee_plot = knee_plot + labs(x='STAMPS', y='Cumulative fraction of reads')
 knee_plot = knee_plot + scale_y_continuous(labels = scales::percent)
+knee_plot = knee_plot + theme_classic()
 
 if(!is.null(snakemake@input$barcodes))
 {
