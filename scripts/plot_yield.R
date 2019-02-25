@@ -75,6 +75,10 @@ for (i in 1:length(samples)) {
 }
 
 mydata_long <- melt(mydata, c("Sample", "Batch"))
+# tidyr version
+# library(tidyr)
+# melt will be retired, use gather instead: https://github.com/hadley/reshape
+# mydata_long <- mydata %>% gather(variable, value, -Sample, -Batch)
 
 p1 <- ggplot(subset(mydata_long, mydata_long$variable != "Total reads"),
              aes(x = Sample, y = value, fill = factor(variable))) +
