@@ -6,7 +6,8 @@ localrules:
     multiqc_star,
     plot_yield,
     plot_knee_plot,
-    pigz_unmapped
+    pigz_unmapped,
+    summary_stats
 
 
 rule STAR_align:
@@ -229,3 +230,17 @@ rule plot_knee_plot:
         pdf='{results_dir}/plots/knee_plots/{sample}_knee_plot.pdf'
     script:
         '../scripts/plot_knee_plot.R'
+
+rule summary_stats:
+    input:
+        R_objects='{results_dir}/summary/R_Seurat_objects.rdata',
+        hist_cell=expand('{results_dir}/logs/dropseq_tools/{sample}_hist_out_cell.txt', sample=samples.index, results_dir=results_dir)
+    conda: '../envs/plots_ext.yaml'
+    output:
+        stats_pre='{results_dir}/summary/barcode_stats_pre_filter.csv',
+        stats_post='{results_dir}/summary/barcode_stats_post_filter.csv',
+    params:
+        sample_names=lambda wildcards: samples.index,
+        batches=lambda wildcards: samples.loc[samples.index, 'batch']
+    script:
+        '../scripts/create_summary_stats.R'

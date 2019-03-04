@@ -155,6 +155,8 @@ elif len(config['META']['species'].keys()) == 1:
                 '{results_dir}/plots/knee_plots/{sample}_knee_plot.pdf',
                 '{results_dir}/reports/star.html',
                 '{results_dir}/plots/yield.pdf',
+                '{results_dir}/summary/barcode_stats_pre_filter.csv',
+                '{results_dir}/summary/barcode_stats_post_filter.csv',
                 '{results_dir}/samples/{sample}/Unmapped.out.mate1.gz',
                 #extract
                 '{results_dir}/plots/rna_metrics/{sample}_rna_metrics.pdf',
@@ -209,6 +211,8 @@ rule map:
             ['{results_dir}/plots/knee_plots/{sample}_knee_plot.pdf',
             '{results_dir}/reports/star.html',
             '{results_dir}/plots/yield.pdf',
+            '{results_dir}/summary/barcode_stats_pre_filter.csv',
+            '{results_dir}/summary/barcode_stats_post_filter.csv',
             '{results_dir}/samples/{sample}/final.bam',
             '{results_dir}/samples/{sample}/Unmapped.out.mate1.gz'],
                 sample=samples.index,
