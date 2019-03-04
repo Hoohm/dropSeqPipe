@@ -23,7 +23,7 @@ debug_flag <- FALSE
 # check if DEBUG flag is set
 if (!is.null(snakemake@config$DEBUG)) {
   message("debug flag is set")
-  #if set, then check if True
+  # if set, then check if True
   if (snakemake@config$DEBUG) {
     debug_flag <- TRUE
     message("In debug mode: saving R objects to inspect later")
@@ -32,7 +32,7 @@ if (!is.null(snakemake@config$DEBUG)) {
     save(snakemake, file = file.path(path_debug, "create_summary_stats_snakemake.rdata"))
   }
 }
-####/debug
+#### /debug
 
 library(dplyr) # Dataframe manipulation
 library(Matrix) # Sparse matrices
@@ -49,8 +49,10 @@ batches <- snakemake@params$batches
 # creating environment so objects don't get overwritten upon loading
 env_imported_r_objects <- new.env()
 # importing Seurat object
-load(file = file.path(snakemake@input$R_objects),
-     envir = env_imported_r_objects)
+load(
+  file = file.path(snakemake@input$R_objects),
+  envir = env_imported_r_objects
+)
 # attach
 seuratobj <- env_imported_r_objects$seuratobj
 meta.data <- seuratobj@meta.data
@@ -70,24 +72,26 @@ gini_index <- function (x, weights = rep(1, length = length(x))) {
 # stats only based after keeping most abundant `expected-cells`
 # taken out from seurat object generated in violine_plot rule.
 
-#median calculator
+# median calculator
+
 stats_post <- meta.data %>%
   group_by(orig.ident) %>%
   summarise(
-            Total_nb_reads                 = sum(nCounts),
-            Nb_STAMPS                      = mean(expected_cells), # should be all the same anyway..
-            Median_reads_per_STAMP         = round(median(nCounts),2),
-            Mean_reads_per_STAMP           = round(mean(nCounts),2),
-            Total_nb_UMIs                  = sum(nUMI),
-            Median_UMIs_per_STAMP          = round(median(nUMI),2),
-            Mean_UMIs_per_STAMP            = round(mean(nUMI),2),
-            Mean_UMIs_per_Gene             = round(mean(umi.per.gene),2),
-            Median_number_genes_per_STAMP  = round(median(nGene),2),
-            Mean_number_genes_per_STAMP    = round(mean(nGene),2),
-            Mean_Ribo_pct                  = round(100 * mean(pct.Ribo),2),
-            Mean_Mito_pct                  = round(100 * mean(pct.mito),2),
-            Read_length                    = mean(read_length), # should be all the same anyway..
-            Number_barcodes_used_for_debug = n())
+    Total_nb_reads                 = sum(nCounts),
+    Nb_STAMPS                      = mean(expected_cells), # should be all the same anyway..
+    Median_reads_per_STAMP         = round(median(nCounts), 2),
+    Mean_reads_per_STAMP           = round(mean(nCounts), 2),
+    Total_nb_UMIs                  = sum(nUMI),
+    Median_UMIs_per_STAMP          = round(median(nUMI), 2),
+    Mean_UMIs_per_STAMP            = round(mean(nUMI), 2),
+    Mean_UMIs_per_Gene             = round(mean(umi.per.gene), 2),
+    Median_number_genes_per_STAMP  = round(median(nGene), 2),
+    Mean_number_genes_per_STAMP    = round(mean(nGene), 2),
+    Mean_Ribo_pct                  = round(100 * mean(pct.Ribo), 2),
+    Mean_Mito_pct                  = round(100 * mean(pct.mito), 2),
+    Read_length                    = mean(read_length), # should be all the same anyway..
+    Number_barcodes_used_for_debug = n()
+  )
 
 
 
@@ -95,9 +99,9 @@ stats_post <- meta.data %>%
 # pre STAMP stats
 
 # hist out goes into knee plots
-		# 'logs/{sample}_hist_out_cell.txt'
-		# """export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && BAMTagHistogram -m {params.memory}\
-		# TAG=XC\
+# 'results/logs/{sample}_hist_out_cell.txt'
+# """export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && BAMTagHistogram -m {params.memory}\
+# TAG=XC\
 # https://hpc.nih.gov/apps/dropseq.html
 # there is not hint in documentation on any filtering (only read quality)
 
@@ -109,50 +113,66 @@ stats_post <- meta.data %>%
 
 # TODO: Nr UMI for pre filter
 
-stats_pre <- data.frame(matrix(nrow=length(samples), ncol=10))
+stats_pre <- data.frame(matrix(nrow = length(samples), ncol = 10))
 colnames(stats_pre) <- c(
-                    "Sample",
-                    "Batch",
-                    "Total_raw_reads",
-                    "Nr_barcodes_total",
-                    "Nr_barcodes_more_than_1_reads",
-                    "Nr_barcodes_more_than_10_reads",
-                    "percentile99",
-                    "percentile95",
-                    "percentile50",
-                    "Gini-index"
-                    )
+  "Sample",
+  "Batch",
+  "Total_raw_reads",
+  "Nr_barcodes_total",
+  "Nr_barcodes_more_than_1_reads",
+  "Nr_barcodes_more_than_10_reads",
+  "percentile99",
+  "percentile95",
+  "percentile50",
+  "Gini-index"
+)
 
 stats_pre[, "Sample"] <- samples
 stats_pre[, "Batch"]  <- batches
 
-for (i in 1:length(samples)){
+
+for (i in 1:length(samples)) {
   # importing 'logs/{sample}_hist_out_cell.txt'
-  hist_out <- read.table(file = snakemake@input$hist_cell[i],
-                         header = FALSE, stringsAsFactors = FALSE)
+  hist_out <- read.table(
+    file = snakemake@input$hist_cell[i],
+    header = FALSE, stringsAsFactors = FALSE
+  )
   sample <- samples[i]
-  reads        <- hist_out$V1
-  barcodes     <- hist_out$V2
+  reads <- hist_out$V1
+  barcodes <- hist_out$V2
   # calculations on reads
-  total_reads  <- sum(reads)
-  reads_cumsum <- cumsum(reads)
-  reads_cumsum_perc <- (reads_cumsum/total_reads)
+  # total reads are not sum(reads)! Needs to be taken from
+  # results/logs/cutadapt/sample1_R1.qc.txt
+  #
+  # read in full text file "sample_R2.qc.txt"
+  filedump <- readLines(snakemake@input$R2qc[i])
+  # subset line matching a pattern
+  total_reads <- filedump[grep("Total reads processed:", filedump)] %>% #extract line
+    str_extract("[0-9,]+") %>% # extract number from line
+    str_replace(",", "") %>% # delete comma for subsequent numeric casting
+    as.numeric()
+  reads_cumsum      <- cumsum(reads)
+  reads_cumsum_perc <- (reads_cumsum / sum(reads))
   # reporting stats
-  stats_pre[i, "Total_raw_reads"] <-  total_reads
-  stats_pre[i, "Nr_barcodes_total"] <-  length(barcodes)
-  stats_pre[i, "percentile99"] <-  which.min(reads_cumsum_perc<0.99)
-  stats_pre[i, "percentile95"] <-  which.min(reads_cumsum_perc<0.95)
-  stats_pre[i, "percentile50"] <-  which.min(reads_cumsum_perc<0.50)
-  stats_pre[i, "Nr_barcodes_more_than_1_reads"]  <-  sum(reads > 1)
-  stats_pre[i, "Nr_barcodes_more_than_10_reads"] <-  sum(reads > 10)
-  stats_pre[i, "Gini-index"] <-  round(gini_index(reads),2)
-  stats_post[i, "Pct_reads_after_filter"] <- round(100 * (stats_post[i, "Total_nb_reads"]  /
-                                                              stats_pre [i, "Total_raw_reads"]), 2)
+  stats_pre[i, "Total_raw_reads"]                <- total_reads
+  stats_pre[i, "Reads_assigned_to_expected_STAMPs"] <- sum(reads[1:stats_post$Nb_STAMPS[i]])
+  stats_pre[i, "Nr_barcodes_total"]              <- length(barcodes)
+  stats_pre[i, "percentile99"]                   <- which.min(reads_cumsum_perc < 0.99)
+  stats_pre[i, "percentile95"]                   <- which.min(reads_cumsum_perc < 0.95)
+  stats_pre[i, "percentile50"]                   <- which.min(reads_cumsum_perc < 0.50)
+  stats_pre[i, "Nr_barcodes_more_than_1_reads"]  <- sum(reads > 1)
+  stats_pre[i, "Nr_barcodes_more_than_10_reads"] <- sum(reads > 10)
+  stats_pre[i, "Gini-index"]                     <- round(gini_index(reads), 2)
+  stats_post[i, "Pct_reads_after_filter"] <-
+    round(100 * (
+                 stats_post[i, "Total_nb_reads"] /
+                 stats_pre [i, "Total_raw_reads"]), 2
+         )
 }
 
 # output
-write.csv(stats_pre,  file.path(snakemake@output$stats_pre))
-write.csv(stats_post, file.path(snakemake@output$stats_post)) #writes table for excel
+write.csv(stats_pre, file.path(snakemake@output$stats_pre))
+write.csv(stats_post, file.path(snakemake@output$stats_post)) # writes table for excel
 
 if (debug_flag) {
   save.image(file = file.path(path_debug, "create_summary_stats_workspace.rdata"))
