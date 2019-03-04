@@ -50,13 +50,9 @@ rule multiqc_fastqc_reads:
 
 rule fasta_fastq_adapter:
     input:
-        adapters=config['FILTER']['cutadapt']['adapters-file']
+        fa=config['FILTER']['cutadapt']['adapters-file']
     output:
-        file="fastqc_adapter.tsv"
-    run:
-        import sys
-        from Bio import SeqIO
-        with open( output.file, "w" ) as myoutput:
-            for seq_record in SeqIO.parse(input.adapters, "fasta"):
-                myline = (str(seq_record.id)) + "\t" + str(seq_record.seq[0:13]) + "\n"
-                myoutput.write(myline)
+        tsv="fastqc_adapter.tsv"
+    conda: '../envs/merge_bam.yaml'
+    script:
+        '../scripts/fa2tsv.py'
