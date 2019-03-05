@@ -149,7 +149,7 @@ for (i in 1:length(samples)) {
   # subset line matching a pattern
   total_reads <- filedump[grep("Total reads processed:", filedump)] %>% #extract line
     str_extract("[0-9,]+") %>% # extract number from line
-    str_replace(",", "") %>% # delete comma for subsequent numeric casting
+    str_replace_all(",", "") %>% # delete comma for subsequent numeric casting
     as.numeric()
   reads_cumsum      <- cumsum(reads)
   reads_cumsum_perc <- (reads_cumsum / sum(reads))
