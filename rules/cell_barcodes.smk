@@ -6,7 +6,6 @@ ruleorder: extend_barcode_whitelist > get_cell_whitelist
 
 localrules:
     get_cell_whitelist,
-    extend_barcode_whitelist,
     extend_barcode_top
 
 rule extend_barcode_whitelist:
