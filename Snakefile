@@ -155,8 +155,6 @@ elif len(config['META']['species'].keys()) == 1:
                 '{results_dir}/plots/knee_plots/{sample}_knee_plot.pdf',
                 '{results_dir}/reports/star.html',
                 '{results_dir}/plots/yield.pdf',
-                '{results_dir}/summary/barcode_stats_pre_filter.csv',
-                '{results_dir}/summary/barcode_stats_post_filter.csv',
                 '{results_dir}/samples/{sample}/Unmapped.out.mate1.gz',
                 #extract
                 '{results_dir}/plots/rna_metrics/{sample}_rna_metrics.pdf',
@@ -167,6 +165,8 @@ elif len(config['META']['species'].keys()) == 1:
                 '{results_dir}/plots/UMI_vs_gene.pdf',
                 '{results_dir}/plots/Count_vs_gene.pdf',
                 '{results_dir}/summary/R_Seurat_objects.rdata',
+                '{results_dir}/summary/barcode_stats_pre_filter.csv',
+                '{results_dir}/summary/barcode_stats_post_filter.csv',
                 '{results_dir}/plots/violinplots_comparison_UMI.pdf'],
                     read_length=read_lengths,
                     sample=samples.index,

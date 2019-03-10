@@ -6,8 +6,7 @@ localrules:
     multiqc_star,
     plot_yield,
     plot_knee_plot,
-    pigz_unmapped,
-    summary_stats
+    pigz_unmapped
 
 
 rule STAR_align:
@@ -21,7 +20,7 @@ rule STAR_align:
     output:
         temp('{results_dir}/samples/{sample}/Aligned.out.bam'),
         '{results_dir}/samples/{sample}/Unmapped.out.mate1'
-        
+
     log:
         '{results_dir}/samples/{sample}/Log.final.out'
     params:
@@ -199,7 +198,7 @@ rule bam_hist:
         READ_MQ=10\
         O={output}
         """
-        
+
 
 rule plot_yield:
     input:
@@ -223,25 +222,10 @@ rule plot_knee_plot:
     input:
         data='{results_dir}/logs/dropseq_tools/{sample}_hist_out_cell.txt',
         barcodes='{results_dir}/samples/{sample}/barcodes.csv'
-    params: 
+    params:
         cells=lambda wildcards: int(samples.loc[wildcards.sample,'expected_cells'])
     conda: '../envs/plots.yaml'
     output:
         pdf='{results_dir}/plots/knee_plots/{sample}_knee_plot.pdf'
     script:
         '../scripts/plot_knee_plot.R'
-
-rule summary_stats:
-    input:
-        R_objects='{results_dir}/summary/R_Seurat_objects.rdata',
-        R2qc=expand('{results_dir}/logs/cutadapt/{sample}_R2.qc.txt', sample=samples.index, results_dir=results_dir),
-        hist_cell=expand('{results_dir}/logs/dropseq_tools/{sample}_hist_out_cell.txt', sample=samples.index, results_dir=results_dir)
-    conda: '../envs/plots_ext.yaml'
-    output:
-        stats_pre='{results_dir}/summary/barcode_stats_pre_filter.csv',
-        stats_post='{results_dir}/summary/barcode_stats_post_filter.csv',
-    params:
-        sample_names=lambda wildcards: samples.index,
-        batches=lambda wildcards: samples.loc[samples.index, 'batch']
-    script:
-        '../scripts/create_summary_stats.R'
