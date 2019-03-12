@@ -9,10 +9,11 @@ rule fastqc_barcodes:
     """Create fastqc report"""
     input: 
         get_R1_files,
+        'fastqc_adapter.tsv',
     output:
         html='{results_dir}/logs/fastqc/{sample}_R1_fastqc.html',
         zip='{results_dir}/logs/fastqc/{sample}_R1_fastqc.zip'
-    params: '--extract'
+    params: '--extract -a fastqc_adapter.tsv'
     wrapper:
         '0.27.1/bio/fastqc'
 
@@ -20,10 +21,11 @@ rule fastqc_reads:
     """Create fastqc report"""
     input: 
         get_R2_files,
+        'fastqc_adapter.tsv',
     output:
         html='{results_dir}/logs/fastqc/{sample}_R2_fastqc.html',
         zip='{results_dir}/logs/fastqc/{sample}_R2_fastqc.zip'
-    params: '--extract'
+    params: '--extract -a fastqc_adapter.tsv'
     wrapper:
         '0.27.1/bio/fastqc'
 
@@ -45,3 +47,12 @@ rule multiqc_fastqc_reads:
     params: '-m fastqc --ignore *_R1*'
     wrapper:
         '0.27.1/bio/multiqc'
+
+rule fasta_fastq_adapter:
+    input:
+        fa=config['FILTER']['cutadapt']['adapters-file']
+    output:
+        tsv="fastqc_adapter.tsv"
+    conda: '../envs/merge_bam.yaml'
+    script:
+        '../scripts/fa2tsv.py'
