@@ -96,7 +96,7 @@ rule MergeBamAlignment:
         mapped='{results_dir}/samples/{sample}/Aligned.out.bam',
         R1_ref = '{results_dir}/samples/{sample}/trimmmed_repaired_R1.fastq.gz'
     output:
-        temp('{results_dir}/samples/{sample}/Aligned.merged.bam')
+        '{results_dir}/samples/{sample}/Aligned.merged.bam'
     params:
         BC_start=config['FILTER']['cell-barcode']['start']-1,
         BC_end=config['FILTER']['cell-barcode']['end'],
@@ -107,6 +107,8 @@ rule MergeBamAlignment:
     script:
         '../scripts/merge_bam.py'
 
+# Note: rule repair_barcodes (cell_barcodes.smk) creates Aligned.repaired.bam
+# this is using barcode information (i.e. dependent on expected_cells in config.yaml)
 
 
 rule TagReadWithGeneExon:

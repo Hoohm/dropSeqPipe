@@ -114,6 +114,7 @@ if len(config['META']['species'].keys()) == 2:
                 '{results_dir}/reports/barcode_filtering.html',
                 '{results_dir}/reports/RNA_filtering.html',
                 '{results_dir}/samples/{sample}/trimmmed_repaired_R1.fastq.gz',
+                '{results_dir}/samples/{sample}/top_barcodes.csv',
                 #mapping
                 '{results_dir}/plots/knee_plots/{sample}_knee_plot.pdf',
                 '{results_dir}/reports/star.html',
@@ -201,7 +202,8 @@ rule filter:
             ['{results_dir}/plots/adapter_content.pdf',
             '{results_dir}/reports/barcode_filtering.html',
             '{results_dir}/reports/RNA_filtering.html',
-            '{results_dir}/samples/{sample}/trimmmed_repaired_R1.fastq.gz'],
+            '{results_dir}/samples/{sample}/trimmmed_repaired_R1.fastq.gz',
+            '{results_dir}/samples/{sample}/top_barcodes.csv'],
                 results_dir=results_dir,
                 sample=samples.index)
 
