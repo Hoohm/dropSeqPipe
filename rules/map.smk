@@ -20,7 +20,7 @@ rule STAR_align:
     output:
         temp('{results_dir}/samples/{sample}/Aligned.out.bam'),
         '{results_dir}/samples/{sample}/Unmapped.out.mate1'
-        
+
     log:
         '{results_dir}/samples/{sample}/Log.final.out'
     params:
@@ -198,7 +198,7 @@ rule bam_hist:
         READ_MQ=10\
         O={output}
         """
-        
+
 
 rule plot_yield:
     input:
@@ -222,7 +222,7 @@ rule plot_knee_plot:
     input:
         data='{results_dir}/logs/dropseq_tools/{sample}_hist_out_cell.txt',
         barcodes='{results_dir}/samples/{sample}/barcodes.csv'
-    params: 
+    params:
         cells=lambda wildcards: int(samples.loc[wildcards.sample,'expected_cells'])
     conda: '../envs/plots.yaml'
     output:
