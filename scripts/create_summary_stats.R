@@ -50,12 +50,21 @@ batches <- snakemake@params$batches
 env_imported_r_objects <- new.env()
 # importing Seurat object
 load(
-  file = file.path(snakemake@input$R_objects),
+  file  = file.path(snakemake@input$R_objects),
   envir = env_imported_r_objects
 )
 # attach
 seuratobj <- env_imported_r_objects$seuratobj
 meta.data <- seuratobj@meta.data
+
+# subset only highest stamps as set in config.yaml
+# this is necessary since there are more stamps selected as a safty margin which now have to be taken out again to calculate stats.
+
+meta.data.sub <- meta.data %>%
+  group_by(orig.ident) %>%
+  arrange(desc(nCounts)) %>%
+  filter(nCounts >= nCounts[expected_cells[1]]) %>%
+  as.data.frame()
 
 gini_index <- function (x, weights = rep(1, length = length(x))) {
     ox      <- order(x)
@@ -74,7 +83,7 @@ gini_index <- function (x, weights = rep(1, length = length(x))) {
 
 # median calculator
 
-stats_post <- meta.data %>%
+stats_post <- meta.data.sub %>%
   group_by(orig.ident) %>%
   summarise(
     Total_nb_reads                 = sum(nCounts),
@@ -89,9 +98,13 @@ stats_post <- meta.data %>%
     Mean_number_genes_per_STAMP    = round(mean(nGene), 2),
     Mean_Ribo_pct                  = round(100 * mean(pct.Ribo), 2),
     Mean_Mito_pct                  = round(100 * mean(pct.mito), 2),
+    Mean_Count_per_UMI             = round(sum(nCounts) / sum(nUMI), 2),
     Read_length                    = mean(read_length), # should be all the same anyway..
     Number_barcodes_used_for_debug = n()
-  )
+  ) %>%
+  as.data.frame()
+
+row.names(stats_post) <- stats_post$orig.ident
 
 
 
@@ -137,7 +150,7 @@ for (i in 1:length(samples)) {
     file = snakemake@input$hist_cell[i],
     header = FALSE, stringsAsFactors = FALSE
   )
-  sample <- samples[i]
+  mysample <- samples[i]
   reads <- hist_out$V1
   barcodes <- hist_out$V2
   # calculations on reads
@@ -163,15 +176,29 @@ for (i in 1:length(samples)) {
   stats_pre[i, "Nr_barcodes_more_than_1_reads"]  <- sum(reads > 1)
   stats_pre[i, "Nr_barcodes_more_than_10_reads"] <- sum(reads > 10)
   stats_pre[i, "Gini-index"]                     <- round(gini_index(reads), 2)
-  stats_post[i, "Pct_reads_after_filter"] <-
+  expected_cells <- as.numeric(filter(stats_post, orig.ident==mysample) %>% select(Nb_STAMPS))
+  # % of reads left after applying expected_cells cuttoff
+  stats_post[mysample, "Pct_reads_after_filter_expected_cells"] <-
     round(100 * (
-                 stats_post[i, "Total_nb_reads"] /
+                 reads_cumsum[expected_cells] / sum(reads)
+    ), 2)
+  # % of reads left after applying all filters including mapping etc.
+  # Thats the effecive usable reads of the sequencing run
+  stats_post[mysample, "Pct_reads_after_filter_everything"] <-
+    round(100 * (
+                 filter(stats_post, orig.ident==mysample) %>% select(Total_nb_reads) /
                  stats_pre [i, "Total_raw_reads"]), 2
          )
 }
 
+stats_pre <- stats_pre %>%
+  arrange(Sample)
+
+stats_post <- stats_post %>%
+  arrange((orig.ident))
+
 # output
-write.csv(stats_pre, file.path(snakemake@output$stats_pre))
+write.csv(stats_pre,  file.path(snakemake@output$stats_pre))
 write.csv(stats_post, file.path(snakemake@output$stats_post)) # writes table for excel
 
 if (debug_flag) {
