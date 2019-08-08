@@ -63,7 +63,7 @@ meta.data <- seuratobj@meta.data
 meta.data.sub <- meta.data %>%
   group_by(orig.ident) %>%
   arrange(desc(nCounts)) %>%
-  filter(nCounts >= nCounts[expected_cells[1]]) %>%
+  #filter(nCounts >= nCounts[expected_cells[1]]) %>%
   as.data.frame()
 
 gini_index <- function (x, weights = rep(1, length = length(x))) {
