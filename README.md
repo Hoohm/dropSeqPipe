@@ -80,3 +80,11 @@ I'm actively seeking help to implement the points listed bellow. Don't hesitate 
 I hope it can help you out in your single cell experiments!
 
 Feel free to comment and point out potential improvements via [issues](https://github.com/Hoohm/dropSeqPipe/issues)
+
+
+TODO
+---------------------------------------------
+* Add a mixed reference reference for testing purposes
+* Finalize the parameters validation schema
+* Make the debug feature a bit "cleaner". Deal with automatic naming of the debug variables
+* Implement ddseq barcoding strategies
