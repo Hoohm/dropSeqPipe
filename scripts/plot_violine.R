@@ -10,6 +10,7 @@
 # save.image(file="R_workspace_debug.rdata")
 # load("R_workspace_debug.rdata")
 ####/debug
+debug_flag = FALSE
 if (!is.null(snakemake@config$DEBUG)) {
   message("debug flag is set")
   # if set, then check if True
