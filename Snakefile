@@ -29,7 +29,7 @@ raw_data_dir = config['LOCAL']['raw_data']
 
 # dropSeqPipe version
 config['version'] = '0.4'
-#validate(config, schema=os.path.join(snakefile_root_path,"schemas","config.schema.yaml"))
+validate(config, schema=os.path.join(snakefile_root_path,"schemas","config.schema.yaml"))
 
 
 # In order to deal with single species or mixed species experiment
@@ -71,7 +71,7 @@ else:
 
 # Get sample names from samples.csv
 samples = pd.read_table("samples.csv", sep=',').set_index("samples", drop=False)
-#validate(samples, schema=os.path.join(snakefile_root_path,"schemas","samples.schema.yaml"))
+validate(samples, schema=os.path.join(snakefile_root_path,"schemas","samples.schema.yaml"))
 types=['read','umi']
 # Get read_lengths from samples.csv
 read_lengths = list(samples.loc[:,'read_length'])
