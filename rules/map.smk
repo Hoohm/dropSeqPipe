@@ -96,7 +96,7 @@ rule MergeBamAlignment:
         mapped='{results_dir}/samples/{sample}/Aligned.out.bam',
         R1_ref = '{results_dir}/samples/{sample}/trimmmed_repaired_R1.fastq.gz'
     output:
-        '{results_dir}/samples/{sample}/Aligned.merged.bam'
+        temp('{results_dir}/samples/{sample}/Aligned.merged.bam')
     params:
         BC_start=config['FILTER']['cell-barcode']['start']-1,
         BC_end=config['FILTER']['cell-barcode']['end'],
