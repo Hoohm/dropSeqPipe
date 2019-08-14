@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - samples.csv and config.yaml schema validation. This will help users fix missing values.
 - DetectBeadSubstitutionErrors was added in the mapping steps.
 
+### Changed
+- Minimum read length after trimming is now the index of the end of the UMI
+
 
 ## [0.4] - 2018-12-19
 ### Added
