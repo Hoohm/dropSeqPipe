@@ -18,7 +18,7 @@ rule cutadapt_R1:
         fastq=temp('{results_dir}/samples/{sample}/trimmmed_R1.fastq.gz')
     params:
         cell_barcode_length=round((config['FILTER']['cell-barcode']['end'] - config['FILTER']['cell-barcode']['start'] + 1) * 1.3),
-        barcode_length=config['FILTER']['UMI-barcode']['end'] - config['FILTER']['cell-barcode']['start'] + 1,
+        barcode_length=config['FILTER']['UMI-barcode']['end'],
         extra_params=config['FILTER']['cutadapt']['R1']['extra-params'],
         max_n=config['FILTER']['cutadapt']['R1']['maximum-Ns'],
         barcode_quality=config['FILTER']['cutadapt']['R1']['quality-filter']
