@@ -146,13 +146,11 @@ rule DetectBeadSubstitutionErrors:
     threads: 5
     shell:
         """
-        export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && DetectBeadSynthesisErrors -m {params.memory}\
+        export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && DetectBeadSubstitutionErrors -m {params.memory}\
         I={input}\
         O={output.data}\
-        REPORT={output.report}\
-        OUTPUT_STATS={output.stats}\
-        SUMMARY={output.summary}\
-        PRIMER_SEQUENCE={params.SmartAdapter}\
+        OUTPUT_REPORT={output.report}\
+        OUTPUT_SUMMARY={output.summary}\
         NUM_THREADS={threads}
         """
 
