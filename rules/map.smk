@@ -107,6 +107,8 @@ rule MergeBamAlignment:
     script:
         '../scripts/merge_bam.py'
 
+# Note: rule repair_barcodes (cell_barcodes.smk) creates Aligned.repaired.bam
+# this is using barcode information (i.e. dependent on expected_cells in config.yaml)
 
 
 rule TagReadWithGeneExon:
