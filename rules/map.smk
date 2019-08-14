@@ -125,7 +125,7 @@ rule DetectBeadSubstitutionErrors:
     output:
         data=temp('{results_dir}/samples/{sample}/gene_exon_tagged_bead_sub.bam'),
         report='{results_dir}/logs/dropseq_tools/{sample}_beadSubstitutionReport.txt',
-        #stats='{results_dir}/logs/dropseq_tools/{sample}_beadSubstitutionStats.txt',
+        stats='{results_dir}/logs/dropseq_tools/{sample}_beadSubstitutionStats.txt',
         summary='{results_dir}/logs/dropseq_tools/{sample}_beadSubstitutionSummary.txt'
     params:
         SmartAdapter=config['FILTER']['5-prime-smart-adapter'],
@@ -135,15 +135,17 @@ rule DetectBeadSubstitutionErrors:
     threads: 5
     shell:
         """
-        export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && DetectBeadSubstitutionErrors -m {params.memory}\
+        export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && DetectBeadSynthesisErrors -m {params.memory}\
         I={input}\
         O={output.data}\
-        OUTPUT_REPORT={output.report}\
-        OUTPUT_SUMMARY={output.summary}\
+        REPORT={output.report}\
+        OUTPUT_STATS={output.stats}\
+        SUMMARY={output.summary}\
+        PRIMER_SEQUENCE={params.SmartAdapter}\
         NUM_THREADS={threads}
         """
 
-rule DetectBeadSynthesisErrors:
+rule bead_errors_metrics:
     input:
         '{results_dir}/samples/{sample}/gene_exon_tagged_bead_sub.bam'
     output:
