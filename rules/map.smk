@@ -136,7 +136,6 @@ rule DetectBeadSubstitutionErrors:
     output:
         data=temp('{results_dir}/samples/{sample}/gene_exon_tagged_bead_sub.bam'),
         report='{results_dir}/logs/dropseq_tools/{sample}_beadSubstitutionReport.txt',
-        stats='{results_dir}/logs/dropseq_tools/{sample}_beadSubstitutionStats.txt',
         summary='{results_dir}/logs/dropseq_tools/{sample}_beadSubstitutionSummary.txt'
     params:
         SmartAdapter=config['FILTER']['5-prime-smart-adapter'],
