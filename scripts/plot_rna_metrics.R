@@ -4,7 +4,6 @@ library(gridExtra)
 library(grid)
 
 data <- read.csv(file = snakemake@input$rna_metrics, header = T, stringsAsFactors = F, skip = 6, sep = "\t")
-data <- read.csv(file = "~/workspace/dolomite/rna_metrics.txt", header = T, stringsAsFactors = F, skip = 6, sep = "\t")
 data <- data[order(data$PF_ALIGNED_BASES, decreasing = T), ]
 data_pct <- data[, c("READ_GROUP", "PCT_RIBOSOMAL_BASES", "PCT_CODING_BASES", "PCT_UTR_BASES", "PCT_INTRONIC_BASES", "PCT_INTERGENIC_BASES")]
 data <- data[, c("READ_GROUP", "RIBOSOMAL_BASES", "CODING_BASES", "UTR_BASES", "INTRONIC_BASES", "INTERGENIC_BASES")]
