@@ -3,6 +3,21 @@ library(tidyr)
 library(gridExtra)
 library(grid)
 
+debug_flag <- FALSE
+# check if DEBUG flag is set
+if (!is.null(snakemake@config$DEBUG)) {
+  message("debug flag is set")
+  # if set, then check if True
+  if (snakemake@config$DEBUG) {
+    debug_flag <- TRUE
+    message("In debug mode: saving R objects to inspect later")
+    path_debug <- file.path(snakemake@config$LOCAL$results, "debug")
+    dir.create(path_debug, showWarnings = FALSE)
+    save(snakemake, file = file.path(path_debug, "plot_rna_metrics_snakemake.rdata"))
+  }
+}
+#### /debug
+
 data <- read.csv(file = snakemake@input$rna_metrics, header = T, stringsAsFactors = F, skip = 6, sep = "\t")
 data <- data[order(data$PF_ALIGNED_BASES, decreasing = T), ]
 data_pct <- data[, c("READ_GROUP", "PCT_RIBOSOMAL_BASES", "PCT_CODING_BASES", "PCT_UTR_BASES", "PCT_INTRONIC_BASES", "PCT_INTERGENIC_BASES")]
@@ -41,3 +56,7 @@ pdf(file = snakemake@output$pdf, width = 16, height = 13)
 grid::grid.newpage()
 grid::grid.draw(rbind(gp1, gp2, size = "last"))
 dev.off()
+
+if (debug_flag) {
+  save.image(file = file.path(path_debug, "plot_rna_metrics_workspace.rdata"))
+}
