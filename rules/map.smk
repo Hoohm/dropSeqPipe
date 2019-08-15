@@ -210,7 +210,7 @@ rule plot_yield:
         UMI_length=config['FILTER']['UMI-barcode']['end'] - config['FILTER']['UMI-barcode']['start']+1,
         sample_names=lambda wildcards: samples.index,
         batches=lambda wildcards: samples.loc[samples.index, 'batch']
-    conda: '../envs/plots.yaml'
+    conda: '../envs/r.yaml'
     output:
         pdf='{results_dir}/plots/yield.pdf'
     script:
@@ -223,7 +223,7 @@ rule plot_knee_plot:
         barcodes='{results_dir}/samples/{sample}/barcodes.csv'
     params:
         cells=lambda wildcards: int(samples.loc[wildcards.sample,'expected_cells'])
-    conda: '../envs/plots.yaml'
+    conda: '../envs/r.yaml'
     output:
         pdf='{results_dir}/plots/knee_plots/{sample}_knee_plot.pdf'
     script:
