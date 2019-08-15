@@ -36,7 +36,7 @@ rule summary_stats:
         R_objects='{results_dir}/summary/R_Seurat_objects.rdata',
         R2qc=expand('{results_dir}/logs/cutadapt/{sample}_R2.qc.txt', sample=samples.index, results_dir=results_dir),
         hist_cell=expand('{results_dir}/logs/dropseq_tools/{sample}_hist_out_cell.txt', sample=samples.index, results_dir=results_dir)
-    conda: '../envs/plots_ext.yaml'
+    conda: '../envs/r.yaml'
     output:
         stats_pre='{results_dir}/summary/barcode_stats_pre_filter.csv',
         stats_post='{results_dir}/summary/barcode_stats_post_filter.csv',
