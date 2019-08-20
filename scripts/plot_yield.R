@@ -20,7 +20,7 @@ if (!is.null(snakemake@config$DEBUG)) {
 #------------------------------------ debugging
 
 library(ggplot2)
-library(reshape2)
+library(tidyr)
 library(grid)
 library(gridExtra)
 library(viridis)
@@ -74,11 +74,9 @@ for (i in 1:length(samples)) {
   mydata[which(mydata$Sample == mysample), "Unmapped"]        <- unmapped
 }
 
-mydata_long <- melt(mydata, c("Sample", "Batch"))
 # tidyr version
-# library(tidyr)
+ mydata_long <- mydata %>% gather(variable, value, -Sample, -Batch)
 # melt will be retired, use gather instead: https://github.com/hadley/reshape
-# mydata_long <- mydata %>% gather(variable, value, -Sample, -Batch)
 
 p1 <- ggplot(subset(mydata_long, mydata_long$variable != "Total reads"),
              aes(x = Sample, y = value, fill = factor(variable))) +
@@ -100,9 +98,9 @@ mydata_pct <- mydata[, -c(1, 2)] / mydata[, "Total reads"]
 mydata_pct <- cbind(Sample = mydata[, "Sample"],
                     Batch = mydata[, "Batch"], mydata_pct)
 
-mydata_long <- melt(mydata_pct, c("Sample", "Batch"))
+mydata_long_pct <- mydata_pct %>% gather(variable, value, -Sample, -Batch)
 
-p2 <- ggplot(subset(mydata_long, mydata_long$variable != "Total reads"),
+p2 <- ggplot(subset(mydata_long_pct, mydata_long_pct$variable != "Total reads"),
              aes(x = Sample, y = value, fill = variable)) +
   labs(fill = "Filters") +
   geom_histogram(stat = "identity", binwidth = 1 / length(samples)) +

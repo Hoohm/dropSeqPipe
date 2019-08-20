@@ -113,7 +113,7 @@ rule plot_adapter_content:
         UMI_length=config['FILTER']['UMI-barcode']['end'] - config['FILTER']['UMI-barcode']['start'] + 1,
         sample_names=lambda wildcards: samples.index,
         batches=lambda wildcards: samples.loc[samples.index, 'batch']
-    conda: '../envs/plots.yaml'
+    conda: '../envs/r.yaml'
     output:
         pdf='{results_dir}/plots/adapter_content.pdf'
     script:
