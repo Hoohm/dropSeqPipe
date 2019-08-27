@@ -13,6 +13,7 @@ rule merge_long:
         features='{results_dir}/summary/{type}/features.tsv',
     params:
         samples=lambda wildcards: samples.index
+    conda: '../envs/merge_long.yaml'
     script:
         "../scripts/convert_mtx.py"
 

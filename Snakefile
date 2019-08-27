@@ -4,6 +4,8 @@ import re
 import glob
 from snakemake.utils import validate, min_version
 
+singularity: "docker://continuumio/miniconda3:4.5.4"
+
 min_version("5.1.2")
 
 #print(os.path.abspath(os.path.dirname(workflow.snakefile)))
