@@ -79,7 +79,7 @@ rule multiqc_star:
         html='{results_dir}/reports/star.html'
     params: '-m star'
     wrapper:
-        '0.21.0/bio/multiqc'
+        '0.36.0/bio/multiqc'
 
 rule pigz_unmapped:
     input:
