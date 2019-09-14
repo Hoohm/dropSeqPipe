@@ -1,6 +1,6 @@
 $schema: "http://json-schema.org/draft-06/schema#"
 
-description: an entry in the sample sheet
+description: Validation schema for all config entries
 
 properties:
   CONTACT:
@@ -14,6 +14,7 @@ properties:
         type: string
         pattern: ".*@.*"
         description: Email address of the contact person.
+        default: john.doe@john.com
   LOCAL:
     type: object
     description: Computer/experiment local details, paths, options.
@@ -234,6 +235,10 @@ properties:
           - genomeChrBinNbits
     required:
       - STAR
+  DEBUG:
+    type: boolean
+    description: Boolean value that enables debug mode for R scripts providing Rdata of the snakemake object as well as the R env.
+    default: False
 required:
   - LOCAL
   - META

@@ -6,8 +6,7 @@ import os
 import subprocess
 
 
-samples=snakemake.params['samples']
-
+samples = snakemake.params['samples']
 barcodes = {}
 features = {}
 

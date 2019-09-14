@@ -1,6 +1,6 @@
 CONTACT:
-  email: ''
-  person: ''
+  email: john.doe@john.com
+  person: John Doe
 LOCAL:
     temp-directory:
     memory: 4g
@@ -51,3 +51,4 @@ EXTRACTION:
     strand-strategy: SENSE
     UMI-edit-distance: 1
     minimum-counts-per-UMI: 0
+DEBUG: False

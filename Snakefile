@@ -31,7 +31,7 @@ raw_data_dir = config['LOCAL']['raw_data']
 
 # dropSeqPipe version
 config['version'] = '0.4'
-#validate(config, schema=os.path.join(snakefile_root_path,"schemas","config.schema.yaml"))
+validate(config, schema=os.path.join(snakefile_root_path,"schemas","config.schema.yaml"))
 
 
 # In order to deal with single species or mixed species experiment
@@ -73,7 +73,7 @@ else:
 
 # Get sample names from samples.csv
 samples = pd.read_table("samples.csv", sep=',').set_index("samples", drop=False)
-#validate(samples, schema=os.path.join(snakefile_root_path,"schemas","samples.schema.yaml"))
+validate(samples, schema=os.path.join(snakefile_root_path,"schemas","samples.schema.yaml"))
 types=['read','umi']
 # Get read_lengths from samples.csv
 read_lengths = list(samples.loc[:,'read_length'])
@@ -116,6 +116,7 @@ if len(config['META']['species'].keys()) == 2:
                 '{results_dir}/reports/barcode_filtering.html',
                 '{results_dir}/reports/RNA_filtering.html',
                 '{results_dir}/samples/{sample}/trimmmed_repaired_R1.fastq.gz',
+                '{results_dir}/samples/{sample}/top_barcodes.csv',
                 #mapping
                 '{results_dir}/plots/knee_plots/{sample}_knee_plot.pdf',
                 '{results_dir}/reports/star.html',
@@ -203,7 +204,8 @@ rule filter:
             ['{results_dir}/plots/adapter_content.pdf',
             '{results_dir}/reports/barcode_filtering.html',
             '{results_dir}/reports/RNA_filtering.html',
-            '{results_dir}/samples/{sample}/trimmmed_repaired_R1.fastq.gz'],
+            '{results_dir}/samples/{sample}/trimmmed_repaired_R1.fastq.gz',
+            '{results_dir}/samples/{sample}/top_barcodes.csv'],
                 results_dir=results_dir,
                 sample=samples.index)
 
@@ -213,8 +215,6 @@ rule map:
             ['{results_dir}/plots/knee_plots/{sample}_knee_plot.pdf',
             '{results_dir}/reports/star.html',
             '{results_dir}/plots/yield.pdf',
-            '{results_dir}/summary/barcode_stats_pre_filter.csv',
-            '{results_dir}/summary/barcode_stats_post_filter.csv',
             '{results_dir}/samples/{sample}/final.bam',
             '{results_dir}/samples/{sample}/Unmapped.out.mate1.gz'],
                 sample=samples.index,
@@ -260,6 +260,8 @@ rule merge:
             '{results_dir}/plots/UMI_vs_gene.pdf',
             '{results_dir}/plots/Count_vs_gene.pdf',
             '{results_dir}/summary/R_Seurat_objects.rdata',
+            '{results_dir}/summary/barcode_stats_pre_filter.csv',
+            '{results_dir}/summary/barcode_stats_post_filter.csv',
             '{results_dir}/plots/violinplots_comparison_UMI.pdf',
             '{results_dir}/summary/{type}/expression.mtx'],
                 results_dir=results_dir,

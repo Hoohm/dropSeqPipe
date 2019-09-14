@@ -80,7 +80,7 @@ rule multiqc_star:
         html='{results_dir}/reports/star.html'
     params: '-m star'
     wrapper:
-        '0.21.0/bio/multiqc'
+        '0.36.0/bio/multiqc'
 
 rule pigz_unmapped:
     input:
@@ -108,6 +108,8 @@ rule MergeBamAlignment:
     script:
         '../scripts/merge_bam.py'
 
+# Note: rule repair_barcodes (cell_barcodes.smk) creates Aligned.repaired.bam
+# this is using barcode information (i.e. dependent on expected_cells in config.yaml)
 
 
 rule TagReadWithGeneExon:
@@ -137,7 +139,6 @@ rule DetectBeadSubstitutionErrors:
     output:
         data=temp('{results_dir}/samples/{sample}/gene_exon_tagged_bead_sub.bam'),
         report='{results_dir}/logs/dropseq_tools/{sample}_beadSubstitutionReport.txt',
-        stats='{results_dir}/logs/dropseq_tools/{sample}_beadSubstitutionStats.txt',
         summary='{results_dir}/logs/dropseq_tools/{sample}_beadSubstitutionSummary.txt'
     params:
         SmartAdapter=config['FILTER']['5-prime-smart-adapter'],
@@ -147,13 +148,11 @@ rule DetectBeadSubstitutionErrors:
     threads: 5
     shell:
         """
-        export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && DetectBeadSynthesisErrors -m {params.memory}\
+        export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && DetectBeadSubstitutionErrors -m {params.memory}\
         I={input}\
         O={output.data}\
-        REPORT={output.report}\
-        OUTPUT_STATS={output.stats}\
-        SUMMARY={output.summary}\
-        PRIMER_SEQUENCE={params.SmartAdapter}\
+        OUTPUT_REPORT={output.report}\
+        OUTPUT_SUMMARY={output.summary}\
         NUM_THREADS={threads}
         """
 
@@ -212,7 +211,7 @@ rule plot_yield:
         UMI_length=config['FILTER']['UMI-barcode']['end'] - config['FILTER']['UMI-barcode']['start']+1,
         sample_names=lambda wildcards: samples.index,
         batches=lambda wildcards: samples.loc[samples.index, 'batch']
-    conda: '../envs/plots.yaml'
+    conda: '../envs/r.yaml'
     output:
         pdf='{results_dir}/plots/yield.pdf'
     script:
@@ -225,7 +224,7 @@ rule plot_knee_plot:
         barcodes='{results_dir}/samples/{sample}/barcodes.csv'
     params:
         cells=lambda wildcards: int(samples.loc[wildcards.sample,'expected_cells'])
-    conda: '../envs/plots.yaml'
+    conda: '../envs/r.yaml'
     output:
         pdf='{results_dir}/plots/knee_plots/{sample}_knee_plot.pdf'
     script:

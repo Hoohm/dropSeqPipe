@@ -18,7 +18,7 @@ rule cutadapt_R1:
         fastq=temp('{results_dir}/samples/{sample}/trimmmed_R1.fastq.gz')
     params:
         cell_barcode_length=round((config['FILTER']['cell-barcode']['end'] - config['FILTER']['cell-barcode']['start'] + 1) * 1.3),
-        barcode_length=config['FILTER']['UMI-barcode']['end'] - config['FILTER']['cell-barcode']['start'] + 1,
+        barcode_length=config['FILTER']['UMI-barcode']['end'],
         extra_params=config['FILTER']['cutadapt']['R1']['extra-params'],
         max_n=config['FILTER']['cutadapt']['R1']['maximum-Ns'],
         barcode_quality=config['FILTER']['cutadapt']['R1']['quality-filter']
@@ -113,7 +113,7 @@ rule plot_adapter_content:
         UMI_length=config['FILTER']['UMI-barcode']['end'] - config['FILTER']['UMI-barcode']['start'] + 1,
         sample_names=lambda wildcards: samples.index,
         batches=lambda wildcards: samples.loc[samples.index, 'batch']
-    conda: '../envs/plots.yaml'
+    conda: '../envs/r.yaml'
     output:
         pdf='{results_dir}/plots/adapter_content.pdf'
     script:
@@ -126,7 +126,7 @@ rule multiqc_cutadapt_barcodes:
     output:
         html='{results_dir}/reports/barcode_filtering.html'
     wrapper:
-        '0.21.0/bio/multiqc'
+        '0.36.0/bio/multiqc'
 
 rule multiqc_cutadapt_RNA:
     input:
@@ -135,4 +135,4 @@ rule multiqc_cutadapt_RNA:
     output:
         html='{results_dir}/reports/RNA_filtering.html'
     wrapper:
-        '0.21.0/bio/multiqc'
+        '0.36.0/bio/multiqc'

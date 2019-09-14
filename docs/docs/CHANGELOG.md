@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [0.4.1]
 ### Added
 - samples.csv and config.yaml schema validation. This will help users fix missing values.
+- DetectBeadSubstitutionErrors was added in the mapping steps.
+
+### Changed
+- Minimum read length after trimming is now the index of the end of the UMI
+- dropSeqPipe can now run with a docker image if you use the `--use-singularity` option. This should help people with package issues and different linux setups. You need to have installed singularity system wide to use this option.
 
 
 ## [0.4] - 2018-12-19

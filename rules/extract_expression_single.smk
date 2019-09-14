@@ -95,7 +95,7 @@ rule plot_rna_metrics:
     input:
         rna_metrics='{results_dir}/logs/dropseq_tools/{sample}_rna_metrics.txt',
         barcodes='{results_dir}/samples/{sample}/barcodes.csv'
-    conda: '../envs/plots.yaml'
+    conda: '../envs/r.yaml'
     output:
         pdf='{results_dir}/plots/rna_metrics/{sample}_rna_metrics.pdf'
     script:
