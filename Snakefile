@@ -4,6 +4,8 @@ import re
 import glob
 from snakemake.utils import validate, min_version
 
+singularity: "shub://seb-mueller/singularity_dropSeqPipe:latest"
+
 min_version("5.1.2")
 
 #print(os.path.abspath(os.path.dirname(workflow.snakefile)))

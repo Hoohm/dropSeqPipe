@@ -42,11 +42,11 @@ rule STAR_align:
             species,
             build,
             release) + '_' + str(samples.loc[wildcards.sample,'read_length']) + '/'
-    singularity:
-        "shub://seb-mueller/singularity_star:latest"
+    # singularity:
+    #     "shub://seb-mueller/singularity_star:latest"
     threads: 24
     wrapper:
-        "0.37.1/bio/star/align"
+        "0.27.1/bio/star/align"
 # rule alevin:
 #   input:
 #       index='{salmon_index}',
