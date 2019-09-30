@@ -4,7 +4,8 @@ import re
 import glob
 from snakemake.utils import validate, min_version
 
-singularity: "shub://seb-mueller/singularity_dropSeqPipe:latest"
+singularity:
+    "shub://seb-mueller/singularity_dropSeqPipe:v04"
 
 min_version("5.1.2")
 
