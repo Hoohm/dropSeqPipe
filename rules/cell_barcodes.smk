@@ -21,7 +21,7 @@ rule extend_barcode_whitelist:
 
 rule get_top_barcodes:
     input:
-        '{results_dir}/samples/{sample}/trimmmed_repaired_R1.fastq.gz'
+        '{results_dir}/samples/{sample}/trimmed_repaired_R1.fastq.gz'
     output:
         '{results_dir}/samples/{sample}/top_barcodes.csv'
     conda: '../envs/umi_tools.yaml'

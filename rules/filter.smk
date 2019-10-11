@@ -15,7 +15,7 @@ rule cutadapt_R1:
         R1=get_R1_files,
         adapters=config['FILTER']['cutadapt']['adapters-file']
     output:
-        fastq=temp('{results_dir}/samples/{sample}/trimmmed_R1.fastq.gz')
+        fastq=temp('{results_dir}/samples/{sample}/trimmed_R1.fastq.gz')
     params:
         cell_barcode_length=round((config['FILTER']['cell-barcode']['end'] - config['FILTER']['cell-barcode']['start'] + 1) * 1.3),
         barcode_length=config['FILTER']['UMI-barcode']['end'],
@@ -31,7 +31,7 @@ rule cutadapt_R1:
         --max-n {params.max_n}\
         -a file:{input.adapters}\
         -g file:{input.adapters}\
-        -q {params.barcode_quality},0\
+        -q {params.barcode_quality},{params.barcode_quality}\
         --minimum-length {params.barcode_length}\
         --cores={threads}\
         --overlap {params.cell_barcode_length}\
@@ -43,7 +43,7 @@ rule cutadapt_R2:
         R2=get_R2_files,
         adapters=config['FILTER']['cutadapt']['adapters-file']
     output:
-        fastq=temp('{results_dir}/samples/{sample}/trimmmed_R2.fastq.gz')
+        fastq=temp('{results_dir}/samples/{sample}/trimmed_R2.fastq.gz')
     params:
         extra_params=config['FILTER']['cutadapt']['R2']['extra-params'],
         read_quality=config['FILTER']['cutadapt']['R2']['quality-filter'],
@@ -75,11 +75,11 @@ rule clean_cutadapt:
 
 rule repair:
     input:
-        R1='{results_dir}/samples/{sample}/trimmmed_R1.fastq.gz',
-        R2='{results_dir}/samples/{sample}/trimmmed_R2.fastq.gz'
+        R1='{results_dir}/samples/{sample}/trimmed_R1.fastq.gz',
+        R2='{results_dir}/samples/{sample}/trimmed_R2.fastq.gz'
     output:
-        R1='{results_dir}/samples/{sample}/trimmmed_repaired_R1.fastq.gz',
-        R2='{results_dir}/samples/{sample}/trimmmed_repaired_R2.fastq.gz'
+        R1='{results_dir}/samples/{sample}/trimmed_repaired_R1.fastq.gz',
+        R2='{results_dir}/samples/{sample}/trimmed_repaired_R2.fastq.gz'
     log:
         '{results_dir}/logs/bbmap/{sample}_repair.txt'
     params:
@@ -98,7 +98,7 @@ rule repair:
 
 rule detect_barcodes:
     input:
-        R1='{results_dir}/samples/{sample}/trimmmed_repaired_R1.fastq.gz'
+        R1='{results_dir}/samples/{sample}/trimmed_repaired_R1.fastq.gz'
     output:
         positions='{results_dir}/samples/{sample}/test.csv'
     conda: '../envs/merge_bam.yaml'
