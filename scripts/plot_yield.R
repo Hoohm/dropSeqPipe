@@ -111,7 +111,7 @@ p2 <- ggplot(subset(mydata_long_pct, mydata_long_pct$variable != "Total reads"),
   labs(x = "Samples",
        y = "Percentage of reads") +
   facet_grid(~Batch, scales = "free") +
-  scale_fill_viridis(discrete = TRUE, option = "magma") +
+  scale_fill_viridis(discrete = TRUE, option = "viridis") +
   scale_y_continuous(labels = scales::percent)
 
 gp1 <- ggplotGrob(p1)
