@@ -11,7 +11,7 @@ localrules:
 
 rule STAR_align:
     input:
-        fq1='{results_dir}/samples/{sample}/trimmmed_repaired_R2.fastq.gz',
+        fq1='{results_dir}/samples/{sample}/trimmed_repaired_R2.fastq.gz',
         index=lambda wildcards: '{}/{}_{}_{}/STAR_INDEX/SA'.format(
             config['META']['reference-directory'],
             species,
@@ -50,8 +50,8 @@ rule STAR_align:
 # rule alevin:
 #   input:
 #       index='{salmon_index}',
-#       R1="samples/{sample}/trimmmed_repaired_R1.fastq.gz",
-#       R2="samples/{sample}/trimmmed_repaired_R2.fastq.gz",
+#       R1="samples/{sample}/trimmed_repaired_R1.fastq.gz",
+#       R2="samples/{sample}/trimmed_repaired_R2.fastq.gz",
 #   conda: '../envs/salmon.yaml'
 #   params:
 #       cell_barcode_length=(config['FILTER']['cell-barcode']['end'] - config['FILTER']['cell-barcode']['start'] + 1),
@@ -95,7 +95,7 @@ rule pigz_unmapped:
 rule MergeBamAlignment:
     input:
         mapped='{results_dir}/samples/{sample}/Aligned.out.bam',
-        R1_ref = '{results_dir}/samples/{sample}/trimmmed_repaired_R1.fastq.gz'
+        R1_ref = '{results_dir}/samples/{sample}/trimmed_repaired_R1.fastq.gz'
     output:
         temp('{results_dir}/samples/{sample}/Aligned.merged.bam')
     params:
