@@ -5,20 +5,15 @@
 #  R object that can be loaded into a custom R session as below:
 
 debug_flag <- FALSE
-# check if DEBUG flag is set
-if (!is.null(snakemake@config$DEBUG)) {
-  message("debug flag is set")
-  # if set, then check if True
-  if (snakemake@config$DEBUG) {
-    debug_flag <- TRUE
-    message("In debug mode: saving R objects to inspect later")
-    path_debug <- file.path(snakemake@config$LOCAL$results, "debug")
-    dir.create(path_debug, showWarnings = FALSE)
-    save(snakemake, file = file.path(path_debug,
-       paste0("plot_knee_plot_snakemake_",
-              attr(snakemake, "wildcard")$sample, ".rdata"))
-            )
-  }
+if (snakemake@config$DEBUG) {
+  debug_flag <- TRUE
+  message("In debug mode: saving R objects to inspect later")
+  path_debug <- file.path(snakemake@config$LOCAL$results, "debug")
+  dir.create(path_debug, showWarnings = FALSE)
+  save(snakemake, file = file.path(path_debug,
+     paste0("plot_knee_plot_snakemake_",
+            attr(snakemake, "wildcard")$sample, ".rdata"))
+          )
 }
 #### /debug
 

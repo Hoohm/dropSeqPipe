@@ -238,7 +238,7 @@ properties:
   DEBUG:
     type: boolean
     description: Boolean value that enables debug mode for R scripts providing Rdata of the snakemake object as well as the R env.
-    default: False
+    default: FALSE
 required:
   - LOCAL
   - META

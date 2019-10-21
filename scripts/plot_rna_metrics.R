@@ -2,20 +2,16 @@ library(ggplot2)
 library(tidyr)
 library(gridExtra)
 library(grid)
-
+library(viridis)
 debug_flag <- FALSE
-# check if DEBUG flag is set
-if (!is.null(snakemake@config$DEBUG)) {
-  message("debug flag is set")
-  # if set, then check if True
-  if (snakemake@config$DEBUG) {
-    debug_flag <- TRUE
-    message("In debug mode: saving R objects to inspect later")
-    path_debug <- file.path(snakemake@config$LOCAL$results, "debug")
-    dir.create(path_debug, showWarnings = FALSE)
-    save(snakemake, file = file.path(path_debug, "plot_rna_metrics_snakemake.rdata"))
-  }
+if (snakemake@config$DEBUG) {
+  debug_flag <- TRUE
+  message("In debug mode: saving R objects to inspect later")
+  path_debug <- file.path(snakemake@config$LOCAL$results, "debug")
+  dir.create(path_debug, showWarnings = FALSE)
+  save(snakemake, file = file.path(path_debug, "plot_rna_metrics_snakemake.rdata"))
 }
+
 #### /debug
 
 mydata <- read.csv(file = snakemake@input$rna_metrics, header = T,
@@ -47,6 +43,8 @@ p1 <- p1 + theme(axis.title.x = element_blank(),
                  axis.text.x = element_blank(),
                  axis.ticks.x = element_blank())
 p1 <- p1 + scale_y_continuous(labels = scales::scientific)
+p1 <- p1 + scale_fill_viridis(discrete = TRUE, option = "viridis")
+
 
 mydata_long_pct <- mydata_pct %>% gather(read_overlap, fraction, -READ_GROUP)
 # Keep the original order of the barcodes using factor and levels.
@@ -59,7 +57,7 @@ p2 <- ggplot(mydata_long_pct, aes(x = READ_GROUP, y = fraction, fill = read_over
   geom_bar(stat = "identity") +
   theme(axis.text.x = element_text(angle = 90, hjust = 0)) +
   labs(x = "Barcodes", y = "%Bases") +
-  scale_y_continuous(labels = scales::percent)
+  scale_y_continuous(labels = scales::percent) + scale_fill_viridis(discrete = TRUE, option = "viridis")
 # This allows to align the main plots so that we can relate both directly with the label from the bottom one.
 gp1 <- ggplotGrob(p1)
 gp2 <- ggplotGrob(p2)
