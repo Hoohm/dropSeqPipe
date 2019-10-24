@@ -3,7 +3,7 @@
 # Usage: Copy into project root folder and rename to 'config.yaml'
 DEBUG: FALSE
 CONTACT:
-  email: person@mail.com
+  email: luke@mail.com
   person: Luke Dropwalker
 LOCAL:
     temp-directory: ./tmp
@@ -22,7 +22,7 @@ META:
             release: 91
     # for mixed species: threshold for calling a STAMP mixed (i.e. 0.2 means at least 20% from both species)
     ratio: 0.2
-    reference-directory: /home/sm934/analysis/dropseq/data/reference-dir
+    reference-directory: /path/to/reference-dir
     gtf_biotypes: gtf_biotypes.yaml
 FILTER:
     barcode-whitelist: ''
@@ -65,3 +65,8 @@ EXTRACTION:
     strand-strategy: SENSE
     UMI-edit-distance: 1
     minimum-counts-per-UMI: 0
+DOUBLET_DETECTION:
+    min_counts: 1
+    min_cells: 0
+    min_gene_variability_pctl: 85
+    n_prin_comps: 20

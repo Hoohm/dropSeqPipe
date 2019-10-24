@@ -42,15 +42,9 @@ samples <- snakemake@params$sample_names
 batches <- snakemake@params$batches
 
 
-# creating environment so objects don't get overwritten upon loading
-env_imported_r_objects <- new.env()
 # importing Seurat object
-load(
-  file  = file.path(snakemake@input$R_objects),
-  envir = env_imported_r_objects
-)
-# attach
-seuratobj <- env_imported_r_objects$seuratobj
+
+seuratobj <- readRDS(file  = file.path(snakemake@input$R_objects))
 meta.data <- seuratobj@meta.data
 
 # subset only highest stamps as set in config.yaml
