@@ -18,6 +18,7 @@ if (snakemake@config$DEBUG) {
 
 library(ggplot2)
 library(dplyr)
+library(viridis)
 
 samples <- snakemake@params$sample_names
 batches <- snakemake@params$batches
@@ -49,7 +50,8 @@ p1 <- ggplot(cutadapt_counts, aes(x=Sample, y = Percentages, fill = Adapter))  +
   ggtitle("Comparison accross samples of adapter content") +
   scale_x_discrete(label=abbreviate) +
   scale_y_continuous(labels = scales::percent) +
-  theme(axis.text.x=element_text(angle = 90, hjust = 0))
+  theme(axis.text.x=element_text(angle = 90, hjust = 0)) +
+  scale_fill_viridis_d()
 
 ggsave(plot=p1, filename=snakemake@output$pdf)
 
