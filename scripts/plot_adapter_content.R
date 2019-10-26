@@ -51,7 +51,7 @@ p1 <- ggplot(cutadapt_counts, aes(x=Sample, y = Percentages, fill = Adapter))  +
   scale_x_discrete(label=abbreviate) +
   scale_y_continuous(labels = scales::percent) +
   theme(axis.text.x=element_text(angle = 90, hjust = 0)) +
-  scale_fill_viridis_d()
+  scale_fill_viridis(discrete=TRUE)
 
 ggsave(plot=p1, filename=snakemake@output$pdf)
 
