@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+
+## [0.5]
+### Added
+- Singularity usage. Try out the `--use-singularity` option instead of `--use-conda`
+
+### Changed 
+- Lots off small bugfixes
+
+
 ## [0.4.1]
 ### Added
 - samples.csv and config.yaml schema validation. This will help users fix missing values.
