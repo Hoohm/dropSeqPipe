@@ -6,21 +6,19 @@
 
 debug_flag <- FALSE
 # check if DEBUG flag is set
-if (!is.null(snakemake@config$DEBUG)) {
-  message("debug flag is set")
-  #if set, then check if True
-  if (snakemake@config$DEBUG) {
-    debug_flag <- TRUE
-    message("In debug mode: saving R objects to inspect later")
-    path_debug <- file.path(snakemake@config$LOCAL$results, "debug")
-    dir.create(path_debug)
-    save(snakemake, file = file.path(path_debug, "plot_adapter_content_snakemake.rdata"))
-  }
+if (snakemake@config$DEBUG) {
+  debug_flag <- TRUE
+  message("In debug mode: saving R objects to inspect later")
+  path_debug <- file.path(snakemake@config$LOCAL$results, "debug")
+  dir.create(path_debug, showWarnings = FALSE)
+  save(snakemake, file = file.path(path_debug, "plot_adapter_content_snakemake.rdata"))
 }
+
 #------------------------------------ debugging
 
 library(ggplot2)
 library(dplyr)
+library(viridis)
 
 samples <- snakemake@params$sample_names
 batches <- snakemake@params$batches
@@ -52,7 +50,8 @@ p1 <- ggplot(cutadapt_counts, aes(x=Sample, y = Percentages, fill = Adapter))  +
   ggtitle("Comparison accross samples of adapter content") +
   scale_x_discrete(label=abbreviate) +
   scale_y_continuous(labels = scales::percent) +
-  theme(axis.text.x=element_text(angle = 90, hjust = 0))
+  theme(axis.text.x=element_text(angle = 90, hjust = 0)) +
+  scale_fill_viridis(discrete=TRUE)
 
 ggsave(plot=p1, filename=snakemake@output$pdf)
 

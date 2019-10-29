@@ -1,0 +1,4 @@
+channels:
+  - anaconda
+dependencies:
+  - pigz=2.4

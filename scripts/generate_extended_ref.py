@@ -25,7 +25,7 @@ def generate_all(barcode, reference, mapping, edit_distance):
 def generate_mutants(sequence, d=1):
     """Taken from stackoverflow: https://stackoverflow.com/a/19823295/9178565"""
     N = len(sequence)
-    letters = 'ACGT'
+    letters = 'ACGTN'
     pool = list(sequence)
     for indices in combinations(range(N), d):
         for replacements in product(letters, repeat=d):

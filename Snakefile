@@ -2,6 +2,12 @@ import pandas as pd
 import os
 import re
 import glob
+from snakemake.utils import validate, min_version
+
+singularity:
+    "shub://seb-mueller/singularity_dropSeqPipe:v04"
+
+min_version("5.1.2")
 
 #print(os.path.abspath(os.path.dirname(workflow.snakefile)))
 
@@ -10,7 +16,7 @@ import glob
 try:
     configfile_path = config['configfile_path']
 except:
-    configfile_path = "config.yaml"    
+    configfile_path = "config.yaml"
 configfile: configfile_path
 
 
@@ -18,13 +24,15 @@ configfile: configfile_path
 configfile: config['META']['gtf_biotypes']
 
 # Define a few variables to make them easier to reference
+snakefile_root_path = os.path.abspath(os.path.dirname(workflow.snakefile))
 ref_path = config['META']['reference-directory']
 barcode_whitelist = config['FILTER']['barcode-whitelist']
 results_dir = config['LOCAL']['results']
 raw_data_dir = config['LOCAL']['raw_data']
 
 # dropSeqPipe version
-config['version'] = '0.4'
+config['version'] = '0.5'
+validate(config, schema=os.path.join(snakefile_root_path,"schemas","config.schema.yaml"))
 
 
 # In order to deal with single species or mixed species experiment
@@ -65,7 +73,8 @@ else:
     exit("Number of species in the config.yaml must be one or two. Exiting")
 
 # Get sample names from samples.csv
-samples = pd.read_table("samples.csv", header=0, sep=',', index_col=0)
+samples = pd.read_table("samples.csv", sep=',').set_index("samples", drop=False)
+validate(samples, schema=os.path.join(snakefile_root_path,"schemas","samples.schema.yaml"))
 types=['read','umi']
 # Get read_lengths from samples.csv
 read_lengths = list(samples.loc[:,'read_length'])
@@ -101,15 +110,19 @@ if len(config['META']['species'].keys()) == 2:
                 #qc
                 '{results_dir}/reports/fastqc_reads.html',
                 '{results_dir}/reports/fastqc_barcodes.html',
+                #fastqc_adapter
+                'fastqc_adapter.tsv',
                 #filter
                 '{results_dir}/plots/adapter_content.pdf',
                 '{results_dir}/reports/barcode_filtering.html',
                 '{results_dir}/reports/RNA_filtering.html',
-                '{results_dir}/samples/{sample}/trimmmed_repaired_R1.fastq.gz',
+                '{results_dir}/samples/{sample}/trimmed_repaired_R1.fastq.gz',
+                '{results_dir}/samples/{sample}/top_barcodes.csv',
                 #mapping
                 '{results_dir}/plots/knee_plots/{sample}_knee_plot.pdf',
                 '{results_dir}/reports/star.html',
                 '{results_dir}/plots/yield.pdf',
+                '{results_dir}/samples/{sample}/Unmapped.out.mate1.gz',
                 #splitting
                 '{results_dir}/plots/barnyard/{sample}_genes.pdf',
                 '{results_dir}/plots/barnyard/{sample}_transcripts.pdf'],
@@ -122,8 +135,8 @@ if len(config['META']['species'].keys()) == 2:
                     release=release,
                     species=species),
             expand(
-                ['{results_dir}/samples/{sample}/{species}/umi/expression.mtx',
-                '{results_dir}/samples/{sample}/{species}/read/expression.mtx',
+                ['{results_dir}/samples/{sample}/{species}/umi/matrix.mtx',
+                '{results_dir}/samples/{sample}/{species}/read/matrix.mtx',
                 '{results_dir}/plots/rna_metrics/{sample}_{species}_rna_metrics.pdf'],
                 results_dir=results_dir,
                 sample=samples.index,
@@ -146,15 +159,18 @@ elif len(config['META']['species'].keys()) == 1:
                 '{results_dir}/plots/knee_plots/{sample}_knee_plot.pdf',
                 '{results_dir}/reports/star.html',
                 '{results_dir}/plots/yield.pdf',
+                '{results_dir}/samples/{sample}/Unmapped.out.mate1.gz',
                 #extract
                 '{results_dir}/plots/rna_metrics/{sample}_rna_metrics.pdf',
-                '{results_dir}/summary/{type}/expression.mtx',
-                '{results_dir}/samples/{sample}/{type}/expression.mtx',
+                '{results_dir}/summary/{type}/matrix.mtx',
+                '{results_dir}/samples/{sample}/{type}/matrix.mtx',
                 #merge
                 '{results_dir}/plots/UMI_vs_counts.pdf',
                 '{results_dir}/plots/UMI_vs_gene.pdf',
                 '{results_dir}/plots/Count_vs_gene.pdf',
                 '{results_dir}/summary/R_Seurat_objects.rdata',
+                '{results_dir}/summary/barcode_stats_pre_filter.csv',
+                '{results_dir}/summary/barcode_stats_post_filter.csv',
                 '{results_dir}/plots/violinplots_comparison_UMI.pdf'],
                     read_length=read_lengths,
                     sample=samples.index,
@@ -164,22 +180,23 @@ elif len(config['META']['species'].keys()) == 1:
                     build=build,
                     release=release,
                     species=species)
-        
-rule download_meta:
-    input:
-        expand(
-            ["{ref_path}/{species}_{build}_{release}/annotation.gtf",
-            "{ref_path}/{species}_{build}_{release}/genome.fa"],
-                ref_path=config['META']['reference-directory'],
-                species=species_list,
-                release=release,
-                build=build)
-        
+    rule download_meta:
+        input:
+            expand(
+                ["{ref_path}/{species}_{build}_{release}/annotation.gtf",
+                "{ref_path}/{species}_{build}_{release}/genome.fa"],
+                    ref_path=config['META']['reference-directory'],
+                    species=species_list,
+                    release=release,
+                    build=build)
+
+
 rule qc:
     input:
         expand(
             ['{results_dir}/reports/fastqc_reads.html',
-            '{results_dir}/reports/fastqc_barcodes.html'],
+            '{results_dir}/reports/fastqc_barcodes.html',
+            'fastqc_adapter.tsv'],
                 results_dir=results_dir)
 
 rule filter:
@@ -188,17 +205,19 @@ rule filter:
             ['{results_dir}/plots/adapter_content.pdf',
             '{results_dir}/reports/barcode_filtering.html',
             '{results_dir}/reports/RNA_filtering.html',
-            '{results_dir}/samples/{sample}/trimmmed_repaired_R1.fastq.gz'],
+            '{results_dir}/samples/{sample}/trimmed_repaired_R1.fastq.gz',
+            '{results_dir}/samples/{sample}/top_barcodes.csv'],
                 results_dir=results_dir,
                 sample=samples.index)
-        
+
 rule map:
-    input:  
+    input:
         expand(
             ['{results_dir}/plots/knee_plots/{sample}_knee_plot.pdf',
             '{results_dir}/reports/star.html',
             '{results_dir}/plots/yield.pdf',
-            '{results_dir}/samples/{sample}/final.bam'],
+            '{results_dir}/samples/{sample}/final.bam',
+            '{results_dir}/samples/{sample}/Unmapped.out.mate1.gz'],
                 sample=samples.index,
                 results_dir=results_dir)
 
@@ -206,8 +225,8 @@ rule extract:
     input:
         expand(
             ['{results_dir}/plots/rna_metrics/{sample}_rna_metrics.pdf',
-            '{results_dir}/summary/{type}/expression.mtx',
-            '{results_dir}/samples/{sample}/{type}/expression.mtx'],
+            '{results_dir}/summary/{type}/matrix.mtx',
+            '{results_dir}/samples/{sample}/{type}/matrix.mtx.gz'],
                 results_dir=results_dir,
                 sample=samples.index,
                 type=types)
@@ -227,13 +246,13 @@ rule split_species:
 rule extract_species:
     input:
         expand(
-            ['{results_dir}/samples/{sample}/{species}/umi_expression_matrix.txt',
-            '{results_dir}/samples/{sample}/{species}/counts_expression_matrix.txt',
+            ['{results_dir}/samples/{sample}/{species}/{type}/matrix.mtx',
             '{results_dir}/plots/rna_metrics/{sample}_{species}_rna_metrics.pdf'],
                 sample=samples.index,
                 species=config['META']['species'],
-                results_dir=results_dir)
-            
+                results_dir=results_dir,
+                type=types)
+
 rule merge:
     input:
         #merge
@@ -242,11 +261,13 @@ rule merge:
             '{results_dir}/plots/UMI_vs_gene.pdf',
             '{results_dir}/plots/Count_vs_gene.pdf',
             '{results_dir}/summary/R_Seurat_objects.rdata',
+            '{results_dir}/summary/barcode_stats_pre_filter.csv',
+            '{results_dir}/summary/barcode_stats_post_filter.csv',
             '{results_dir}/plots/violinplots_comparison_UMI.pdf',
-            '{results_dir}/summary/{type}/expression.mtx'],
+            '{results_dir}/summary/{type}/matrix.mtx'],
                 results_dir=results_dir,
                 type=types)
-        
+
 rule make_report:
     input:
         expand('{results_dir}/reports/publication_text.html', results_dir=results_dir)

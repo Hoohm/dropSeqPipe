@@ -19,14 +19,18 @@ barcodes_struct = {
 	'UMI_end':snakemake.params['UMI_end']
 	}
 
-
 def parse_barcodes(fastq_parser, query_name, read_barcodes, barcodes_struct):
 	for fastq_R1 in fastq_parser:
-		read_barcodes[fastq_R1.id]['XC'] = str(fastq_R1.seq)[barcodes_struct['BC_start']:barcodes_struct['BC_end']]
-		read_barcodes[fastq_R1.id]['XM'] = str(fastq_R1.seq)[barcodes_struct['UMI_start']:barcodes_struct['UMI_end']]
-		if(read_barcodes[fastq_R1.id]['XM']==''):
-			sys.SystemExit('UMI empty for read {}.\n The barcode is: {}.\nWhole entry is:{}'.format(fastq_R1.id, fastq_R1.seq,fastq_R1))
-		if (fastq_R1.id == query_name):
+		# Some sequencers give a /1 and /2 to R1 and R2 read ids respectively. This attempts to solve the issue #69.
+		if '/' in fastq_R1.id:
+			R1_id = fastq_R1.id[:fastq_R1.id.find("/")]
+		else:
+			R1_id = fastq_R1.id
+		read_barcodes[R1_id]['XC'] = str(fastq_R1.seq)[barcodes_struct['BC_start']:barcodes_struct['BC_end']]
+		read_barcodes[R1_id]['XM'] = str(fastq_R1.seq)[barcodes_struct['UMI_start']:barcodes_struct['UMI_end']]
+		if(read_barcodes[R1_id]['XM']==''):
+			sys.SystemExit('UMI empty for read {}.\n The barcode is: {}.\nWhole entry is:{}'.format(R1_id, fastq_R1.seq,fastq_R1))
+		if (R1_id == query_name):
 			return(fastq_parser,read_barcodes)
 	return(fastq_parser,read_barcodes)
 	
@@ -43,16 +47,20 @@ for bam_read in infile_bam:
 		continue
 	if (bam_read.query_name) in read_barcodes:
 		current_barcodes = read_barcodes.pop(bam_read.query_name)
-		bam_read.set_tags([
+		tags = bam_read.get_tags()
+		tags.extend([
 			('XC', current_barcodes['XC'],'Z'),
 			('XM', current_barcodes['XM'],'Z')])
+		bam_read.set_tags(tags)
 	else:
 		fastq_parser,read_barcodes = parse_barcodes(fastq_parser, bam_read.query_name, read_barcodes, barcodes_struct)
 		if (bam_read.query_name) not in read_barcodes:
-			raise SystemExit('Read from mapped file is missing in reference fastq file!')
+			raise SystemExit('Read {} from mapped file is missing in reference fastq file!'.format(bam_read.query_name))
 			os.remove(snakemake.output[0])
 		current_barcodes = read_barcodes.pop(bam_read.query_name)
-		bam_read.set_tags([
+		tags = bam_read.get_tags()
+		tags.extend([
 			('XC', current_barcodes['XC'],'Z'),
 			('XM', current_barcodes['XM'],'Z')])
+		bam_read.set_tags(tags)
 	outfile.write(bam_read)

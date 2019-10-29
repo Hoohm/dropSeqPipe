@@ -7,21 +7,22 @@ This pipeline is based on [snakemake](https://snakemake.readthedocs.io/en/stable
 
 This is the tool we use in our lab to improve our wetlab protocol as well as provide an easy framework to reproduce and compare different experiments with different parameters.
 
-It uses STAR to map the reads. It is usable for any single cell protocol using two reads where the first one holds the Cell and UMI barcodes and the second read holds the RNA. Here is a non-exhausitve list of compatible protocols:
+It uses STAR to map the reads. It is usable for any single cell protocol using two reads where the first one holds the Cell and UMI barcodes and the second read holds the RNA. Here is a non-exhausitve list of compatible protocols/brands:
 
 * Drop-Seq
 * SCRB-Seq
 * 10x Genomics
 * DroNc-seq
+* Dolomite Bio ([Nadia Instrument](https://www.dolomite-bio.com/product/nadia-instrument/))
 
 This package is trying to be as user friendly as possible. One of the hopes is that non-bioinformatician can make use of it without too much hassle. It will still require some command line execution, this is not going to be fully interactive package.
 
 
 ## Authors
 
-* Patrick Roelli (@Hoohm)
-* Sebastian Mueller (@seb-mueller)
-* Charles Girardot (@cgirardot)
+* Patrick Roelli ([@Hoohm)](https://github.com/Hoohm))
+* Sebastian Mueller ([@seb-mueller)](https://github.com/seb-mueller))
+* Charles Girardot ([@cgirardot)](https://github.com/cgirardot))
 
 ## Usage
 
@@ -80,3 +81,11 @@ I'm actively seeking help to implement the points listed bellow. Don't hesitate 
 I hope it can help you out in your single cell experiments!
 
 Feel free to comment and point out potential improvements via [issues](https://github.com/Hoohm/dropSeqPipe/issues)
+
+
+TODO
+---------------------------------------------
+* Add a mixed reference reference for testing purposes
+* Finalize the parameters validation schema
+* Make the debug feature a bit "cleaner". Deal with automatic naming of the debug variables
+* Implement ddseq barcoding strategies

@@ -1,18 +1,18 @@
 channels:
   - conda-forge
   - bioconda
-  - r
 dependencies:
   - r=3.4.1
   - r-ggplot2=2.2.1
   - r-gridextra
-  - r-reshape2
   - r-viridis
   - r-stringdist
   - r-dplyr=0.7.6
   - r-mvtnorm
-  - r-seurat
+  - r-seurat=2
   - r-hmisc
   - r-tidyverse
   - r-devtools
   - r-rcolorbrewer
+  - font-ttf-dejavu-sans-mono=2.37
+  - fontconfig=2.13.1

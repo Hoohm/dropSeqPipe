@@ -1,0 +1,247 @@
+$schema: "http://json-schema.org/draft-06/schema#"
+
+description: Validation schema for all config entries
+
+properties:
+  CONTACT:
+    type: object
+    description: Details for contacting the person that ran the pipeline.
+    properties:
+      person:
+        type: string
+        description: Name of the contact person.
+      email:
+        type: string
+        pattern: ".*@.*"
+        description: Email address of the contact person.
+        default: john.doe@john.com
+  LOCAL:
+    type: object
+    description: Computer/experiment local details, paths, options.
+    properties:
+      temp-directory: 
+        type: string
+        description: Path of the temporary folder. Must have enough space to handle big files. Use scratch on clusters
+      memory: 
+        type: string
+        description: Amount of memory needed for the java virtual machine as well as default for clusters.
+      raw_data: 
+        type: string
+        description: Raw data folder path.
+      results:
+        type: string
+        description: Results folder path.
+        default: results
+    required:
+      - temp-directory
+      - memory
+      - raw_data
+      - results
+  META:
+    type: object
+    description: Details about metadata. Reference genomes and annotations.
+    properties:
+      species:
+        type: object
+        description: Details about species used in the experiment.
+        properties:
+          first_species:
+            type: object
+            description: First or only species of the experiment as in ensembl.
+            properties:
+              name:
+                type: string
+                description: Species name in lowercase.
+              build:
+                type: number
+                description: Build number of the first species.
+              release:
+                type: number
+                description: Release number of the first species
+            required:
+              - build
+              - release
+          second_species:
+            type: object
+            description: Second species of a mixed experiment as in ensembl.
+            properties:
+              name:
+                type: string
+                description: Species name in lowercase.
+              build:
+                type: number
+                description: Build number of the first species.
+              release:
+                type: number
+                description: Release number of the first species
+            required:
+              - build
+              - release
+          required:
+            - first_species          
+      ratio:
+        type: number
+        description: Minimum percentage of total transcripts in one cell to validate a species
+      reference-directory:
+        type: string
+        description: Folder that will contain all the references and metadata files.
+      gtf_biotypes:
+        type: string
+        default: gtf_biotypes.yaml
+        description: file that contains a list of biotypes that are kept for the annotation curation.
+  FILTER:
+    type: object
+    description: Details about trimming, filtering and cell/UMI barcode structure.
+    properties:
+      barcode-whitelist:
+        type: string
+        description: Filename to the barcode whitelist
+      5-prime-smart-adapter:
+        type: string
+        pattern: "[ATGC]*"
+        description: This is the adapter that comes before the cell barcode in a 3" protocol.
+    cell-barcode:
+      type: object
+      description: Start and end positions for cell barcodes.
+      properties:
+        start:
+          type: number
+          description: Cell barcode's first position in R1.
+        end:
+          type: number
+          description: Cell barcode's last position in R1.
+    UMI-barcode:
+      type: object
+      description: Start and end positions for umi barcodes.
+      properties:
+        start:
+          type: number
+          description: UMI barcode's first position in R1
+        end:
+          type: number
+          description: UMI barcode's last position in R1
+    cutadapt:
+      type: object
+      description: Details about trimming and filtering in cutadapt.
+      properties:
+        adapters-file:
+          type: string
+          description: Adapters file name.
+        R1:
+          type: object
+          description: Details for R1 trimming/filtering.
+          properties:
+            quality-filter:
+              type: number
+              description: Quality filtering value as described in cutadapt's documentation for 3" end. https://cutadapt.readthedocs.io/en/stable/algorithms.html#quality-trimming-algorithm
+            maximum-Ns:
+              type: number
+              description: Maximum number of Ns in R1.
+            extra-params:
+              type: string
+              description: Additional parameters for R1 filtering/trimming. For experienced cutadapt users.
+          required:
+            - quality-filter
+            - maximum-Ns
+        R2:
+          type: object
+          description: Details for R2 trimming.
+          properties:
+            quality-filter:
+              type: number
+              description: Quality filtering value as described in cutadapt's documentation for 3" end. https://cutadapt.readthedocs.io/en/stable/algorithms.html#quality-trimming-algorithm
+            minimum-adapters-overlap:
+              type: number
+              description: Minimum number of bases that overlap with the mRNA.
+            minimum-length:
+              type: number
+              description: Minimum length of R2 once it's trimmed. Anything under this value will be filtered out.
+            extra-params:
+              type: string
+              description: Additional parameters for R1 filtering/trimming. For experienced cutadapt users.
+          required:
+            - quality-filter
+            - minimum-adapters-overlap
+            - minimum-length
+        required:
+          - adapters-file
+          - R1
+          - R2 
+  EXTRACTION:
+    type: object
+    description: Details for count extraction.
+    properties:
+      LOCUS:
+        type: array
+        description: Any combination of UTR, CODING and INTRON as an array.
+      UMI-edit-distance:
+        type: number
+        description: Number of mismatches allowed between UMI barcodes when demultiplexing.
+        default: 1
+      minimum-counts-per-UMI:
+        type: number
+        description: Minimum number of UMI-GENE counts to count as a detected gene in a cell.
+        default: 0
+      strand-strategy:
+        type: string
+        description: Defines how to count genes where the forward strand mapped to the forward region on the DNA. Can be SENSE (only count reads that mapped on the same strand), ANTISENSE (only count reads that mapped on the opposite strand) or BOTH (count all).
+    required:
+      - LOCUS
+      - UMI-edit-distance
+      - minimum-counts-per-UMI
+      - strand-strategy
+  MAPPING:
+    type: object
+    properties:
+      STAR:
+        type: object
+        description: STAR mapper parameters
+        properties:
+          outFilterMismatchNmax:
+            type: number
+            description:
+            default: 10
+          outFilterMismatchNoverLmax: 
+            type: number
+            description:
+            default: 0.3
+          outFilterMismatchNoverReadLmax:
+            type: number
+            description: 
+            default: 1
+          outFilterMatchNmin:
+            type: number
+            description:
+            default: 0
+          outFilterMatchNminOverLread:
+            type: number
+            description:
+            default: 0
+          outFilterScoreMinOverLread:
+            type: number
+            description:
+            default: 0
+          genomeChrBinNbits:
+            type: number
+            description:
+            default: 18
+        required:
+          - outFilterMismatchNmax
+          - outFilterMismatchNoverLmax
+          - outFilterMismatchNoverReadLmax
+          - outFilterMatchNmin
+          - outFilterMatchNminOverLread
+          - outFilterScoreMinOverLread
+          - genomeChrBinNbits
+    required:
+      - STAR
+  DEBUG:
+    type: boolean
+    description: Boolean value that enables debug mode for R scripts providing Rdata of the snakemake object as well as the R env.
+    default: FALSE
+required:
+  - LOCAL
+  - META
+  - FILTER
+  - EXTRACTION
+  - MAPPING
