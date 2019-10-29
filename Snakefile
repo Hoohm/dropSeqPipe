@@ -31,7 +31,7 @@ results_dir = config['LOCAL']['results']
 raw_data_dir = config['LOCAL']['raw_data']
 
 # dropSeqPipe version
-config['version'] = '0.4'
+config['version'] = '0.5'
 validate(config, schema=os.path.join(snakefile_root_path,"schemas","config.schema.yaml"))
 
 
