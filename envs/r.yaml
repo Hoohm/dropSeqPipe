@@ -12,6 +12,8 @@ dependencies:
   - r-seurat=2
   - r-hmisc
   - r-tidyverse
+  - r-rcpp
+  - r-fs
   - r-devtools
   - r-rcolorbrewer
   - font-ttf-dejavu-sans-mono=2.37
