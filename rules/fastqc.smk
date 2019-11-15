@@ -37,6 +37,7 @@ rule multiqc_fastqc_barcodes:
         expand('{results_dir}/logs/fastqc/{sample}_R1_fastqc.html', sample=samples.index, results_dir=results_dir)
     output:
         html='{results_dir}/reports/fastqc_barcodes.html'
+    conda: '../envs/multiqc.yaml'
     params: '-m fastqc --ignore *_R2*'
     wrapper:
         '0.36.0/bio/multiqc'
@@ -46,6 +47,7 @@ rule multiqc_fastqc_reads:
         expand('{results_dir}/logs/fastqc/{sample}_R2_fastqc.html', sample=samples.index, results_dir=results_dir)
     output:
         html='{results_dir}/reports/fastqc_reads.html'
+    conda: '../envs/multiqc.yaml'
     params: '-m fastqc --ignore *_R1*'
     wrapper:
         '0.36.0/bio/multiqc'

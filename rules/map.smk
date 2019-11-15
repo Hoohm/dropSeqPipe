@@ -78,6 +78,7 @@ rule multiqc_star:
         expand('{results_dir}/samples/{sample}/Log.final.out', sample=samples.index, results_dir=results_dir)
     output:
         html='{results_dir}/reports/star.html'
+    conda: '../envs/multiqc.yaml'
     params: '-m star'
     wrapper:
         '0.36.0/bio/multiqc'

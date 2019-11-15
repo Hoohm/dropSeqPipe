@@ -122,6 +122,7 @@ rule plot_adapter_content:
 rule multiqc_cutadapt_barcodes:
     input:
         expand('{results_dir}/logs/cutadapt/{sample}_R1.qc.txt', sample=samples.index, results_dir=results_dir)
+    conda: '../envs/multiqc.yaml'
     params: '-m cutadapt --ignore *_R2*'
     output:
         html='{results_dir}/reports/barcode_filtering.html'
@@ -131,6 +132,7 @@ rule multiqc_cutadapt_barcodes:
 rule multiqc_cutadapt_RNA:
     input:
         expand('{results_dir}/logs/cutadapt/{sample}_R2.qc.txt', sample=samples.index, results_dir=results_dir)
+    conda: '../envs/multiqc.yaml'
     params: '-m cutadapt --ignore *_R1*'
     output:
         html='{results_dir}/reports/RNA_filtering.html'
