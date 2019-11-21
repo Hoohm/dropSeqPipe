@@ -75,14 +75,14 @@ metaData <- data.frame(cellNames = colnames(umi_matrix)) %>%
 rownames(metaData) <- metaData$cellNames
 
 # possible to set is.expr = -1 to avoid filtering whilst creating
-# seuratobj <- CreateSeuratObject(raw.data = umi_matrix, meta.data = metaData, is.expr = -1)
-seuratobj <- CreateSeuratObject(raw.data = umi_matrix, meta.data = metaData)
-seuratobj <- SetAllIdent(object = seuratobj, id = "samples")
+# seuratobj <- CreateSeuratObject(count = umi_matrix, meta.data = metaData, is.expr = -1)
+seuratobj <- CreateSeuratObject(count = umi_matrix, meta.data = metaData)
+Ident(object = seuratobj) <- "samples"
 # relabel cell idenity (https://github.com/satijalab/seurat/issues/380)
 seuratobj@meta.data$orig.ident <- seuratobj@meta.data$samples
 
-mycount <- CreateSeuratObject(raw.data = count_matrix, meta.data = metaData)
-mycount <- SetAllIdent(object = mycount, id = "samples")
+mycount <- CreateSeuratObject(count = count_matrix, meta.data = metaData)
+Ident(object = mycount) <- "samples"
 mycount@meta.data$orig.ident <- mycount@meta.data$samples
 # turn off filtering
 # note, the @meta.data slot contains usefull summary stuff
@@ -141,20 +141,20 @@ ggsave(gg, file = file.path(getwd(), snakemake@output$pdf_umivscounts), width = 
 
 # how about unaligned reads/UMI?
 # Note(Seb): raw.data is actually filtered data i.e. nr of genes likely to be smaller than input data!
-mito.gene.names <- grep("^mt-", rownames(seuratobj@raw.data), value = TRUE, ignore.case = TRUE)
-sribo.gene.names <- grep("^Rps", rownames(seuratobj@raw.data), value = TRUE, ignore.case = TRUE)
-lribo.gene.names <- grep("^Rpl", rownames(seuratobj@raw.data), value = TRUE, ignore.case = TRUE)
+mito.gene.names <- grep("^mt-", rownames(GetAssayData(object = seuratobj, slot = "counts")), value = TRUE, ignore.case = TRUE)
+sribo.gene.names <- grep("^Rps", rownames(GetAssayData(object = seuratobj, slot = "counts")), value = TRUE, ignore.case = TRUE)
+lribo.gene.names <- grep("^Rpl", rownames(GetAssayData(object = seuratobj, slot = "counts")), value = TRUE, ignore.case = TRUE)
 
-col.total <- Matrix::colSums(seuratobj@raw.data)
+col.total <- Matrix::colSums(GetAssayData(object = seuratobj, slot = "counts"))
 meta.data$col.total <- col.total
 
-seuratobj.top_50 <- apply(seuratobj@raw.data, 2, function(x) sum(x[order(x, decreasing = TRUE)][1:50]) / sum(x))
+seuratobj.top_50 <- apply(GetAssayData(object = seuratobj, slot = "counts"), 2, function(x) sum(x[order(x, decreasing = TRUE)][1:50]) / sum(x))
 # mycount.top_50 <- apply(mycount@raw.data, 2, function(x) sum(x[order(x, decreasing = TRUE)][1:50])/sum(x))
 
-seuratobj <- AddMetaData(seuratobj, Matrix::colSums(seuratobj@raw.data[sribo.gene.names, ]) / col.total, "pct.sribo")
-seuratobj <- AddMetaData(seuratobj, Matrix::colSums(seuratobj@raw.data[lribo.gene.names, ]) / col.total, "pct.lribo")
-seuratobj <- AddMetaData(seuratobj, Matrix::colSums(seuratobj@raw.data[unique(c(sribo.gene.names, lribo.gene.names)), ]) / col.total, "pct.Ribo")
-seuratobj <- AddMetaData(seuratobj, Matrix::colSums(seuratobj@raw.data[mito.gene.names, ]) / col.total, "pct.mito")
+seuratobj <- AddMetaData(seuratobj, Matrix::colSums(GetAssayData(object = seuratobj, slot = "counts")[sribo.gene.names, ]) / col.total, "pct.sribo")
+seuratobj <- AddMetaData(seuratobj, Matrix::colSums(GetAssayData(object = seuratobj, slot = "counts")[lribo.gene.names, ]) / col.total, "pct.lribo")
+seuratobj <- AddMetaData(seuratobj, Matrix::colSums(GetAssayData(object = seuratobj, slot = "counts")[unique(c(sribo.gene.names, lribo.gene.names)), ]) / col.total, "pct.Ribo")
+seuratobj <- AddMetaData(seuratobj, Matrix::colSums(GetAssayData(object = seuratobj, slot = "counts")[mito.gene.names, ]) / col.total, "pct.mito")
 seuratobj <- AddMetaData(seuratobj, seuratobj.top_50, "top50")
 tmp <- seuratobj@meta.data$nUMI / seuratobj@meta.data$nGene
 names(tmp) <- rownames(seuratobj@meta.data)

@@ -9,7 +9,7 @@ dependencies:
   - r-stringdist
   - r-dplyr=0.7.6
   - r-mvtnorm
-  - r-seurat=2
+  - r-seurat
   - r-hmisc
   - r-tidyverse
   - r-devtools
