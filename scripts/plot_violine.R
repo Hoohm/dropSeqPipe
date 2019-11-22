@@ -149,7 +149,7 @@ col.total <- Matrix::colSums(GetAssayData(object = seuratobj, slot = "counts"))
 meta.data$col.total <- col.total
 
 seuratobj.top_50 <- apply(GetAssayData(object = seuratobj, slot = "counts"), 2, function(x) sum(x[order(x, decreasing = TRUE)][1:50]) / sum(x))
-# mycount.top_50 <- apply(mycount@raw.data, 2, function(x) sum(x[order(x, decreasing = TRUE)][1:50])/sum(x))
+# mycount.top_50 <- apply(GetAssayData(object = mycount, slot = "counts"), 2, function(x) sum(x[order(x, decreasing = TRUE)][1:50])/sum(x))
 
 seuratobj <- AddMetaData(seuratobj, Matrix::colSums(GetAssayData(object = seuratobj, slot = "counts")[sribo.gene.names, ]) / col.total, "pct.sribo")
 seuratobj <- AddMetaData(seuratobj, Matrix::colSums(GetAssayData(object = seuratobj, slot = "counts")[lribo.gene.names, ]) / col.total, "pct.lribo")
