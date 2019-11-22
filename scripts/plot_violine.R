@@ -87,7 +87,7 @@ mycount@meta.data$orig.ident <- mycount@meta.data$samples
 # turn off filtering
 # note, the @meta.data slot contains usefull summary stuff
 # head(mycount@meta.data,2)
-#                              nGene nUMI expected_cells read_length      barcode
+#                              nFeature_RNA nCount_RNA expected_cells read_length      barcode
 # dropseqLib1_ACTAACATTATT    15   33            400         100 ACTAACATTATT
 # dropseqLib1_GAGTCTGAGGCG     5    9            400         100 GAGTCTGAGGCG
 #                                       origin      origin
@@ -95,7 +95,7 @@ mycount@meta.data$orig.ident <- mycount@meta.data$samples
 # dropseqLib1_GAGTCTGAGGCG dropseqLib1 dropseqLib1
 meta.data <- seuratobj@meta.data
 # combining UMIs and Counts in to one Seurat object
-meta.data$nCounts <- mycount@meta.data$nUMI
+meta.data$nCounts <- mycount@meta.data$nCount_RNA
 seuratobj@meta.data <- meta.data
 # delete since Counts have been added to seuratobj as nCounts column
 rm(mycount)
@@ -124,7 +124,7 @@ gglayers <- list(
   )
 )
 
-gg <- ggplot(meta.data, aes(x = nUMI, y = nCounts, color = orig.ident)) +
+gg <- ggplot(meta.data, aes(x = nCount_RNA, y = nCounts, color = orig.ident)) +
   #   coord_trans(y="log10",x = "log10") +
   gglayers +
   geom_abline(intercept = 0, slope = 1) +
@@ -156,25 +156,25 @@ seuratobj <- AddMetaData(seuratobj, Matrix::colSums(GetAssayData(object = seurat
 seuratobj <- AddMetaData(seuratobj, Matrix::colSums(GetAssayData(object = seuratobj, slot = "counts")[unique(c(sribo.gene.names, lribo.gene.names)), ]) / col.total, "pct.Ribo")
 seuratobj <- AddMetaData(seuratobj, Matrix::colSums(GetAssayData(object = seuratobj, slot = "counts")[mito.gene.names, ]) / col.total, "pct.mito")
 seuratobj <- AddMetaData(seuratobj, seuratobj.top_50, "top50")
-tmp <- seuratobj@meta.data$nUMI / seuratobj@meta.data$nGene
+tmp <- seuratobj@meta.data$nCount_RNA / seuratobj@meta.data$nFeature_RNA
 names(tmp) <- rownames(seuratobj@meta.data)
 seuratobj <- AddMetaData(seuratobj, tmp, "umi.per.gene")
 
 
 gg <- VlnPlot(seuratobj,
-  c("nUMI", "nGene", "top50", "umi.per.gene", "pct.Ribo", "pct.mito"),
+  c("nCount_RNA", "nFeature_RNA", "top50", "umi.per.gene", "pct.Ribo", "pct.mito"),
   x.lab.rot = TRUE, do.return = TRUE
 )
 # ggsave(gg,file=file.path("violinplots_comparison_UMI.pdf"),width=18,height=18)
 ggsave(gg, file = snakemake@output$pdf_violine, width = 18, height = 18)
-# gg <- VlnPlot(mycount,c("nUMI", "nGene", "top50", "count.per.gene","pct.Ribo", "pct.mito"), x.lab.rot = TRUE, do.return = TRUE)
+# gg <- VlnPlot(mycount,c("nCount_RNA", "nFeature_RNA", "top50", "count.per.gene","pct.Ribo", "pct.mito"), x.lab.rot = TRUE, do.return = TRUE)
 # ggsave(gg,file=file.path("violinplots_comparison_count.pdf"),width=18,height=18)
 
-# gg <- GenePlot(object = seuratobj, gene1 = "nUMI", gene2 = "nGene")
+# gg <- GenePlot(object = seuratobj, gene1 = "nCount_RNA", gene2 = "nFeature_RNA")
 # ggsave(gg,file=file.path("violinplots_comparison.pdf"),width=18,height=18)
 
 
-gg <- ggplot(meta.data, aes(x = nUMI, y = nGene, color = orig.ident)) +
+gg <- ggplot(meta.data, aes(x = nCount_RNA, y = nFeature_RNA, color = orig.ident)) +
   gglayers +
   labs(
     title = "Genes (pooled mouse and human set) vs UMIs for each bead",
@@ -191,7 +191,7 @@ ggsave(gg, file = snakemake@output$pdf_umi_vs_gene, width = 12, height = 7)
 
 ################################################################################
 ## same for Counts instead UMIs (using mycount object)
-gg <- ggplot(meta.data, aes(x = nCounts, y = nGene, color = orig.ident)) +
+gg <- ggplot(meta.data, aes(x = nCounts, y = nFeature_RNA, color = orig.ident)) +
   gglayers +
   labs(
     title = "Genes (pooled mouse and human set) vs Counts for each bead",
@@ -207,7 +207,7 @@ ggsave(gg, file = snakemake@output$pdf_count_vs_gene, width = 12, height = 7)
 
 
 # head(meta.data,2)
-#                              nGene nUMI                    cellNames         samples      barcode expected_cells read_length  batch      orig.ident pct.sribo  pct.lribo  pct.Ribo  pct.mito     top50 umi.per.gene
+#                              nFeature_RNA nCount_RNA                    cellNames         samples      barcode expected_cells read_length  batch      orig.ident pct.sribo  pct.lribo  pct.Ribo  pct.mito     top50 umi.per.gene
 # sample1_GAGTCTGAGGCG     6    6 sample1_GAGTCTGAGGCG sample1 GAGTCTGAGGCG            100         100 batch1 sample1 0.0000000 0.00000000 0.0000000 0.0000000 1.0000000     1.000000
 # sample1_CAGCCCTCAGTA   264  437 sample1_CAGCCCTCAGTA sample1 CAGCCCTCAGTA            100         100 batch1 sample1 0.0389016 0.07551487 0.1144165 0.0228833 0.5102975     1.655303
 

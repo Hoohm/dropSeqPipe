@@ -80,15 +80,15 @@ stats_post <- meta.data.sub %>%
     Nb_STAMPS                      = mean(expected_cells), # should be all the same anyway..
     Median_reads_per_STAMP         = round(median(nCounts), 2),
     Mean_reads_per_STAMP           = round(mean(nCounts), 2),
-    Total_nb_UMIs                  = sum(nUMI),
-    Median_UMIs_per_STAMP          = round(median(nUMI), 2),
-    Mean_UMIs_per_STAMP            = round(mean(nUMI), 2),
+    Total_nb_UMIs                  = sum(nCount_RNA),
+    Median_UMIs_per_STAMP          = round(median(nCount_RNA), 2),
+    Mean_UMIs_per_STAMP            = round(mean(nCount_RNA), 2),
     Mean_UMIs_per_Gene             = round(mean(umi.per.gene), 2),
-    Median_number_genes_per_STAMP  = round(median(nGene), 2),
-    Mean_number_genes_per_STAMP    = round(mean(nGene), 2),
+    Median_number_genes_per_STAMP  = round(median(nFeature_RNA), 2),
+    Mean_number_genes_per_STAMP    = round(mean(nFeature_RNA), 2),
     Mean_Ribo_pct                  = round(100 * mean(pct.Ribo), 2),
     Mean_Mito_pct                  = round(100 * mean(pct.mito), 2),
-    Mean_Count_per_UMI             = round(sum(nCounts) / sum(nUMI), 2),
+    Mean_Count_per_UMI             = round(sum(nCounts) / sum(nCount_RNA), 2),
     Read_length                    = mean(read_length), # should be all the same anyway..
     Number_barcodes_used_for_debug = n()
   ) %>%
