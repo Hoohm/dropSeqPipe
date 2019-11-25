@@ -39,22 +39,6 @@ library(plotly, quietly = TRUE, warn.conflicts = FALSE)
 # importing UMI
 # importing counts ( summary/counts_expression_matrix.tsv )
 
-ReadMTX <- function(mtx_path) {
-  data_dir <- dirname(mtx_path)
-  files <- list.files(data_dir)
-  # Find files
-  barcodes_file <- grep("barcodes", files, value = TRUE)
-  features_file <- grep(pattern = "genes|features", x = files, value = TRUE)
-  mtx <- grep("mtx", files, value = TRUE)
-  # load the data
-  data <- readMM(file.path(data_dir, mtx))
-  barcodes <- read.csv(file.path(data_dir, barcodes_file), header = FALSE)$V1
-  features <- read.csv(file.path(data_dir, features_file), header = FALSE)$V1
-
-  colnames(data) <- barcodes
-  rownames(data) <- features
-  return(data)
-}
 
 #count_matrix <- ReadMTX(snakemake@input$counts)
 # importing UMIs ( summary/umi_expression_matrix.tsv )
@@ -212,7 +196,7 @@ ggsave(gg, file = snakemake@output$pdf_count_vs_gene, width = 12, height = 7)
 # sample1_CAGCCCTCAGTA   264  437 sample1_CAGCCCTCAGTA sample1 CAGCCCTCAGTA            100         100 batch1 sample1 0.0389016 0.07551487 0.1144165 0.0228833 0.5102975     1.655303
 
 # saving snakemake meta information into misc slot so all can be exported as one object
-seuratobj@misc <- snakemake
+seuratobj@misc <- list(snakemake)
 # exporting R Seurat objects into summary/R_Seurat_objects.rdata
 saveRDS(seuratobj, file = file.path(snakemake@output$R_objects))
 
