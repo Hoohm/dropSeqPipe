@@ -60,8 +60,8 @@ ReadMTX <- function(mtx_path) {
 # importing UMIs ( summary/umi_expression_matrix.tsv )
 #umi_matrix <- ReadMTX(snakemake@input$UMIs)
 
-count_matrix <- Read10X(file.path(snakemake@wildcards$results_dir,'summary','read'))
-umi_matrix <- Read10X(file.path(snakemake@wildcards$results_dir,'summary','umi'))
+count_matrix <- Read10X(file.path(snakemake@wildcards$results_dir,'summary','read'), gene.column = 1)
+umi_matrix <- Read10X(file.path(snakemake@wildcards$results_dir,'summary','umi'), gene.column = 1)
 
 design <- read.csv(snakemake@input$design,
   stringsAsFactors = TRUE,
@@ -77,12 +77,12 @@ rownames(metaData) <- metaData$cellNames
 # possible to set is.expr = -1 to avoid filtering whilst creating
 # seuratobj <- CreateSeuratObject(count = umi_matrix, meta.data = metaData, is.expr = -1)
 seuratobj <- CreateSeuratObject(count = umi_matrix, meta.data = metaData)
-Ident(object = seuratobj) <- "samples"
+Idents(object = seuratobj) <- "samples"
 # relabel cell idenity (https://github.com/satijalab/seurat/issues/380)
 seuratobj@meta.data$orig.ident <- seuratobj@meta.data$samples
 
 mycount <- CreateSeuratObject(count = count_matrix, meta.data = metaData)
-Ident(object = mycount) <- "samples"
+Idents(object = mycount) <- "samples"
 mycount@meta.data$orig.ident <- mycount@meta.data$samples
 # turn off filtering
 # note, the @meta.data slot contains usefull summary stuff
