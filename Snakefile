@@ -135,8 +135,8 @@ if len(config['META']['species'].keys()) == 2:
                     release=release,
                     species=species),
             expand(
-                ['{results_dir}/samples/{sample}/{species}/umi/matrix.mtx',
-                '{results_dir}/samples/{sample}/{species}/read/matrix.mtx',
+                ['{results_dir}/samples/{sample}/{species}/umi/matrix.mtx.gz',
+                '{results_dir}/samples/{sample}/{species}/read/matrix.mtx.gz',
                 '{results_dir}/plots/rna_metrics/{sample}_{species}_rna_metrics.pdf'],
                 results_dir=results_dir,
                 sample=samples.index,
@@ -162,7 +162,7 @@ elif len(config['META']['species'].keys()) == 1:
                 '{results_dir}/samples/{sample}/Unmapped.out.mate1.gz',
                 #extract
                 '{results_dir}/plots/rna_metrics/{sample}_rna_metrics.pdf',
-                '{results_dir}/summary/{type}/matrix.mtx',
+                '{results_dir}/summary/{type}/matrix.mtx.gz',
                 '{results_dir}/samples/{sample}/{type}/matrix.mtx',
                 #merge
                 '{results_dir}/plots/UMI_vs_counts.pdf',
