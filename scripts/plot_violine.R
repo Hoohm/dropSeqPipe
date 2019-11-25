@@ -60,8 +60,15 @@ ReadMTX <- function(mtx_path) {
 # importing UMIs ( summary/umi_expression_matrix.tsv )
 #umi_matrix <- ReadMTX(snakemake@input$UMIs)
 
-count_matrix <- Read10X(file.path(snakemake@wildcards$results_dir, snakemake@wildcards$sample, 'summary','read'), gene.column = 1)
-umi_matrix <- Read10X(file.path(snakemake@wildcards$results_dir, snakemake@wildcards$sample, 'summary','umi'), gene.column = 1)
+if (debug_flag) {
+  print(file.path(snakemake@wildcards$results_dir, 'summary','umi'))
+  print(list.files(file.path(snakemake@wildcards$results_dir, 'summary','umi')))
+  print(file.path(snakemake@wildcards$results_dir, 'summary','read'))
+  print(list.files(file.path(snakemake@wildcards$results_dir, 'summary','read')))
+}
+
+count_matrix <- Read10X(file.path(snakemake@wildcards$results_dir, 'summary','read'), gene.column = 1)
+umi_matrix <- Read10X(file.path(snakemake@wildcards$results_dir, 'summary','umi'), gene.column = 1)
 
 design <- read.csv(snakemake@input$design,
   stringsAsFactors = TRUE,

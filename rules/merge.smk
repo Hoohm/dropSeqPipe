@@ -1,7 +1,7 @@
-
 localrules:
     merge_long,
-    compress_mtx_summary,
+    compress_mtx_summary_read,
+    compress_mtx_summary_umi,
     violine_plots,
     summary_stats
 
@@ -18,15 +18,29 @@ rule merge_long:
     script:
         "../scripts/convert_mtx.py"
 
-rule compress_mtx_summary:
+rule compress_mtx_summary_read:
     input: 
-        barcodes='{results_dir}/summary/barcodes.tsv',
-        features='{results_dir}/summary/features.tsv',
-        mtx='{results_dir}/summary/matrix.mtx'
+        barcodes='{results_dir}/summary/read/barcodes.tsv',
+        features='{results_dir}/summary/read/features.tsv',
+        mtx='{results_dir}/summary/read/matrix.mtx'
     output:
-        barcodes='{results_dir}/summary/barcodes.tsv.gz',
-        features='{results_dir}/summary/features.tsv.gz',
-        mtx='{results_dir}/summary/matrix.mtx.gz'
+        barcodes='{results_dir}/summary/read/barcodes.tsv.gz',
+        features='{results_dir}/summary/read/features.tsv.gz',
+        mtx='{results_dir}/summary/read/matrix.mtx.gz'
+    conda: '../envs/pigz.yaml'
+    threads: 3
+    shell:
+        """pigz -p {threads} {input.barcodes} {input.features} {input.mtx}"""
+
+rule compress_mtx_summary_umi:
+    input: 
+        barcodes='{results_dir}/summary/umi/barcodes.tsv',
+        features='{results_dir}/summary/umi/features.tsv',
+        mtx='{results_dir}/summary/umi/matrix.mtx'
+    output:
+        barcodes='{results_dir}/summary/umi/barcodes.tsv.gz',
+        features='{results_dir}/summary/umi/features.tsv.gz',
+        mtx='{results_dir}/summary/umi/matrix.mtx.gz'
     conda: '../envs/pigz.yaml'
     threads: 3
     shell:
@@ -35,7 +49,7 @@ rule compress_mtx_summary:
 rule violine_plots:
     input:
         umi_mtx='{results_dir}/summary/umi/matrix.mtx.gz',
-        read_mtx='{results_dir}/summary/umi/matrix.mtx.gz',
+        read_mtx='{results_dir}/summary/read/matrix.mtx.gz',
         design='samples.csv'
     conda: '../envs/r.yaml'
     output:
