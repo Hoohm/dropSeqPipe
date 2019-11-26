@@ -67,7 +67,7 @@ rule convert_long_to_mtx_species:
         '{results_dir}/samples/{sample}/{species}/{type}/expression.long'
     output:
         barcodes='{results_dir}/samples/{sample}/{species}/{type}/barcodes.tsv',
-        features='{results_dir}/samples/{sample}/{species}/{type}/genes.tsv',
+        features='{results_dir}/samples/{sample}/{species}/{type}/features.tsv',
         mtx='{results_dir}/samples/{sample}/{species}/{type}/matrix.mtx'
     params:
         samples=lambda wildcards: wildcards.sample
@@ -77,11 +77,11 @@ rule convert_long_to_mtx_species:
 rule compress_mtx_species:
     input: 
         barcodes='{results_dir}/samples/{sample}/{species}/{type}/barcodes.tsv',
-        features='{results_dir}/samples/{sample}/{species}/{type}/genes.tsv',
+        features='{results_dir}/samples/{sample}/{species}/{type}/features.tsv',
         mtx='{results_dir}/samples/{sample}/{species}/{type}/matrix.mtx'
     output:
         barcodes='{results_dir}/samples/{sample}/{species}/{type}/barcodes.tsv.gz',
-        features='{results_dir}/samples/{sample}/{species}/{type}/genes.tsv.gz',
+        features='{results_dir}/samples/{sample}/{species}/{type}/features.tsv.gz',
         mtx='{results_dir}/samples/{sample}/{species}/{type}/matrix.mtx.gz'
     conda: '../envs/pigz.yaml'
     threads: 3

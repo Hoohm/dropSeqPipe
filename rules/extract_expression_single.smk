@@ -1,4 +1,4 @@
-"""Extract expression fof single species"""
+"""Extract expression for single species"""
 
 #Which rules will be run on the host computer and not sent to nodes
 localrules:
@@ -108,7 +108,7 @@ rule convert_long_to_mtx:
         '{results_dir}/samples/{sample}/{type}/expression.long'
     output:
         barcodes='{results_dir}/samples/{sample}/{type}/barcodes.tsv',
-        features='{results_dir}/samples/{sample}/{type}/genes.tsv',
+        features='{results_dir}/samples/{sample}/{type}/features.tsv',
         mtx='{results_dir}/samples/{sample}/{type}/matrix.mtx'
     params:
         samples=lambda wildcards: wildcards.sample
@@ -118,11 +118,11 @@ rule convert_long_to_mtx:
 rule compress_mtx:
     input: 
         barcodes='{results_dir}/samples/{sample}/{type}/barcodes.tsv',
-        features='{results_dir}/samples/{sample}/{type}/genes.tsv',
+        features='{results_dir}/samples/{sample}/{type}/features.tsv',
         mtx='{results_dir}/samples/{sample}/{type}/matrix.mtx'
     output:
         barcodes='{results_dir}/samples/{sample}/{type}/barcodes.tsv.gz',
-        features='{results_dir}/samples/{sample}/{type}/genes.tsv.gz',
+        features='{results_dir}/samples/{sample}/{type}/features.tsv.gz',
         mtx='{results_dir}/samples/{sample}/{type}/matrix.mtx.gz'
     conda: '../envs/pigz.yaml'
     threads: 3

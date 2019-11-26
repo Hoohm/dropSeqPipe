@@ -135,8 +135,8 @@ if len(config['META']['species'].keys()) == 2:
                     release=release,
                     species=species),
             expand(
-                ['{results_dir}/samples/{sample}/{species}/umi/matrix.mtx',
-                '{results_dir}/samples/{sample}/{species}/read/matrix.mtx',
+                ['{results_dir}/samples/{sample}/{species}/umi/matrix.mtx.gz',
+                '{results_dir}/samples/{sample}/{species}/read/matrix.mtx.gz',
                 '{results_dir}/plots/rna_metrics/{sample}_{species}_rna_metrics.pdf'],
                 results_dir=results_dir,
                 sample=samples.index,
@@ -162,8 +162,8 @@ elif len(config['META']['species'].keys()) == 1:
                 '{results_dir}/samples/{sample}/Unmapped.out.mate1.gz',
                 #extract
                 '{results_dir}/plots/rna_metrics/{sample}_rna_metrics.pdf',
-                '{results_dir}/summary/{type}/matrix.mtx',
-                '{results_dir}/samples/{sample}/{type}/matrix.mtx',
+                '{results_dir}/summary/{type}/matrix.mtx.gz',
+                '{results_dir}/samples/{sample}/{type}/matrix.mtx.gz',
                 #merge
                 '{results_dir}/plots/UMI_vs_counts.pdf',
                 '{results_dir}/plots/UMI_vs_gene.pdf',
@@ -225,7 +225,7 @@ rule extract:
     input:
         expand(
             ['{results_dir}/plots/rna_metrics/{sample}_rna_metrics.pdf',
-            '{results_dir}/summary/{type}/matrix.mtx',
+            '{results_dir}/summary/{type}/matrix.mtx.gz',
             '{results_dir}/samples/{sample}/{type}/matrix.mtx.gz'],
                 results_dir=results_dir,
                 sample=samples.index,
@@ -246,7 +246,7 @@ rule split_species:
 rule extract_species:
     input:
         expand(
-            ['{results_dir}/samples/{sample}/{species}/{type}/matrix.mtx',
+            ['{results_dir}/samples/{sample}/{species}/{type}/matrix.mtx.gz',
             '{results_dir}/plots/rna_metrics/{sample}_{species}_rna_metrics.pdf'],
                 sample=samples.index,
                 species=config['META']['species'],
@@ -264,7 +264,7 @@ rule merge:
             '{results_dir}/summary/barcode_stats_pre_filter.csv',
             '{results_dir}/summary/barcode_stats_post_filter.csv',
             '{results_dir}/plots/violinplots_comparison_UMI.pdf',
-            '{results_dir}/summary/{type}/matrix.mtx'],
+            '{results_dir}/summary/{type}/matrix.mtx.gz'],
                 results_dir=results_dir,
                 type=types)
 
