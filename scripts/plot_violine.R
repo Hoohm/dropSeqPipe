@@ -44,8 +44,15 @@ library(plotly, quietly = TRUE, warn.conflicts = FALSE)
 # importing UMIs ( summary/umi_expression_matrix.tsv )
 #umi_matrix <- ReadMTX(snakemake@input$UMIs)
 
-count_matrix <- Read10X(file.path(snakemake@wildcards$results_dir,'summary','read'), gene.column = 1)
-umi_matrix <- Read10X(file.path(snakemake@wildcards$results_dir,'summary','umi'), gene.column = 1)
+if (debug_flag) {
+  print(file.path(snakemake@wildcards$results_dir, 'summary','umi'))
+  print(list.files(file.path(snakemake@wildcards$results_dir, 'summary','umi')))
+  print(file.path(snakemake@wildcards$results_dir, 'summary','read'))
+  print(list.files(file.path(snakemake@wildcards$results_dir, 'summary','read')))
+}
+
+count_matrix <- Read10X(file.path(snakemake@wildcards$results_dir, 'summary','read'), gene.column = 1)
+umi_matrix <- Read10X(file.path(snakemake@wildcards$results_dir, 'summary','umi'), gene.column = 1)
 
 design <- read.csv(snakemake@input$design,
   stringsAsFactors = TRUE,
@@ -196,7 +203,7 @@ ggsave(gg, file = snakemake@output$pdf_count_vs_gene, width = 12, height = 7)
 # sample1_CAGCCCTCAGTA   264  437 sample1_CAGCCCTCAGTA sample1 CAGCCCTCAGTA            100         100 batch1 sample1 0.0389016 0.07551487 0.1144165 0.0228833 0.5102975     1.655303
 
 # saving snakemake meta information into misc slot so all can be exported as one object
-seuratobj@misc <- list(snakemake)
+Misc(object = pbmc_small, slot = "misc")  <- list(snakemake)
 # exporting R Seurat objects into summary/R_Seurat_objects.rdata
 saveRDS(seuratobj, file = file.path(snakemake@output$R_objects))
 

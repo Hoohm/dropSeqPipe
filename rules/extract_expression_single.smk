@@ -1,10 +1,10 @@
-"""Extract expression fof single species"""
+"""Extract expression for single species"""
 
 #Which rules will be run on the host computer and not sent to nodes
 localrules:
     plot_rna_metrics,
-    convert_long_to_mtx,
-    compress_mtx
+    convert_long_to_mtx#,
+#    compress_mtx
 
 rule extract_umi_expression:
     input:
@@ -108,23 +108,23 @@ rule convert_long_to_mtx:
         '{results_dir}/samples/{sample}/{type}/expression.long'
     output:
         barcodes='{results_dir}/samples/{sample}/{type}/barcodes.tsv',
-        features='{results_dir}/samples/{sample}/{type}/genes.tsv',
+        features='{results_dir}/samples/{sample}/{type}/features.tsv',
         mtx='{results_dir}/samples/{sample}/{type}/matrix.mtx'
     params:
         samples=lambda wildcards: wildcards.sample
     script:
         "../scripts/convert_mtx.py"
 
-rule compress_mtx:
-    input: 
-        barcodes='{results_dir}/samples/{sample}/{type}/barcodes.tsv',
-        features='{results_dir}/samples/{sample}/{type}/genes.tsv',
-        mtx='{results_dir}/samples/{sample}/{type}/matrix.mtx'
-    output:
-        barcodes='{results_dir}/samples/{sample}/{type}/barcodes.tsv.gz',
-        features='{results_dir}/samples/{sample}/{type}/genes.tsv.gz',
-        mtx='{results_dir}/samples/{sample}/{type}/matrix.mtx.gz'
-    conda: '../envs/pigz.yaml'
-    threads: 3
-    shell:
-        """pigz -p {threads} {input.barcodes} {input.features} {input.mtx}"""
+# rule compress_mtx:
+#     input: 
+#         barcodes='{results_dir}/samples/{sample}/{type}/barcodes.tsv',
+#         features='{results_dir}/samples/{sample}/{type}/features.tsv',
+#         mtx='{results_dir}/samples/{sample}/{type}/matrix.mtx'
+#     output:
+#         barcodes='{results_dir}/samples/{sample}/{type}/barcodes.tsv.gz',
+#         features='{results_dir}/samples/{sample}/{type}/features.tsv.gz',
+#         mtx='{results_dir}/samples/{sample}/{type}/matrix.mtx.gz'
+#     conda: '../envs/pigz.yaml'
+#     threads: 3
+#     shell:
+#         """pigz -p {threads} {input.barcodes} {input.features} {input.mtx}"""

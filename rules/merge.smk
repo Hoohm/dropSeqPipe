@@ -1,6 +1,6 @@
-
 localrules:
     merge_long,
+    compress_mtx_summary,
     violine_plots,
     summary_stats
 
