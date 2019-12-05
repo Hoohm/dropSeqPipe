@@ -1,7 +1,11 @@
-This pipeline is dependent on conda.
+#Installation
 
-### Step 1: Download and install miniconda3
-First you need to download and install miniconda3:
+DropSeqPipe is dependent upon the software management system `conda`.
+First step therefore is to install `miniconda3` a small version of `Anaconda` that includes conda, Python, the packages they depend on and a small number of other useful packages such as pip and zlib.
+
+
+## Step 1: Download and install miniconda3
+First you need to download and install miniconda3 by executing the commands below on the command line.
 
 for linux
 ```
@@ -15,32 +19,52 @@ curl https://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh -o M
 bash Miniconda3-latest-MacOSX-x86_64.sh
 ```
 
+The command `conda` should now be available and can be tested by running `conda` on the command line.
+If the command doesn’t work, more information can be found [here](https://conda.io/projects/conda/en/latest/user-guide/install/index.html)
 
-### Step 2: Clone the workflow
+## Step 2: Install snakemake
 
-Clone the worflow
-```
-git clone https://github.com/Hoohm/dropSeqPipe.git
-```
-
-### Step 3: Install snakemake
+To run the pipeline [snakemake]( https://snakemake.readthedocs.io/en/stable/) is needed which will be installed using conda
 
 ```
 conda install -c bioconda -c conda-forge snakemake
 ```
- 
-Next step is config files completion
+The command `snakemake` should now be available and can be tested by running `snakemake` on the command line. If the command doesn’t work, more detailed instruction can be found [here](https://snakemake.readthedocs.io/en/stable/)
 
-[Complete the config.yaml](https://github.com/Hoohm/dropSeqPipe/wiki/Create-config-files) with the missing information
+## Step 3: Obtain pipeline
 
-### UPDATES: How to update the pipeline
+In order to download the actual pipeline either download it directly or use [git]( https://www.git-scm.com/) to clone the workflow.
+
+The pipeline can be directly downloaded [here]
+(https://github.com/Hoohm/dropSeqPipe/archive/master.zip)
+
+It is however recommended to download the pipeline by cloning using git rather than downloading the zip archive.
+If `git` hasn’t been installed yet `conda` can be used to do so.
+
+```
+conda install -c bioconda -c conda-forge git
+```
+
+Next the workflow can be obtained using the following command.
+
+```
+git clone https://github.com/Hoohm/dropSeqPipe.git
+```
+
+This should result in the set-up of a directory called `dropSeqPipe` which contains the pipeline.
+
+
+
+## How to update the pipeline
 
 Go to your experiment folder, then pull.
+
 ```
-git pull https://github.com/Hoohm/dropSeqPipe.git
+git pull
 ```
 
-If you want to update files/plots based on the updates you can use this command:
+To update files/plots, use this command:
+
 ```
 snakemake -R `snakemake --list-codes-changes`
 ```
