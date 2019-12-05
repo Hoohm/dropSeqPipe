@@ -23,6 +23,7 @@ This package is trying to be as user friendly as possible. One of the hopes is t
 * Patrick Roelli ([@Hoohm)](https://github.com/Hoohm))
 * Sebastian Mueller ([@seb-mueller)](https://github.com/seb-mueller))
 * Charles Girardot ([@cgirardot)](https://github.com/cgirardot))
+* Tom Kelly ([@TomKellyGenetics)](https://github.com/TomKellyGenetics))
 
 ## Usage
 
@@ -35,7 +36,7 @@ In any case, if you use this workflow in a paper, don't forget to give credits t
 
 ### Step 2: Configure workflow
 
-Configure the workflow according to your needs via editing the file `config.yaml` and the  `samples.tsv` following those [instructions](https://github.com/Hoohm/dropSeqPipe/wiki/Create-config-files)
+Configure the workflow according to your needs via editing the file `config.yaml` and the  `samples.csv` following those [instructions](https://hoohm.github.io/dropSeqPipe/)
 
 ### Step 3: Execute workflow
 
@@ -51,9 +52,9 @@ Execute the workflow locally via
 
 using `$N` cores on the `$WORKING_DIR`. Alternatively, it can be run in cluster or cloud environments (see [the docs](http://snakemake.readthedocs.io/en/stable/executable.html) for details).
 
-If you not only want to fix the software stack but also the underlying OS, use
+If you not only want to fix the software stack but also the underlying OS (using Singularity), use
 
-    snakemake --use-conda --use-singularity
+    snakemake --use-singularity
 
 in combination with any of the modes above.
 
