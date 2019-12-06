@@ -4,12 +4,10 @@ repo_name: 'GitHub'
 repo_url: https://github.com/Hoohm/dropSeqPipe
 nav:
   - 'index.md'
-  - 'Installation.md'
-  - 'Reference-Files.md'
-  - 'Create-config-files.md'
+  - 'Setting-up-an-experiment.md'
   - 'Running-dropSeqPipe.md'
-  - 'Clusters.md'
   - 'Plots.md'
+  - 'Output_misc.md'
   - 'CHANGELOG.md'
   - 'FAQ.md'
 
