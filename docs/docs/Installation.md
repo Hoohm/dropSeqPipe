@@ -5,7 +5,7 @@ First step therefore is to install `miniconda3` a small version of `Anaconda` th
 
 
 ## Step 1: Download and install miniconda3
-First you need to download and install miniconda3 by executing the commands below on the command line.
+First download and install miniconda3 by executing the commands below on the command line.
 
 for linux
 ```
@@ -57,7 +57,7 @@ This should result in the set-up of a directory called `dropSeqPipe` which conta
 
 ## How to update the pipeline
 
-Go to your experiment folder, then pull.
+Go to the experiment folder, then pull.
 
 ```
 git pull
