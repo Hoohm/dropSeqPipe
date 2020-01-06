@@ -20,7 +20,7 @@ Note, the stepwise approach is not available for mixed experiments.
 For both ways, one needs to first navigate to the dSP install directory (which contains the `Snakefile`).
 
 ## Running all modes in a single command
-Run `snakemake all --use-conda --directory WORKING_DIR` which will run everything without stopping.
+Run `snakemake --use-conda --directory WORKING_DIR` which will run everything without stopping.
 
 
 ## Running each mode separately
@@ -56,12 +56,13 @@ If `--use-conda` is specified, snakemake downloads all necessary software in the
 
 By default, the .snakemake directory is created for each working directory (i.e. experiment), consequently downloading the entire software environments for each experiment.To avoid this,  a central conda location can be specified with `--conda-prefix dir` e.g.:
 
-snakemake –use-conda --conda-prefix ~/.conda/myevns
+`snakemake –use-conda --conda-prefix ~/.conda/myevns`
 
 We highly recommend this step as do [others](https://bioinformatics.stackexchange.com/questions/6914/running-snakemake-in-one-single-conda-env)
 
-*Note: Its likely to run into problems when using `--use-cond` when running the pipeline while being in active conda environment.
+* Note: Its likely to run into problems when using `--use-cond` when running the pipeline while being in active conda environment.
 Deactivate `conda` beforehand, if in doubt use `conda deactivate`.
+
 
 ### Singularity
 
@@ -125,6 +126,5 @@ snakemake --dir .test
 or adding some sensible options:
 
 ```
-snakemake --keep-going --use-conda -rp --conda-prefix ~/.conda/myevns --directory .tes
-t
+snakemake --keep-going --use-conda -rp --conda-prefix ~/.conda/myevns --directory .test
 ```

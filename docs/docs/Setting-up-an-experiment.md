@@ -2,7 +2,7 @@
 
 The pipeline needs to be installed as shown previously.
 In order to run the pipeline, a separate folder (working directory) needs to be created containing raw sequencing data as well as all required configuration files.
-DSP will then be run individually on each of the `workingdir` which contain the sample files.
+dSP will then be run individually on each of the `workingdir` which contain the sample files.
 The `workingdir` folder can contain multiple runs (batches) allowing new samples to be added and analysed easily.
 Adding new samples, will only run the pipeline on the newly added data and recreate reports as well as plots containing all the samples.
 This automatically done by snakemake and will save unecesarry computation performed already.
@@ -48,7 +48,7 @@ Optional: If a barcode whitelist is available like in methods such as ScrbSeq ad
 In order to run the pipeline complete the `config.yaml` file and the `samples.csv` file.
 Templates for both are located in the `templates` folder, which can be copied to the `WORKING_DIR` of the experiment and filled in for missing entries before running the pipeline.
 
-*Note: Ideally the pipeline version and the config files, specifically `config.yaml` and `samples.csv` should be provided with the uploaded data to a repository for a publication.
+* Note: Ideally the pipeline version and the config files, specifically `config.yaml` and `samples.csv` should be provided with the uploaded data to a repository for a publication.
 This provides other users to ability to rerun the processing from scratch with exactly the same parameters.
 This is possible because `snakemake` will download and create the exact same conda software environment (if `--use-conda` parameter is used) for each rule using the `envs` files (`envs` files are conda software environment files provided with the pipeline i.e. yaml files contained in the `envs` directory).
 
@@ -114,7 +114,7 @@ EXTRACTION:
     UMI-edit-distance: 1
     minimum-counts-per-UMI: 0
 ```
- *Note: The "space" after the colon, is needed for `config.yaml` to work.
+ * Note: The "space" after the colon, is needed for `config.yaml` to work.
 
 #### Subsections
 
@@ -193,7 +193,7 @@ sample_name2,500,100,Batch2
 
 ### 3. gtf_biotypes.yaml
 
-TODO
+Here you can select which biotypes you would like to keep in your annotation file. Simply delete the ones you don't want from the file for your experiment and move the folder to the root dir of your experiment.
 
 ### 4. custom_adapters.fa
 

@@ -1,6 +1,6 @@
-#Installation
+# Installation
 
-DropSeqPipe is dependent upon the software management system `conda`.
+dropSeqPipe is dependent upon the software management system `conda`.
 First step therefore is to install `miniconda3` a small version of `Anaconda` that includes conda, Python, the packages they depend on and a small number of other useful packages such as pip and zlib.
 
 
@@ -24,7 +24,7 @@ If the command doesn’t work, more information can be found [here](https://cond
 
 ## Step 2: Install snakemake
 
-To run the pipeline [snakemake]( https://snakemake.readthedocs.io/en/stable/) is needed which will be installed using conda
+To run the pipeline [snakemake](https://snakemake.readthedocs.io/en/stable/) is needed which can be installed using conda
 
 ```
 conda install -c bioconda -c conda-forge snakemake
@@ -35,8 +35,7 @@ The command `snakemake` should now be available and can be tested by running `sn
 
 In order to download the actual pipeline either download it directly or use [git]( https://www.git-scm.com/) to clone the workflow.
 
-The pipeline can be directly downloaded [here]
-(https://github.com/Hoohm/dropSeqPipe/archive/master.zip)
+The pipeline can be directly downloaded [here](https://github.com/Hoohm/dropSeqPipe/archive/master.zip)
 
 It is however recommended to download the pipeline by cloning using git rather than downloading the zip archive.
 If `git` hasn’t been installed yet `conda` can be used to do so.

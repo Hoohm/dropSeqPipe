@@ -6,41 +6,45 @@ Fastqc, STAR and cutadapt reports are generated as [multiqc reports](http://mult
 
 
 ## 2. Adapter content
-![Adapter content](images/adapter_content.pdf)
+![Adapter content](images/adapter_content.png)
 This plot provides an idea of the which adapter has been found in which proportion in each sample. The top plot shows results for read 1, the bottom one for read, samples are assigned on the x axis and the y axis are the percentages of total adapters that have been found (and trimmed) in respective fastq files based on the `adapter-file` provided via `config.yaml`.
 
 Below is a list of adapters that can be trimmed off:
 
 Illumina specific adapters:
-*Illumina_Universal
-*PrefixNX/1
-*Trans1
-*Trans1_rc
-*Trans2
-*Trans2_rc
-*Nextera
+* Illumina_Universal
+* PrefixNX/1
+* Trans1
+* Trans1_rc
+* Trans2
+* Trans2_rc
+* Nextera
 
 Transcript specific adapters
-*polyA
-*polyT
-*polyC
-*polyG
+* polyA
+* polyT
+* polyC
+* polyG
 
 Drop-seq specific adapters
-*drop-seq
+* drop-seq
 
 
 ## 3. Yield (across samples)
 ![Yield](images/yield.png)
 On the x axis are the samples.
-TOP: On the y axis are the number of reads attributed to each category.
-BOTTOM: On the y axis are the percentage of attributed to each category.
+
+* TOP: On the y axis are the number of reads attributed to each category.
+
+* BOTTOM: On the y axis are the percentage of attributed to each category.
 This plot gives an overview of the read distribution.  Uniquely mapped reads are kept for the UMI count matrix.
 
 ## 4. Knee plot
 ![Knee plot](images/sample1_knee_plot.png)
-On the x axis is the cumulative fraction of reads per STAMPS (captured cells).
-On the y axis is the ordered STAMPS (based on total reads).
+
+* On the x axis is the cumulative fraction of reads per STAMPS (captured cells).
+* On the y axis is the ordered STAMPS (based on total reads).
+
 This allows to determine number of cells captured and the amount of reads that assign to cells rather than background reads. The cutting is based on the `expected_cells` parameter in the `samples.csv` file.
 The green `selected cells` are the cells that are going to be in the final expression matrix.
 If the bend on the plot is higher at a higher number of cells than what was expected increase the `expected_cells` value and rerun the `extract` step. If it is under, filter data with a downstream analysis tool such as Seurat.
@@ -49,8 +53,10 @@ If the bend on the plot is higher at a higher number of cells than what was expe
 ## 5. RNA metrics (per sample)
 ![RNA metrics](images/sample1_rna_metrics.png)
 On the x axis are top barcodes based on the `expected_cells` values or the `barcodes.csv` file.
-Top plot: On the y axis are the number of bases classified by region of mapping.
-Bottom plot: On the y axis are the percentage of bases classified by region of mapping.
+
+* Top plot: On the y axis are the number of bases classified by region of mapping.
+* Bottom plot: On the y axis are the percentage of bases classified by region of mapping.
+
 The top plot allows for quick comparison of mapping rates between cells, to identify outliers or bad runs. The bottom plot allows to find cells that have an "abnormal" mapped base distribution compared to other cells.
 
 
@@ -71,8 +77,8 @@ TOP panel from left to right:
 BOTTOM:
 
 - nUMI: average number of UMI per Gene per barcode
-- pct.Ribo: Fraction of ribosomal RNA (Note: ribsomal transcripts defined as starting with "^Rpl")
-- pct.mito: Fraction of mitochondrial RNA (Note: mitchondrial transcripts defined as starting with "^mt-")
+- pct.Ribo: Fraction of ribosomal RNA (Note: ribsomal transcripts defined as starting with "^Rpl", case unsensitive)
+- pct.mito: Fraction of mitochondrial RNA (Note: mitchondrial transcripts defined as starting with "^Mt-", case unsensitive)
 
 ## 7. Saturation plot: UMI per barcode (across samples)
 ![umi per barcode](images/mac_UMI_vs_gene.png)
