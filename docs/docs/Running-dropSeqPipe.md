@@ -1,106 +1,85 @@
-Example
------------------------
-The pipeline is to be cloned once and then run on any folder containing the configuration files and your raw data. The workingdir folder can contain multiple runs (aka batches) as you can easily add new samples when recieving new data and run the same commands. This will simply run the pipeline on the newly added data and recreate reports as well as plots containing all the samples.
+# Running the pipeline
 
-Example: You run 2 biological conditions with 2 replicates. This makes up for 4 samples. Assume a simple dropseq protocol with only human cells.
-1. You sequence the data and recieve the 8 files (two files per sample) and download the pipeline
-2. You run the pipeline with the command: `snakemake --use-conda --cores N --directory WORKING_DIR`. `N` being the number of cores available and `WORKING_DIR` being the folder containing your `config.yaml`, `samples.csv`, adapter file and `gtf_biotypes.yaml`.
-3. You see that there is an issue with the protocol and you modify it
-4. You create a new set of libraries and sequence them (same 2x2 design)
-5. You add the new files in the data folder of `WORKING_DIR` and edit the samples.csv to add missing samples.
-6. You run the pipeline as you did the first time `snakemake --use-conda --cores N --directory WORKING_DIR`
-7. This will run the new samples only and recreate the reports as well as the yield plots.
-8. It is now easy to compare the impact of your change in the procotol
+Once everything is in place, the pipeline can be run using the snakemake command plus appropriate parameter.
+It is recommended to take a [look at the options](http://snakemake.readthedocs.io/en/latest/) that are available since only a few of them will be covered below.
 
-Working dir folder preparation
-----------------
-The raw data from the sequencer should be stored in the `RAW_DATA` folder of `WORKING_DIR` folder like this:
+## The pipeline modes
+
+* `meta`: Downloads and generates all the subsequent references files and STAR index needed to run the pipeline. Run this alone to just create the meta-data file before running a new set of data.
+* `qc`: Creates fastqc reports of the data.
+* `filter`: Generates `sample_filtered.fastq.gz` files from  `sample_R1.fastq.gz` files which are ready to be mapped to the genome.  This step filters out data for low quality reads and trims the adapters provided in the FILTER section.
+* `map`: Mapping the reads (filtered fastq) to the reference. Goes from sample_filtered.fastq.gz to `sample_final.bam`.
+* `extract`: Extracts the expression data such as a UMI and a count expression matrix.
+
+There are two main ways to run the pipeline.
+Either using a single command line that will run the whole pipeline or run each mode separately.
+The second approach is especially recommended when working on a new protocol.
+Since v`0.4` the pipeline detects mixed experiments if two instead of one reference is specified in `config.yaml`.
+Note, the stepwise approach is not available for mixed experiments.
+
+For both ways, one needs to first navigate to the dSP install directory (which contains the `Snakefile`).
+
+## Running all modes in a single command
+Run `snakemake --use-conda --directory WORKING_DIR` which will run everything without stopping.
+
+
+## Running each mode separately
+The main advantage of the second way is that parameters can be fine tune based on the results of individual steps such as fastqc, filtering and mapping quality.
+
+There are seven different modes available and call the mode to run it specifically.
+
+Example:
+To run the `qc` mode:
 ```
-/path/to/your/WORKING_DIR/
-| -- RAW_DATA/
-| -- -- sample1_R1.fastq.gz
-| -- -- sample1_R2.fastq.gz
-| -- -- sample2_R1.fastq.gz
-| -- -- sample2_R2.fastq.gz
-| samples.csv
-| config.yaml
-| barcodes.csv
-| adapters.fa
+snakemake --cores 8 qc --use-conda --directory WORKING_DIR
 ```
-*Note: In DropSeq or ScrbSeq you expect a paired sequencing. R1 will hold the information of your barcode and UMI, R2 will hold the 3' end of the captured mRNA.*
-
-
-Once everything is in place, you can run the pipeline using the normal snakemake commands.
-
-Running the pipeline (TLDR version)
-----------------------------
-
-For a simple single cell run you only need to run: `snakemake --cores N --use-conda --directory WORKING_DIR`
-This will run the whole pipeline and use the X number of cores you gave to it.
-
-
-Running the pipeline
----------------------------------
-
-I highly recommend to take a [look at the options](http://snakemake.readthedocs.io/en/latest/) that are available since I won't cover everything here.
-
-
-Modes
-------------------------------
-You have two main ways to run the pipeline.
-
-You can either just run `snakemake --use-conda --directory WORKING_DIR` in the root folder containing your experiment and it will run everything without stopping.
-
-You can also run each step separately. The main advantage of the second way is that you are able to fine tune your parameters based on the results of fastqc, filtering, mapping quality, etc...
-I would suggest using the second approach when you work on a new protocol and the first one when you are confident of your parameters.
-
-There are seven different modes available and to run one specifically you need to call the mode.
-
-Example: To run the `qc` mode: `snakemake --cores 8 qc --use-conda --directory WORKING_DIR`
-You can also run multiple modes at the same time if you want: `snakemake --cores 8 qc filter --use-conda --directory WORKING_DIR`
-
-### Single species:
-* `meta`: Downloads and generates all the subsequent references files and STAR index needed to run the pipeline. You can run this alone if you just want to create the meta-data file before running a new set of data.
-* `qc`: Creates fastqc reports of your data.    
-* `filter`: Go from sample_R1.fastq.gz to sample_filtered.fastq.gz ready to be mapped to the genome.  This step filters out your data for low quality reads and trims adapter you provided in the FILTER section.
-* `map`: Go from sample_filtered.fastq.gz to the sample_final.bam read to extract the expression data. This maps the data to the genom.
-* `extract`: Extract the expression data. You'll get a umi and a count expression matrix from your whole experiment.
-
-### Mixed species
-Since v`0.4` the pipeline detects mixed experiments on the fly. Simply run `snakemake --directory WORKING_DIR --use-conda`. The stepwise approach is not available for mixed experiments.
-
-Barcode whitelist
----------------------
-In protocols such as SCRBseq, the expected barcodes sequences are known. This pipeline also does allow the use of known barcodes instread of a number of expected cells.
-In order to use this functionnality you just need to add a whitelist barcode file and provide the name of the file in the configuration in the section:
-
+To run multiple modes at the same time:
 ```
-FILTER:
-	barcode_whitelist: name_of_your_whitelist_file
-```
-The file should be in the WORKING_DIR. Run the pipeline as usual.
-
-Advanced options
--------------------
-If you have some specific adapters that are not present by default in the ones in the `templates` folder, you can add whatever adapters you want to trim (as many as you need) following the fasta syntax.
-
-```
-FILTER:
-	cutadapt:
-		adapters-file: name_of_your_adapter_file.fa
+snakemake --cores 8 qc filter --use-conda --directory WORKING_DIR
 ```
 
-Further options
----------------------
-* `--cores N` Use this argument to use X amunt of cores available.
-* `--notemp` Use this to not delete all the temporary files. Without this option, only files between steps are kept. Use this option if you are troobleshooting the pipeline or you want to analyze in between files yourself.
-* `--dryrun` or `-n` Use this to check out what is going to run if you run your command. This is nice to check for potential missing files.
+
+## Useful snakemake parameters
+
+* `--cores N` Use this argument to use X amount of cores available.
+* `--notemp` Use this command to keep all temporary files. Without this option, only files between steps are kept. This option is useful to troubleshoot the pipeline or to analyze in between files.
+* `--dryrun` or `-n` Use this to perform a dry run of the command. This is useful to check for potential missing files.
+* `-p` Print out the shell commands that will be executed.
+* `--verbose` Print debugging output.
 
 
+## Software environments
 
-Folder Structure
------------------------
-This is the folder structure you get in the end:
+### conda
+
+If `--use-conda` is specified, snakemake downloads all necessary software in the working directory (in the hidden folder .snakemake).
+
+By default, the .snakemake directory is created for each working directory (i.e. experiment), consequently downloading the entire software environments for each experiment.To avoid this,  a central conda location can be specified with `--conda-prefix dir` e.g.:
+
+`snakemake –use-conda --conda-prefix ~/.conda/myevns`
+
+We highly recommend this step as do [others](https://bioinformatics.stackexchange.com/questions/6914/running-snakemake-in-one-single-conda-env)
+
+* Note: Its likely to run into problems when using `--use-cond` when running the pipeline while being in active conda environment.
+Deactivate `conda` beforehand, if in doubt use `conda deactivate`.
+
+
+### Singularity
+
+Since version 0.5 Singularity is supported. A container with all software is now provided and automatically used if `--use-singularity` is used.
+
+Again, this can be shared with other datasets using shared directory `--singularity-prefix ~/.singularity/`
+
+Note: This is still immature, and some errors might be solved by specifying the reference-dir as an argument like so:
+`--singularity-args="--bind path/to/reference-dir"`
+
+The collection of container can be found here:
+
+https://singularity-hub.org/collections/3535
+
+## Folder Structure
+
+This is the folder structure in the end:
 ```
 /path/to/your/WORKING_DIR/
 | -- RAW_DATA/
@@ -118,14 +97,34 @@ This is the folder structure you get in the end:
 | .snakemake/
 ```
 
-* `RAW_DATA/` Contains all your samples as well as the intermediary files
+* `RAW_DATA/` Contains all the samples as well as the intermediary files
 * `RESULT_DIR/logs/` Contains all the logfiles generated by the pipeline
 * `RESULT_DIR/logs/cluster` Contains all the logfiles generated by the cluster
 * `RESULT_DIR/plots/` Contains all the plots generated by the pipeline
 * `RESULT_DIR/reports/` Contains all the reports generated by the pipeline
-* `RESULT_DIR/summary/` Contains all the files you might use for downstream analysis (contains barcodes selected per sample per species, final umi/counts expression matrix)
-* `RESULT_DIR/samples/` Contains all the sample specific files. Bam files, barcodes used, single sample expression files, etc...
+* `RESULT_DIR/summary/` Contains all the files which might be used for downstream analysis (barcodes selected per sample and per species, final umi/counts expression matrix)
+* `RESULT_DIR/samples/` Contains all the sample specific files, such as bam files, barcodes used and single sample expression files.
 * `samples.csv` File containing sample details
 * `config.yaml` File containing pipeline parameters as well as system parameters
-* `adapters.fa` File containing all the adapters you wish to trim from the raw data.
-* `.snakemake/` Folder that contains all the environements created for the run as well as a lot of other things.
+* `adapters.fa` File containing all the adapters for trimming from raw data.
+* `.snakemake/` Folder that contains amongst other things all the environments created for the run.
+
+## testrun
+
+A minimal test dataset for testing is provided with the pipeline but needs to be initialized first (in dSP directory):
+
+```
+git submodule update --init --recursive
+```
+
+Sets up test data in the `.test` dir. The pipeline can be tested by this minimal command:
+
+```
+snakemake --dir .test
+```
+
+or adding some sensible options:
+
+```
+snakemake --keep-going --use-conda -rp --conda-prefix ~/.conda/myevns --directory .test
+```
