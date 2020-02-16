@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [0.5.1]
 ### Added
 
+### Changed
+- Fixed a bug where changing the locus would only add to the default (CODING, UTR) instead of replacing.
 
 
 ## [0.5]

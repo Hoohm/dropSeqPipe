@@ -30,6 +30,7 @@ rule extract_umi_expression:
         OUTPUT_LONG_FORMAT={output.long}\
         STRAND_STRATEGY={params.strand_strategy}\
         OUTPUT_READS_INSTEAD=false\
+        LOCUS_FUNCTION_LIST=null\
         LOCUS_FUNCTION_LIST={{{params.locus_list}}}\
         MIN_BC_READ_THRESHOLD={params.count_per_umi}\
         CELL_BC_FILE={input.barcode_whitelist}"""
@@ -58,6 +59,7 @@ rule extract_reads_expression:
         OUTPUT_LONG_FORMAT={output.long}\
         STRAND_STRATEGY={params.strand_strategy}\
         OUTPUT_READS_INSTEAD=true\
+        LOCUS_FUNCTION_LIST=null\
         LOCUS_FUNCTION_LIST={{{params.locus_list}}}\
         MIN_BC_READ_THRESHOLD={params.count_per_umi}\
         CELL_BC_FILE={input.barcode_whitelist}"""
