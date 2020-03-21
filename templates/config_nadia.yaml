@@ -1,0 +1,72 @@
+# Example config template for Dolomite Bio’s Nadia Instrument
+# https://www.dolomite-bio.com/
+# Usage: Copy into project root folder and rename to 'config.yaml'
+DEBUG: FALSE
+CONTACT:
+  email: luke@mail.com
+  person: Luke Dropwalker
+LOCAL:
+    temp-directory: ./tmp
+    memory: 60g
+    raw_data: data
+    results: results
+META:
+    species:
+    # this list two species which is meant for mixed species 
+    # for single species, just delete one of the two (and/or edit the species as required)
+        mus_musculus:
+            build: 38
+            release: 91
+        homo_sapiens:
+            build: 38
+            release: 91
+    # for mixed species: threshold for calling a STAMP mixed (i.e. 0.2 means at least 20% from both species)
+    ratio: 0.2
+    reference-directory: /path/to/reference-dir
+    gtf_biotypes: gtf_biotypes.yaml
+FILTER:
+    barcode-whitelist: ''
+    5-prime-smart-adapter: CCTACACGACGCTCTTCCGATCT
+    cell-barcode:
+        start: 1
+        end: 12
+        min-quality: 3
+        num-below-quality: 0
+    UMI-barcode:
+        start: 13
+        end: 20
+        min-quality: 3
+        num-below-quality: 0
+    cutadapt:
+        adapters-file: custom_adapters.fa
+        R1:
+            quality-filter: 20
+            maximum-Ns: 0
+            extra-params: ''
+        R2:
+            quality-filter: 20
+            minimum-adapters-overlap: 6
+            minimum-length: 15
+            extra-params: ''
+            simpleClipThreshold: 10
+MAPPING:
+    STAR:
+        genomeChrBinNbits: 18
+        outFilterMismatchNmax: 10
+        outFilterMismatchNoverLmax: 0.3
+        outFilterMismatchNoverReadLmax: 1
+        outFilterMatchNmin: 0
+        outFilterMatchNminOverLread: 0.66
+        outFilterScoreMinOverLread: 0.66
+EXTRACTION:
+    LOCUS:
+        - CODING
+        - UTR
+    strand-strategy: SENSE
+    UMI-edit-distance: 1
+    minimum-counts-per-UMI: 0
+DOUBLET_DETECTION:
+    min_counts: 1
+    min_cells: 0
+    min_gene_variability_pctl: 85
+    n_prin_comps: 20

@@ -11,7 +11,7 @@ rule extract_umi_expression_species:
         barcode_whitelist='{results_dir}/samples/{sample}/{species}/barcodes.csv'
     output:
         dense=temp('{results_dir}/samples/{sample}/{species}/umi/expression.txt'),
-        long='{results_dir}/samples/{sample}/{species}/umi/expression.long'
+        long=temp('{results_dir}/samples/{sample}/{species}/umi/expression.long')
     params:
         count_per_umi=config['EXTRACTION']['minimum-counts-per-UMI'],
         num_cells=lambda wildcards: int(samples.loc[wildcards.sample,'expected_cells']),
@@ -29,6 +29,7 @@ rule extract_umi_expression_species:
         OUTPUT_LONG_FORMAT={output.long}\
         STRAND_STRATEGY={params.strand_strategy}\
         OUTPUT_READS_INSTEAD=false\
+        LOCUS_FUNCTION_LIST=null\
         LOCUS_FUNCTION_LIST={{{params.locus_list}}}\
         MIN_BC_READ_THRESHOLD={params.count_per_umi}\
         CELL_BC_FILE={input.barcode_whitelist}"""
@@ -48,7 +49,7 @@ rule extract_reads_expression_species:
         strand_strategy=config['EXTRACTION']['strand-strategy']
     output:
         dense=temp('{results_dir}/samples/{sample}/{species}/read/expression.txt'),
-        long='{results_dir}/samples/{sample}/{species}/read/expression.long'
+        long=temp('{results_dir}/samples/{sample}/{species}/read/expression.long')
     conda: '../envs/dropseq_tools.yaml'
     shell:
         """export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && DigitalExpression -m {params.memory}\
@@ -58,6 +59,7 @@ rule extract_reads_expression_species:
         OUTPUT_LONG_FORMAT={output.long}\
         STRAND_STRATEGY={params.strand_strategy}\
         OUTPUT_READS_INSTEAD=true\
+        LOCUS_FUNCTION_LIST=null\
         LOCUS_FUNCTION_LIST={{{params.locus_list}}}\
         MIN_BC_READ_THRESHOLD={params.count_per_umi}\
         CELL_BC_FILE={input.barcode_whitelist}"""
@@ -68,11 +70,25 @@ rule convert_long_to_mtx_species:
     output:
         barcodes='{results_dir}/samples/{sample}/{species}/{type}/barcodes.tsv',
         features='{results_dir}/samples/{sample}/{species}/{type}/features.tsv',
-        mtx='{results_dir}/samples/{sample}/{species}/{type}/expression.mtx'
+        mtx='{results_dir}/samples/{sample}/{species}/{type}/matrix.mtx'
     params:
         samples=lambda wildcards: wildcards.sample
     script:
         "../scripts/convert_mtx.py"
+
+rule compress_mtx_species:
+    input: 
+        barcodes='{results_dir}/samples/{sample}/{species}/{type}/barcodes.tsv',
+        features='{results_dir}/samples/{sample}/{species}/{type}/features.tsv',
+        mtx='{results_dir}/samples/{sample}/{species}/{type}/matrix.mtx'
+    output:
+        barcodes='{results_dir}/samples/{sample}/{species}/{type}/barcodes.tsv.gz',
+        features='{results_dir}/samples/{sample}/{species}/{type}/features.tsv.gz',
+        mtx='{results_dir}/samples/{sample}/{species}/{type}/matrix.mtx.gz'
+    conda: '../envs/pigz.yaml'
+    threads: 3
+    shell:
+        """pigz -p {threads} {input.barcodes} {input.features} {input.mtx}"""
 
 rule SingleCellRnaSeqMetricsCollector_species:
     input:

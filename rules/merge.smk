@@ -1,6 +1,6 @@
-
 localrules:
     merge_long,
+    compress_mtx_summary,
     violine_plots,
     summary_stats
 
@@ -8,7 +8,7 @@ rule merge_long:
     input:
         expand('{results_dir}/samples/{sample}/{{type}}/expression.long', sample=samples.index, results_dir=results_dir)
     output:
-        mtx='{results_dir}/summary/{type}/expression.mtx',
+        mtx='{results_dir}/summary/{type}/matrix.mtx',
         barcodes='{results_dir}/summary/{type}/barcodes.tsv',
         features='{results_dir}/summary/{type}/features.tsv',
     params:
@@ -17,10 +17,24 @@ rule merge_long:
     script:
         "../scripts/convert_mtx.py"
 
+rule compress_mtx_summary:
+    input: 
+        barcodes='{results_dir}/summary/{type}/barcodes.tsv',
+        features='{results_dir}/summary/{type}/features.tsv',
+        mtx='{results_dir}/summary/{type}/matrix.mtx'
+    output:
+        barcodes='{results_dir}/summary/{type}/barcodes.tsv.gz',
+        features='{results_dir}/summary/{type}/features.tsv.gz',
+        mtx='{results_dir}/summary/{type}/matrix.mtx.gz'
+    conda: '../envs/pigz.yaml'
+    threads: 3
+    shell:
+        """pigz -p {threads} {input.barcodes} {input.features} {input.mtx}"""
+
 rule violine_plots:
     input:
-        UMIs='{results_dir}/summary/umi/expression.mtx',
-        counts='{results_dir}/summary/read/expression.mtx',
+        umi_mtx='{results_dir}/summary/umi/matrix.mtx.gz',
+        read_mtx='{results_dir}/summary/read/matrix.mtx.gz',
         design='samples.csv'
     conda: '../envs/r.yaml'
     output:

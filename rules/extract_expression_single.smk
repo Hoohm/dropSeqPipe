@@ -1,9 +1,10 @@
-"""Extract expression fof single species"""
+"""Extract expression for single species"""
 
 #Which rules will be run on the host computer and not sent to nodes
 localrules:
-	plot_rna_metrics,
-	convert_long_to_mtx
+    plot_rna_metrics,
+    convert_long_to_mtx,
+    compress_mtx
 
 rule extract_umi_expression:
     input:
@@ -29,6 +30,7 @@ rule extract_umi_expression:
         OUTPUT_LONG_FORMAT={output.long}\
         STRAND_STRATEGY={params.strand_strategy}\
         OUTPUT_READS_INSTEAD=false\
+        LOCUS_FUNCTION_LIST=null\
         LOCUS_FUNCTION_LIST={{{params.locus_list}}}\
         MIN_BC_READ_THRESHOLD={params.count_per_umi}\
         CELL_BC_FILE={input.barcode_whitelist}"""
@@ -38,7 +40,7 @@ rule extract_reads_expression:
         data='{results_dir}/samples/{sample}/final.bam',
         barcode_whitelist='{results_dir}/samples/{sample}/barcodes.csv'
     output:
-        long='{results_dir}/samples/{sample}/read/expression.long',
+        long=temp('{results_dir}/samples/{sample}/read/expression.long'),
         dense=temp('{results_dir}/samples/{sample}/read/expression.tsv')
     params:
         count_per_umi=config['EXTRACTION']['minimum-counts-per-UMI'],
@@ -57,6 +59,7 @@ rule extract_reads_expression:
         OUTPUT_LONG_FORMAT={output.long}\
         STRAND_STRATEGY={params.strand_strategy}\
         OUTPUT_READS_INSTEAD=true\
+        LOCUS_FUNCTION_LIST=null\
         LOCUS_FUNCTION_LIST={{{params.locus_list}}}\
         MIN_BC_READ_THRESHOLD={params.count_per_umi}\
         CELL_BC_FILE={input.barcode_whitelist}"""
@@ -108,8 +111,22 @@ rule convert_long_to_mtx:
     output:
         barcodes='{results_dir}/samples/{sample}/{type}/barcodes.tsv',
         features='{results_dir}/samples/{sample}/{type}/features.tsv',
-        mtx='{results_dir}/samples/{sample}/{type}/expression.mtx'
+        mtx='{results_dir}/samples/{sample}/{type}/matrix.mtx'
     params:
         samples=lambda wildcards: wildcards.sample
     script:
         "../scripts/convert_mtx.py"
+
+rule compress_mtx:
+    input: 
+        barcodes='{results_dir}/samples/{sample}/{type}/barcodes.tsv',
+        features='{results_dir}/samples/{sample}/{type}/features.tsv',
+        mtx='{results_dir}/samples/{sample}/{type}/matrix.mtx'
+    output:
+        barcodes='{results_dir}/samples/{sample}/{type}/barcodes.tsv.gz',
+        features='{results_dir}/samples/{sample}/{type}/features.tsv.gz',
+        mtx='{results_dir}/samples/{sample}/{type}/matrix.mtx.gz'
+    conda: '../envs/pigz.yaml'
+    threads: 3
+    shell:
+        """pigz -p {threads} {input.barcodes} {input.features} {input.mtx}"""

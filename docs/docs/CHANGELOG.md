@@ -4,6 +4,37 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.5.1]
+### Added
+
+### Changed
+- Fixed a bug where changing the locus would only add to the default (CODING, UTR) instead of replacing.
+
+
+## [0.5]
+### Added
+- Singularity usage. Try out the `--use-singularity` option instead of `--use-conda`. This helps by only having one big env dealing with all the necessary packages to run the whole pipeline.
+- Unmapped reads are now properly created and kept.
+- New option to help debug R scripts, mostly plots. There is a new value in the config.yaml that is not required by default called `DEBUG`. If `DEBUG: True` then Rscripts will output an R object before the scripts runs ex: `plot_yield_snakemake.rdata`. Once the script has run, it will also create another file `plot_yield_workspace.rdata` that will contain the env of the script. Those files are created in `result_dir/DEBUG/`. This should help us improve debugging and help people who want to contribute to add new features.
+- fastqc now also uses the provided adapters for the adapter content plot.
+- Added new global run statistics in the `summary` folder with pre: `barcode_stats_pre_filter.csv` and post: `barcode_stats_post_filter.csv` filter statistics. This should allow you to have a quick overlook at your run.
+- New extended knee plots. See the documentation for more info!
+- Default config for nadia platform is present in the templates now.
+
+### Changed 
+- Rewrote how the barcodes are readded to the aligned bam file at `MergeBamAlignment`. Is now less memory hugry and faster.
+- Fixed bug #69 where read names had a different name than anticipated when using picard rather than bcl2fastq to demux sequencig data. Improved debug output as well.
+- Fixed bug #71 where output paths were not referenced to snakemake output properly.
+- Older bam tags are now properly kept after the `MergeBamAlignment` step.
+- Fixed issue #75 where the step would not run if you did not have Biopython installed in your local env. It's now a proper script with conda env call.
+- `extend_barcode_whitelist` is now run on the cluster with cluster calls.
+- Updated Seurat ouptut to V3.
+- MTX format data i now compressed.
+
+### Removed
+- Removed the multiplication of memory usage for bbmap for the repair step.
+
+
 ## [0.4.1]
 ### Added
 - samples.csv and config.yaml schema validation. This will help users fix missing values.
