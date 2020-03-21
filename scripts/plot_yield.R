@@ -79,7 +79,7 @@ for (i in 1:length(samples)) {
 # melt will be retired, use gather instead: https://github.com/hadley/reshape
 
 p1 <- ggplot(subset(mydata_long, mydata_long$variable != "Total reads"),
-             aes(x = Sample, y = value, fill = factor(variable))) +
+             aes(x = Sample, y = value, fill = variable)) +
   geom_histogram(stat = "identity", binwidth = 1 / length(samples)) +
   theme(axis.text.x = element_text(angle = 90, hjust = 0)) +
   labs(title = paste("Yield of all the reads for each category"),
