@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 - Fixed a bug where changing the locus would only add to the default (CODING, UTR) instead of replacing.
+- Now using the STAR index wrapper instead of a custom shell script. It will be easier to maintain and keep the same STAR versions.
+- Locationf the STAR indexes has moved. It's now in `STAR_INDEXES/N` N being the read length -1. If you don't want dropSeqPipe to recreate them please move them before running the pipeline.
 
 
 ## [0.5]

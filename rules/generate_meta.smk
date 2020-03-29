@@ -120,55 +120,15 @@ def get_sjdbOverhang(wildcards):
     return(int(wildcards.read_length)-1)
 
 
-rule prep_star_index:
-    input:
-        reference_file="{ref_path}/{species}_genome.fa",
-        config_file='config.yaml'
-    output:
-        '{reference_directory}/star_ref_config.txt'
-    conda:
-        '../envs/pyyaml.yaml'
-    script:
-        '../scripts/prep_star.py'
-
-
-    
-
-# rule create_star_index:
-#     input:
-#         reference_file="{ref_path}/{species}_{build}_{release}/genome.fa",
-#         annotation_file="{ref_path}/{species}_{build}_{release}/curated_annotation.gtf"  
-#     params:
-#         sjdbOverhang=lambda wildcards: get_sjdbOverhang(wildcards),
-#         genomeDir='{ref_path}/{species}_{build}_{release}/STAR_INDEX/SA_{read_length}',
-#         genomeChrBinNbits=config['MAPPING']['STAR']['genomeChrBinNbits']
-#     output:
-#         '{ref_path}/{species}_{build}_{release}/STAR_INDEX/SA_{read_length}/SA'
-#     threads: 24
-#     conda: '../envs/star.yaml'
-#     shell:
-#         """mkdir -p {params.genomeDir}; STAR\
-#         --runThreadN {threads}\
-#         --runMode genomeGenerate\
-#         --genomeDir {params.genomeDir}\
-#         --genomeFastaFiles {input.reference_file}\
-#         --sjdbGTFfile {input.annotation_file}\
-#         --sjdbOverhang {params.sjdbOverhang}\
-#         --genomeChrBinNbits {params.genomeChrBinNbits}\
-#         --genomeSAsparseD 2
-#         """
-
 rule create_star_index:
     input:
         fasta="{ref_path}/{species}_{build}_{release}/genome.fa",
         gtf="{ref_path}/{species}_{build}_{release}/curated_annotation.gtf"  
     params:
-        #genomeDir='{ref_path}/{species}_{build}_{release}/STAR_INDEX/SA_{read_length}',
-        extra='--genomeChrBinNbits {} --genomeSAsparseD 2 --sjdbOverhang {}'.format(
-            config['MAPPING']['STAR']['genomeChrBinNbits'],
-            lambda wildcards: int(wildcards.read_length-1))
+        extra="--genomeChrBinNbits {} --genomeSAsparseD 2".format(config['MAPPING']['STAR']['genomeChrBinNbits']),
+        sjdbOverhang=lambda wildcards: str(int(wildcards.read_length)-1)
     output:
-        directory('{ref_path}/{species}_{build}_{release}/STAR_INDEX/SA_{read_length}')
+        directory('{ref_path}/{species}_{build}_{release}/STAR_INDEXES/{read_length}')
     threads: 24
     conda: '../envs/star.yaml'
     wrapper:

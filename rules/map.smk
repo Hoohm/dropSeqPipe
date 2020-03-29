@@ -12,11 +12,11 @@ localrules:
 rule STAR_align:
     input:
         fq1='{results_dir}/samples/{sample}/trimmed_repaired_R2.fastq.gz',
-        index=lambda wildcards: '{}/{}_{}_{}/STAR_INDEX/SA'.format(
+        index=lambda wildcards: '{}/{}_{}_{}/STAR_INDEXES/'.format(
             config['META']['reference-directory'],
             species,
             build,
-            release) + '_' + str(samples.loc[wildcards.sample,'read_length']) + '/SA'
+            release) + str(samples.loc[wildcards.sample,'read_length'])
     output:
         temp('{results_dir}/samples/{sample}/Aligned.out.bam'),
         '{results_dir}/samples/{sample}/Unmapped.out.mate1'
@@ -38,11 +38,11 @@ rule STAR_align:
                 config['MAPPING']['STAR']['outFilterMatchNmin'],
                 config['MAPPING']['STAR']['outFilterMatchNminOverLread'],
                 config['MAPPING']['STAR']['outFilterScoreMinOverLread'],),
-        index=lambda wildcards: '{}/{}_{}_{}/STAR_INDEX/SA'.format(
+        index=lambda wildcards: '{}/{}_{}_{}/STAR_INDEXES/'.format(
             config['META']['reference-directory'],
             species,
             build,
-            release) + '_' + str(samples.loc[wildcards.sample,'read_length']) + '/SA'
+            release) + str(samples.loc[wildcards.sample,'read_length'])
     singularity:
         "shub://seb-mueller/singularity_dropSeqPipe:v04"
     threads: 24

@@ -106,7 +106,7 @@ if len(config['META']['species'].keys()) == 2:
     rule all:
         input:
             expand(
-                ['{ref_path}/{species}_{build}_{release}/STAR_INDEX/SA_{read_length}/SA',
+                ['{ref_path}/{species}_{build}_{release}/STAR_INDEXES/{read_length}',
                 #qc
                 '{results_dir}/reports/fastqc_reads.html',
                 '{results_dir}/reports/fastqc_barcodes.html',
@@ -147,7 +147,7 @@ elif len(config['META']['species'].keys()) == 1:
         input:
             #meta
             expand(
-                ['{ref_path}/{species}_{build}_{release}/STAR_INDEX/SA_{read_length}/SA',
+                ['{ref_path}/{species}_{build}_{release}/STAR_INDEXES/{read_length}',
                 #qc
                 '{results_dir}/reports/fastqc_reads.html',
                 '{results_dir}/reports/fastqc_barcodes.html',
