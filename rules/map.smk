@@ -24,7 +24,8 @@ rule STAR_align:
     log:
         '{results_dir}/samples/{sample}/Log.final.out'
     params:
-        extra="""--outReadsUnmapped Fastx\
+        extra="""--outSAMtype BAM Unsorted\
+                --outReadsUnmapped Fastx\
                 --outFilterMismatchNmax {}\
                 --outFilterMismatchNoverLmax {}\
                 --outFilterMismatchNoverReadLmax {}\
@@ -41,36 +42,13 @@ rule STAR_align:
             config['META']['reference-directory'],
             species,
             build,
-            release) + '_' + str(samples.loc[wildcards.sample,'read_length']) + '/'
+            release) + '_' + str(samples.loc[wildcards.sample,'read_length']) + '/SA'
     singularity:
         "shub://seb-mueller/singularity_dropSeqPipe:v04"
     threads: 24
     wrapper:
-        "0.27.1/bio/star/align"
-# rule alevin:
-#   input:
-#       index='{salmon_index}',
-#       R1="samples/{sample}/trimmed_repaired_R1.fastq.gz",
-#       R2="samples/{sample}/trimmed_repaired_R2.fastq.gz",
-#   conda: '../envs/salmon.yaml'
-#   params:
-#       cell_barcode_length=(config['FILTER']['cell-barcode']['end'] - config['FILTER']['cell-barcode']['start'] + 1),
-#       umi_barcode_length=(config['FILTER']['UMI-barcode']['end'] - config['FILTER']['UMI-barcode']['start'] + 1)
-#   output:
-#       out_folder='samples/{sample}/salmon/',
-#       counts='samples/{sample}/salmon/mapping.tsv'
-#   shell:
-#       """salmon alevin\
-#       -l ISR\
-#       -1 {input.R1}\
-#       -2 {input.R2}\
-#       -i {inout.index}\
-#       -p 10\
-#       -o {output.out_folder}\
-#       --tgMap {output.counts}\
-#       --barcodeLength {params.cell_barcode_length}\
-#       --umiLength {params.umi_barcode_length}\
-#       --end 5"""
+        "0.50.4/bio/star/align"
+
 
 
 rule multiqc_star:

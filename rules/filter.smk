@@ -83,7 +83,7 @@ rule repair:
     log:
         '{results_dir}/logs/bbmap/{sample}_repair.txt'
     params:
-        memory='{}g'.format(int(config['LOCAL']['memory'].rstrip('g')) )
+        memory='{}g'.format(2*int(config['LOCAL']['memory'].rstrip('g')) )
     conda: '../envs/bbmap.yaml'
     threads: 4
     shell:

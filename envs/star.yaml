@@ -1,4 +1,4 @@
 channels:
   - bioconda
 dependencies:
-  - star=2.6.1b
+  - star=2.7.3a

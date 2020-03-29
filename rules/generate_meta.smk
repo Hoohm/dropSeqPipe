@@ -134,26 +134,42 @@ rule prep_star_index:
 
     
 
+# rule create_star_index:
+#     input:
+#         reference_file="{ref_path}/{species}_{build}_{release}/genome.fa",
+#         annotation_file="{ref_path}/{species}_{build}_{release}/curated_annotation.gtf"  
+#     params:
+#         sjdbOverhang=lambda wildcards: get_sjdbOverhang(wildcards),
+#         genomeDir='{ref_path}/{species}_{build}_{release}/STAR_INDEX/SA_{read_length}',
+#         genomeChrBinNbits=config['MAPPING']['STAR']['genomeChrBinNbits']
+#     output:
+#         '{ref_path}/{species}_{build}_{release}/STAR_INDEX/SA_{read_length}/SA'
+#     threads: 24
+#     conda: '../envs/star.yaml'
+#     shell:
+#         """mkdir -p {params.genomeDir}; STAR\
+#         --runThreadN {threads}\
+#         --runMode genomeGenerate\
+#         --genomeDir {params.genomeDir}\
+#         --genomeFastaFiles {input.reference_file}\
+#         --sjdbGTFfile {input.annotation_file}\
+#         --sjdbOverhang {params.sjdbOverhang}\
+#         --genomeChrBinNbits {params.genomeChrBinNbits}\
+#         --genomeSAsparseD 2
+#         """
+
 rule create_star_index:
     input:
-        reference_file="{ref_path}/{species}_{build}_{release}/genome.fa",
-        annotation_file="{ref_path}/{species}_{build}_{release}/curated_annotation.gtf"  
+        fasta="{ref_path}/{species}_{build}_{release}/genome.fa",
+        gtf="{ref_path}/{species}_{build}_{release}/curated_annotation.gtf"  
     params:
-        sjdbOverhang=lambda wildcards: get_sjdbOverhang(wildcards),
-        genomeDir='{ref_path}/{species}_{build}_{release}/STAR_INDEX/SA_{read_length}',
-        genomeChrBinNbits=config['MAPPING']['STAR']['genomeChrBinNbits']
+        #genomeDir='{ref_path}/{species}_{build}_{release}/STAR_INDEX/SA_{read_length}',
+        extra='--genomeChrBinNbits {} --genomeSAsparseD 2 --sjdbOverhang {}'.format(
+            config['MAPPING']['STAR']['genomeChrBinNbits'],
+            lambda wildcards: int(wildcards.read_length-1))
     output:
-        '{ref_path}/{species}_{build}_{release}/STAR_INDEX/SA_{read_length}/SA'
+        directory('{ref_path}/{species}_{build}_{release}/STAR_INDEX/SA_{read_length}')
     threads: 24
     conda: '../envs/star.yaml'
-    shell:
-        """mkdir -p {params.genomeDir}; STAR\
-        --runThreadN {threads}\
-        --runMode genomeGenerate\
-        --genomeDir {params.genomeDir}\
-        --genomeFastaFiles {input.reference_file}\
-        --sjdbGTFfile {input.annotation_file}\
-        --sjdbOverhang {params.sjdbOverhang}\
-        --genomeChrBinNbits {params.genomeChrBinNbits}\
-        --genomeSAsparseD 2
-        """
+    wrapper:
+        "0.50.4/bio/star/index"
