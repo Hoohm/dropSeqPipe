@@ -55,17 +55,3 @@ rule extend_barcode_top:
         barcode_mapping='{results_dir}/samples/{sample}/empty_barcode_mapping.pkl'
     script:
         '../scripts/umi_tools_extended_ref.py'
-
-
-rule repair_barcodes:
-    input:
-        bam='{results_dir}/samples/{sample}/Aligned.merged.bam',
-        barcode_ref='{results_dir}/samples/{sample}/barcode_ref.pkl',
-        barcode_ext_ref='{results_dir}/samples/{sample}/barcode_ext_ref.pkl',
-        barcode_mapping='{results_dir}/samples/{sample}/empty_barcode_mapping.pkl'
-    conda: '../envs/merge_bam.yaml'
-    output:
-        bam=temp('{results_dir}/samples/{sample}/Aligned.repaired.bam'),
-        barcode_mapping_counts='{results_dir}/samples/{sample}/barcode_mapping_counts.pkl'
-    script:
-        '../scripts/repair_barcodes.py'

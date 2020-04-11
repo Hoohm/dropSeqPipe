@@ -9,20 +9,21 @@ localrules:
     pigz_unmapped
 
 
-rule STAR_align:
+rule STAR_solo_align:
     input:
-        fq1='{results_dir}/samples/{sample}/trimmed_repaired_R2.fastq.gz',
+        fq2='{results_dir}/samples/{sample}/trimmed_repaired_R2.fastq.gz',
+        fq1='{results_dir}/samples/{sample}/trimmed_repaired_R1.fastq.gz',
         index=lambda wildcards: '{}/{}_{}_{}/STAR_INDEXES/'.format(
             config['META']['reference-directory'],
             species,
             build,
-            release) + str(samples.loc[wildcards.sample,'read_length'])
-    output:
-        temp('{results_dir}/samples/{sample}/Aligned.out.bam'),
-        '{results_dir}/samples/{sample}/Unmapped.out.mate1'
+            release) + str(samples.loc[wildcards.sample,'read_length']),
+            whitelist='{results_dir}/samples/{sample}/barcodes.csv'
 
-    log:
-        '{results_dir}/samples/{sample}/Log.final.out'
+    output:
+        bam=temp('{results_dir}/samples/{sample}/Aligned.out.bam'),
+        unmapped='{results_dir}/samples/{sample}/Unmapped.out.mate1',
+        logs='{results_dir}/samples/{sample}/Log.final.out'
     params:
         extra="""--outSAMtype BAM Unsorted\
                 --outReadsUnmapped Fastx\
@@ -31,7 +32,8 @@ rule STAR_align:
                 --outFilterMismatchNoverReadLmax {}\
                 --outFilterMatchNmin {}\
                 --outFilterScoreMinOverLread {}\
-                --outFilterMatchNminOverLread {}""".format(
+                --outFilterMatchNminOverLread {}\
+                --outSAMattributes CR CY UR UY NH HI AS nM""".format(
                 config['MAPPING']['STAR']['outFilterMismatchNmax'],
                 config['MAPPING']['STAR']['outFilterMismatchNoverLmax'],
                 config['MAPPING']['STAR']['outFilterMismatchNoverReadLmax'],
@@ -42,15 +44,34 @@ rule STAR_align:
             config['META']['reference-directory'],
             species,
             build,
-            release) + str(samples.loc[wildcards.sample,'read_length'])
+            release) + str(samples.loc[wildcards.sample,'read_length']),
+        extra_solo="""--soloFeatures Gene\
+            --soloType Droplet\
+            --soloCBstart {}\
+            --soloCBlen {}\
+            --soloUMIstart {}\
+            --soloUMIlen {}\
+            --soloAdapterSequence {}\
+            --soloCBmatchWLtype 1MM\
+            --soloUMIdedup 1MM_Directional\
+            --soloCellFilter None""".format(
+                1,12,13,8,"CCTACACGACGCTCTTCCGATCT"
+            ),
+        out_prefix=lambda wildcards: '{}/samples/{}/'.format(wildcards.results_dir, wildcards.sample)
     singularity:
         "shub://seb-mueller/singularity_dropSeqPipe:v04"
     threads: 24
-    wrapper:
-        "0.50.4/bio/star/align"
+    conda: '../envs/star.yaml'
+    shell:
+        """STAR {params.extra} {params.extra_solo}\
+            --runThreadN {threads}\
+            --genomeDir {input.index}\
+            --readFilesCommand zcat\
+            --readFilesIn {input.fq2} {input.fq1}\
+            --outFileNamePrefix {params.out_prefix}\
+            --soloCBwhitelist {input.whitelist}"""
 
-
-
+    
 rule multiqc_star:
     input:
         expand('{results_dir}/samples/{sample}/Log.final.out', sample=samples.index, results_dir=results_dir)
@@ -70,29 +91,10 @@ rule pigz_unmapped:
     shell:
         """pigz -p 4 {input}"""
 
-rule MergeBamAlignment:
-    input:
-        mapped='{results_dir}/samples/{sample}/Aligned.out.bam',
-        R1_ref = '{results_dir}/samples/{sample}/trimmed_repaired_R1.fastq.gz'
-    output:
-        temp('{results_dir}/samples/{sample}/Aligned.merged.bam')
-    params:
-        BC_start=config['FILTER']['cell-barcode']['start']-1,
-        BC_end=config['FILTER']['cell-barcode']['end'],
-        UMI_start=config['FILTER']['UMI-barcode']['start']-1,
-        UMI_end=config['FILTER']['UMI-barcode']['end'],
-        discard_secondary_alignements=True
-    conda: '../envs/merge_bam.yaml'
-    script:
-        '../scripts/merge_bam.py'
-
-# Note: rule repair_barcodes (cell_barcodes.smk) creates Aligned.repaired.bam
-# this is using barcode information (i.e. dependent on expected_cells in config.yaml)
-
 
 rule TagReadWithGeneExon:
     input:
-        data='{results_dir}/samples/{sample}/Aligned.repaired.bam',
+        data='{results_dir}/samples/{sample}/Aligned.out.bam',
         refFlat=expand("{ref_path}/{species}_{build}_{release}/curated_annotation.refFlat",
             ref_path=config['META']['reference-directory'],
             species=species,
@@ -131,6 +133,8 @@ rule DetectBeadSubstitutionErrors:
         O={output.data}\
         OUTPUT_REPORT={output.report}\
         OUTPUT_SUMMARY={output.summary}\
+        CELL_BARCODE_TAG=CR\
+        MOLECULAR_BARCODE_TAG=UR\
         NUM_THREADS={threads}
         """
 
@@ -156,6 +160,8 @@ rule bead_errors_metrics:
         SUMMARY={params.summary}\
         NUM_BARCODES={params.barcodes}\
         PRIMER_SEQUENCE={params.SmartAdapter}\
+        CELL_BARCODE_TAG=CR\
+        MOLECULAR_BARCODE_TAG=UR\
         NUM_THREADS={threads}
         """
 
@@ -171,7 +177,7 @@ rule bam_hist:
     conda: '../envs/dropseq_tools.yaml'
     shell:
         """export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && BamTagHistogram -m {params.memory}\
-        TAG=XC\
+        TAG=CR\
         I={input}\
         READ_MQ=10\
         O={output}
