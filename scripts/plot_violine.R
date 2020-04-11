@@ -153,8 +153,7 @@ seuratobj <- AddMetaData(seuratobj, tmp, "umi.per.gene")
 
 
 gg <- VlnPlot(seuratobj,
-  c("nCount_RNA", "nFeature_RNA", "top50", "umi.per.gene", "pct.Ribo", "pct.mito"),
-  x.lab.rot = TRUE, do.return = TRUE
+  c("nCount_RNA", "nFeature_RNA", "top50", "umi.per.gene", "pct.Ribo", "pct.mito")
 )
 # ggsave(gg,file=file.path("violinplots_comparison_UMI.pdf"),width=18,height=18)
 ggsave(gg, file = snakemake@output$pdf_violine, width = 18, height = 18)
