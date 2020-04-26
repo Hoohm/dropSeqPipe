@@ -9,9 +9,9 @@ localrules:
 rule extract_umi_expression:
     input:
         data='{results_dir}/samples/{sample}/final.bam',
-        barcode_whitelist='{results_dir}/samples/{sample}/barcodes.csv'
+        barcode_whitelist='{results_dir}/samples/{sample}/filtered_barcodes.csv'
     output:
-        long='{results_dir}/samples/{sample}/umi/expression.long',
+        long=temp('{results_dir}/samples/{sample}/umi/expression.long'),
         dense=temp('{results_dir}/samples/{sample}/umi/expression.tsv')
     params:
         count_per_umi=config['EXTRACTION']['minimum-counts-per-UMI'],
@@ -40,7 +40,7 @@ rule extract_umi_expression:
 rule extract_reads_expression:
     input:
         data='{results_dir}/samples/{sample}/final.bam',
-        barcode_whitelist='{results_dir}/samples/{sample}/barcodes.csv'
+        barcode_whitelist='{results_dir}/samples/{sample}/filtered_barcodes.csv'
     output:
         long=temp('{results_dir}/samples/{sample}/read/expression.long'),
         dense=temp('{results_dir}/samples/{sample}/read/expression.tsv')
@@ -72,7 +72,7 @@ rule extract_reads_expression:
 rule SingleCellRnaSeqMetricsCollector:
     input:
         data='{results_dir}/samples/{sample}/final.bam',
-        barcode_whitelist='{results_dir}/samples/{sample}/barcodes.csv',
+        barcode_whitelist='{results_dir}/samples/{sample}/filtered_barcodes.csv',
         refFlat=expand("{ref_path}/{species}_{build}_{release}/curated_annotation.refFlat",
             ref_path=config['META']['reference-directory'],
             species=species,
@@ -102,7 +102,7 @@ rule SingleCellRnaSeqMetricsCollector:
 rule plot_rna_metrics:
     input:
         rna_metrics='{results_dir}/logs/dropseq_tools/{sample}_rna_metrics.txt',
-        barcodes='{results_dir}/samples/{sample}/barcodes.csv'
+        barcodes='{results_dir}/samples/{sample}/filtered_barcodes.csv'
     conda: '../envs/r.yaml'
     output:
         pdf='{results_dir}/plots/rna_metrics/{sample}_rna_metrics.pdf'

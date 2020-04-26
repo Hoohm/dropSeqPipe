@@ -22,7 +22,7 @@ rule cutadapt_R1:
         extra_params=config['FILTER']['cutadapt']['R1']['extra-params'],
         max_n=config['FILTER']['cutadapt']['R1']['maximum-Ns'],
         barcode_quality=config['FILTER']['cutadapt']['R1']['quality-filter']
-    threads: 10
+    threads: 20
     log:
         qc='{results_dir}/logs/cutadapt/{sample}_R1.qc.txt'
     conda: '../envs/cutadapt.yaml' 
@@ -49,7 +49,7 @@ rule cutadapt_R2:
         read_quality=config['FILTER']['cutadapt']['R2']['quality-filter'],
         minimum_length=config['FILTER']['cutadapt']['R2']['minimum-length'],
         adapters_minimum_overlap=config['FILTER']['cutadapt']['R2']['minimum-adapters-overlap'],
-    threads: 10
+    threads: 20
     log:
         qc='{results_dir}/logs/cutadapt/{sample}_R2.qc.txt'
     conda: '../envs/cutadapt.yaml' 

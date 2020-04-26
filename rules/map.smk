@@ -25,7 +25,7 @@ rule STAR_solo_align:
         unmapped='{results_dir}/samples/{sample}/Unmapped.out.mate1',
         logs='{results_dir}/samples/{sample}/Log.final.out'
     params:
-        extra="""--outSAMtype BAM Unsorted\
+        extra="""--outSAMtype BAM SortedByCoordinate\
                 --outReadsUnmapped Fastx\
                 --outFilterMismatchNmax {}\
                 --outFilterMismatchNoverLmax {}\
@@ -33,7 +33,7 @@ rule STAR_solo_align:
                 --outFilterMatchNmin {}\
                 --outFilterScoreMinOverLread {}\
                 --outFilterMatchNminOverLread {}\
-                --outSAMattributes CR CY UR UY NH HI AS nM""".format(
+                --outSAMattributes CR CY UR UY NH HI AS nM jM""".format(
                 config['MAPPING']['STAR']['outFilterMismatchNmax'],
                 config['MAPPING']['STAR']['outFilterMismatchNoverLmax'],
                 config['MAPPING']['STAR']['outFilterMismatchNoverReadLmax'],
@@ -55,7 +55,11 @@ rule STAR_solo_align:
             --soloCBmatchWLtype 1MM\
             --soloUMIdedup 1MM_Directional\
             --soloCellFilter None""".format(
-                1,12,13,8,"CCTACACGACGCTCTTCCGATCT"
+                config['FILTER']['cell-barcode']['start'],
+                config['FILTER']['cell-barcode']['end'],
+                config['FILTER']['UMI-barcode']['start'],
+                1 + config['FILTER']['UMI-barcode']['end'] - config['FILTER']['UMI-barcode']['start'],
+                config['FILTER']['5-prime-smart-adapter']
             ),
         out_prefix=lambda wildcards: '{}/samples/{}/'.format(wildcards.results_dir, wildcards.sample)
     singularity:
@@ -166,23 +170,6 @@ rule bead_errors_metrics:
         """
 
 
-rule bam_hist:
-    input:
-        '{results_dir}/samples/{sample}/final.bam'
-    params:
-        memory=config['LOCAL']['memory'],
-        temp_directory=config['LOCAL']['temp-directory']
-    output:
-        '{results_dir}/logs/dropseq_tools/{sample}_hist_out_cell.txt'
-    conda: '../envs/dropseq_tools.yaml'
-    shell:
-        """export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && BamTagHistogram -m {params.memory}\
-        TAG=CR\
-        I={input}\
-        READ_MQ=10\
-        O={output}
-        """
-
 
 rule plot_yield:
     input:
@@ -205,7 +192,7 @@ rule plot_yield:
 rule plot_knee_plot:
     input:
         data='{results_dir}/logs/dropseq_tools/{sample}_hist_out_cell.txt',
-        barcodes='{results_dir}/samples/{sample}/barcodes.csv'
+        barcodes='{results_dir}/samples/{sample}/filtered_barcodes.csv'
     params:
         cells=lambda wildcards: int(samples.loc[wildcards.sample,'expected_cells'])
     conda: '../envs/r.yaml'

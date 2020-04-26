@@ -78,7 +78,7 @@ color_palette = c('#e88270','#cb7262','#ae6254','#70d6e8')
 
 p1 <- ggplot(subset(mydata_long, mydata_long$variable != "Total reads"),
              aes(x = Sample, y = value, fill = variable)) +
-  geom_histogram(stat = "identity", binwidth = 1 / length(samples)) +
+  geom_histogram(stat = "identity") +
   theme(axis.text.x = element_text(angle = 90, hjust = 0)) +
   labs(title = paste("Yield of all the reads for each category"),
        x = "Samples",
@@ -103,7 +103,7 @@ mydata_long_pct$variable = factor(mydata_long$variable, levels = c('Cutadapt fil
 p2 <- ggplot(subset(mydata_long_pct, mydata_long_pct$variable != "Total reads"),
              aes(x = Sample, y = value, fill = variable)) +
   labs(fill = "Filters") +
-  geom_histogram(stat = "identity", binwidth = 1 / length(samples)) +
+  geom_histogram(stat = "identity") +
   theme(axis.text.x = element_text(angle = 90, hjust = 0),
         legend.position = "bottom",
         strip.background = element_blank(),
