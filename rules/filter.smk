@@ -3,12 +3,11 @@
 
 #Which rules will be run on the host computer and not sent to nodes
 localrules:
-	clean_cutadapt,
-	plot_adapter_content,
-	multiqc_cutadapt_barcodes,
-	multiqc_cutadapt_RNA,
-	detect_barcodes
-
+    clean_cutadapt,
+    plot_adapter_content,
+    multiqc_cutadapt_barcodes,
+    multiqc_cutadapt_RNA,
+    repair
 
 rule cutadapt_R1:
     input:
@@ -18,7 +17,6 @@ rule cutadapt_R1:
         fastq=temp('{results_dir}/samples/{sample}/trimmed_R1.fastq.gz')
     params:
         cell_barcode_length=round((config['FILTER']['cell-barcode']['end'] - config['FILTER']['cell-barcode']['start'] + 1) * 1.3),
-        barcode_length=config['FILTER']['UMI-barcode']['end'],
         extra_params=config['FILTER']['cutadapt']['R1']['extra-params'],
         max_n=config['FILTER']['cutadapt']['R1']['maximum-Ns'],
         barcode_quality=config['FILTER']['cutadapt']['R1']['quality-filter']
@@ -32,7 +30,6 @@ rule cutadapt_R1:
         -a file:{input.adapters}\
         -g file:{input.adapters}\
         -q {params.barcode_quality},{params.barcode_quality}\
-        --minimum-length {params.barcode_length}\
         --cores={threads}\
         --overlap {params.cell_barcode_length}\
         -o {output.fastq} {input.R1}\
@@ -47,7 +44,6 @@ rule cutadapt_R2:
     params:
         extra_params=config['FILTER']['cutadapt']['R2']['extra-params'],
         read_quality=config['FILTER']['cutadapt']['R2']['quality-filter'],
-        minimum_length=config['FILTER']['cutadapt']['R2']['minimum-length'],
         adapters_minimum_overlap=config['FILTER']['cutadapt']['R2']['minimum-adapters-overlap'],
     threads: 20
     log:
@@ -58,7 +54,6 @@ rule cutadapt_R2:
         -a file:{input.adapters}\
         -g file:{input.adapters}\
         -q {params.read_quality}\
-        --minimum-length {params.minimum_length}\
         --cores={threads}\
         --overlap {params.adapters_minimum_overlap}\
         -o {output.fastq} {input.R2}\
@@ -80,30 +75,46 @@ rule repair:
     output:
         R1='{results_dir}/samples/{sample}/trimmed_repaired_R1.fastq.gz',
         R2='{results_dir}/samples/{sample}/trimmed_repaired_R2.fastq.gz'
-    log:
-        '{results_dir}/logs/bbmap/{sample}_repair.txt'
     params:
-        memory='{}g'.format(2*int(config['LOCAL']['memory'].rstrip('g')) )
-    conda: '../envs/bbmap.yaml'
-    threads: 4
-    shell:
-        """repair.sh\
-        -Xmx{params.memory}\
-        in={input.R1}\
-        in2={input.R2}\
-        out1={output.R1}\
-        out2={output.R2}\
-        repair=t\
-        threads={threads} 2> {log}"""
-
-rule detect_barcodes:
-    input:
-        R1='{results_dir}/samples/{sample}/trimmed_repaired_R1.fastq.gz'
-    output:
-        positions='{results_dir}/samples/{sample}/test.csv'
+        min_r2_length=config['FILTER']['cutadapt']['R2']['minimum-length'],
+        barcode_length=config['FILTER']['UMI-barcode']['end']
+    log:
+        stats='{results_dir}/logs/repair/{sample}.csv'
     conda: '../envs/merge_bam.yaml'
-    script:
-        '../scripts/detect_barcodes.py'
+    script: '../scripts/repair.py'
+
+
+# rule repair:
+#     input:
+#         R1='{results_dir}/samples/{sample}/trimmed_R1.fastq.gz',
+#         R2='{results_dir}/samples/{sample}/trimmed_R2.fastq.gz'
+#     output:
+#         R1='{results_dir}/samples/{sample}/trimmed_repaired_R1.fastq.gz',
+#         R2='{results_dir}/samples/{sample}/trimmed_repaired_R2.fastq.gz'
+#     log:
+#         '{results_dir}/logs/bbmap/{sample}_repair.txt'
+#     params:
+#         memory='{}g'.format(2*int(config['LOCAL']['memory'].rstrip('g')) )
+#     conda: '../envs/bbmap.yaml'
+#     threads: 4
+#     shell:
+#         """repair.sh\
+#         -Xmx{params.memory}\
+#         in={input.R1}\
+#         in2={input.R2}\
+#         out1={output.R1}\
+#         out2={output.R2}\
+#         repair=t\
+#         threads={threads} 2> {log}"""
+
+# rule detect_barcodes:
+#     input:
+#         R1='{results_dir}/samples/{sample}/trimmed_repaired_R1.fastq.gz'
+#     output:
+#         positions='{results_dir}/samples/{sample}/test.csv'
+#     conda: '../envs/merge_bam.yaml'
+#     script:
+#         '../scripts/detect_barcodes.py'
 
 rule plot_adapter_content:
     input:

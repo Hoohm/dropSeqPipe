@@ -21,7 +21,7 @@ rule STAR_solo_align:
             whitelist='{results_dir}/samples/{sample}/barcodes.csv'
 
     output:
-        bam=temp('{results_dir}/samples/{sample}/Aligned.out.bam'),
+        bam=temp('{results_dir}/samples/{sample}/Aligned.sortedByCoord.out.bam'),
         unmapped='{results_dir}/samples/{sample}/Unmapped.out.mate1',
         logs='{results_dir}/samples/{sample}/Log.final.out'
     params:
@@ -98,7 +98,7 @@ rule pigz_unmapped:
 
 rule TagReadWithGeneExon:
     input:
-        data='{results_dir}/samples/{sample}/Aligned.out.bam',
+        data='{results_dir}/samples/{sample}/Aligned.sortedByCoord.out.bam',
         refFlat=expand("{ref_path}/{species}_{build}_{release}/curated_annotation.refFlat",
             ref_path=config['META']['reference-directory'],
             species=species,
@@ -175,7 +175,7 @@ rule plot_yield:
     input:
         R1_filtered=expand('{results_dir}/logs/cutadapt/{sample}_R1.qc.txt', sample=samples.index, results_dir=results_dir),
         R2_filtered=expand('{results_dir}/logs/cutadapt/{sample}_R2.qc.txt', sample=samples.index, results_dir=results_dir),
-        repaired=expand('{results_dir}/logs/bbmap/{sample}_repair.txt', sample=samples.index, results_dir=results_dir),
+        repaired=expand('{results_dir}/logs/repair/{sample}.csv', sample=samples.index, results_dir=results_dir),
         STAR_output=expand('{results_dir}/samples/{sample}/Log.final.out', sample=samples.index, results_dir=results_dir),
     params:
         BC_length=config['FILTER']['cell-barcode']['end'] - config['FILTER']['cell-barcode']['start']+1,

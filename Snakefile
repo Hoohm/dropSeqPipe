@@ -199,6 +199,18 @@ rule qc:
             'fastqc_adapter.tsv'],
                 results_dir=results_dir)
 
+rule trim:
+    input:
+        expand(
+            ['{results_dir}/plots/adapter_content.pdf',
+            '{results_dir}/reports/barcode_filtering.html',
+            '{results_dir}/reports/RNA_filtering.html',
+            '{results_dir}/samples/{sample}/trimmed_R1.fastq.gz',
+            '{results_dir}/samples/{sample}/trimmed_R2.fastq.gz'],
+                results_dir=results_dir,
+                sample=samples.index)
+
+
 rule filter:
     input:
         expand(
@@ -206,6 +218,7 @@ rule filter:
             '{results_dir}/reports/barcode_filtering.html',
             '{results_dir}/reports/RNA_filtering.html',
             '{results_dir}/samples/{sample}/trimmed_repaired_R1.fastq.gz',
+            '{results_dir}/samples/{sample}/trimmed_repaired_R2.fastq.gz',
             '{results_dir}/samples/{sample}/top_barcodes.csv'],
                 results_dir=results_dir,
                 sample=samples.index)
