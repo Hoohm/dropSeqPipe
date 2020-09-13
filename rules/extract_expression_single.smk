@@ -37,6 +37,33 @@ rule extract_umi_expression:
         MIN_BC_READ_THRESHOLD={params.count_per_umi}\
         CELL_BC_FILE={input.barcode_whitelist}"""
 
+rule extract_bc_umi_data:
+    input: 
+        data='{results_dir}/samples/{sample}/final.bam',
+        barcode_whitelist='{results_dir}/samples/{sample}/filtered_barcodes.csv'
+    output:
+        data='{results_dir}/samples/{sample}/bc_umi_long.csv'
+    params:
+        count_per_umi=config['EXTRACTION']['minimum-counts-per-UMI'],
+        umiBarcodeEditDistance=config['EXTRACTION']['UMI-edit-distance'],
+        temp_directory=config['LOCAL']['temp-directory'],
+        memory=config['LOCAL']['memory'],
+        locus_list=','.join(config['EXTRACTION']['LOCUS']),
+        strand_strategy=config['EXTRACTION']['strand-strategy']
+    conda: '../envs/dropseq_tools.yaml'
+    shell:
+        """export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && GatherMolecularBarcodeDistributionByGene -m {params.memory}\
+        I={input.data}\
+        O={output.data}\
+        EDIT_DISTANCE={params.umiBarcodeEditDistance}\
+        STRAND_STRATEGY={params.strand_strategy}\
+        CELL_BARCODE_TAG=CR\
+        MOLECULAR_BARCODE_TAG=UR\
+        LOCUS_FUNCTION_LIST=null\
+        LOCUS_FUNCTION_LIST={{{params.locus_list}}}\
+        MIN_BC_READ_THRESHOLD={params.count_per_umi}\
+        CELL_BC_FILE={input.barcode_whitelist}"""
+
 rule extract_reads_expression:
     input:
         data='{results_dir}/samples/{sample}/final.bam',

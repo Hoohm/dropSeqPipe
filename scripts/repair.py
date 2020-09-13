@@ -65,14 +65,14 @@ with open(snakemake.log.stats, "w") as logfile:
     logfile.write(
         "{},{},{},{},{}\n".format(
             "total_reads",
-            "R1_toot_short",
+            "R1_too_short",
             "R2_too_short",
             "both_too_short",
             "written_reads",
         )
     )
     logfile.write(
-        "{},{},{},{},{}".format(
+        "{},{},{},{},{}\n".format(
             logs.total_reads,
             logs.R1_too_short,
             logs.R2_too_short,

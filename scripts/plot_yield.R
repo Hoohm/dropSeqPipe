@@ -22,8 +22,8 @@ library(stringr)
 
 samples <- snakemake@params$sample_names
 batches <- snakemake@params$batches
-mydata  <- data.frame(matrix(nrow = length(samples), ncol = 7))
-colnames(mydata) <- c("Sample", "Batch", "Cutadapt filtered", "Unmapped",
+mydata  <- data.frame(matrix(nrow = length(samples), ncol = 9))
+colnames(mydata) <- c("Sample", "Batch", "R1_filtered", "R2_filtered", "Read_filtered","Unmapped",
                       "Multi mapped", "Uniquely mapped", "Total reads")
 mydata[, "Sample"] <- samples
 mydata[, "Batch"]  <- batches
@@ -33,30 +33,14 @@ for (i in 1:length(samples)) {
                             skip = 5, sep = "\t",
                             fill = TRUE, stringsAsFactors = FALSE)
   mysample <- samples[i]
-  # Read files
-  # bbmap_log = read.table(snakemake@input$repaired[i], sep=':', header=FALSE, skip=8, row.names=1, nrows=4)
-  # reads_after_filtering = as.numeric(str_match(bbmap_log['Pairs',], pattern = "\t([0-9]{1,20}) reads.*")[,2])/2
-  bbmap_log   <- readLines(snakemake@input$repaired[i])
-  reads_after_filtering <- as.numeric(str_match(bbmap_log[grep("^Pairs:", bbmap_log)],
-                                                pattern = "\t([0-9]{1,20}) reads.*")[, 2]) / 2
-  R1_filtered <- read.table(snakemake@input$R1_filtered[i], header = FALSE, skip = 7, sep = ":", nrows = 7, row.names = 1)
-  total_reads <- as.numeric(str_replace_all(R1_filtered["Total reads processed", ], pattern = (" |,"), ""))
-
-  # R2_filtered = read.table(snakemake@input$R2_filtered[i], header = FALSE, skip=8, sep=':', nrows=7, row.names=1)
-
-  # R1_adapters = as.numeric(str_remove_all(str_match(R1_filtered['Reads with adapters',], pattern = "(.*) \\(")[,2], pattern = (' |,')))
-  # R1_too_short = as.numeric(str_remove_all(str_match(R1_filtered['Reads that were too short',], pattern = "(.*) \\(")[,2], pattern = (' |,')))
-  # R1_passed = as.numeric(str_remove_all(str_match(R1_filtered['Reads written (passing filters)',], pattern = "(.*) \\(")[,2], pattern = (' |,')))
-  # R1_filtered = total_reads - R1_passed
-
-  # R2_adapters = as.numeric(str_remove_all(str_match(R2_filtered['Reads with adapters',], pattern = "(.*) \\(")[,2], pattern = (' |,')))
-  # R2_too_short = as.numeric(str_remove_all(str_match(R2_filtered['Reads that were too short',], pattern = "(.*) \\(")[,2], pattern = (' |,')))
-  # R2_passed = as.numeric(str_remove_all(str_match(R2_filtered['Reads written (passing filters)',], pattern = "(.*) \\(")[,2], pattern = (' |,')))
-  # R2_filtered = total_reads - R2_passed
-
-  mydata[which(mydata$Sample == mysample), "Cutadapt filtered"] <- total_reads - reads_after_filtering
-  mydata[which(mydata$Sample == mysample), "Total reads"] <- total_reads
-
+  repaired_log   <- read.csv(snakemake@input$repaired[i])
+  mydata[which(mydata$Sample == mysample), "R1_filtered"] <- repaired_log$R1_too_short[1]
+  mydata[which(mydata$Sample == mysample), "R2_filtered"] <- repaired_log$R2_too_short[1]
+  mydata[which(mydata$Sample == mysample), "Read_filtered"] <- repaired_log$both_too_short[1]
+  mydata[which(mydata$Sample == mysample), "Total reads"] <- repaired_log$total_reads[1]
+  
+  
+  
   # STAR output
   reads_in        <- as.numeric(STAR_output$V2[1])
   uniquely_mapped <- as.numeric(STAR_output$V2[4])
