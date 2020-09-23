@@ -19,11 +19,11 @@ FILTER:
     barcode-whitelist: ''
     5-prime-smart-adapter: CCTACACGACGCTCTTCCGATCT
     cell-barcode:
-        start: 2
+        start: 1
         end: 6
     UMI-barcode:
         start: 7
-        end: 16
+        end: 19
     cutadapt:
         adapters-file: NexteraPE-PE.fa
         R1:

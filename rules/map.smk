@@ -31,6 +31,7 @@ rule STAR_solo_align:
                 --outFilterMismatchNoverLmax {}\
                 --outFilterMismatchNoverReadLmax {}\
                 --outFilterMatchNmin {}\
+                --soloBarcodeReadLength 0\
                 --outFilterScoreMinOverLread {}\
                 --outFilterMatchNminOverLread {}\
                 --outSAMattributes CR CY UR UY NH HI AS nM jM""".format(
