@@ -137,7 +137,7 @@ rule multiqc_cutadapt_barcodes:
     output:
         html='{results_dir}/reports/barcode_filtering.html'
     wrapper:
-        '0.36.0/bio/multiqc'
+        '0.66.0/bio/multiqc'
 
 rule multiqc_cutadapt_RNA:
     input:
@@ -146,4 +146,4 @@ rule multiqc_cutadapt_RNA:
     output:
         html='{results_dir}/reports/RNA_filtering.html'
     wrapper:
-        '0.36.0/bio/multiqc'
+        '0.66.0/bio/multiqc'

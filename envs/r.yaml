@@ -18,3 +18,5 @@ dependencies:
   - r-rcolorbrewer
   - font-ttf-dejavu-sans-mono=2.37
   - fontconfig=2.13.1
+  - readline
+  - r-matrix

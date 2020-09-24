@@ -1,7 +1,6 @@
 channels:
   - bioconda
   - conda-forge
-  - defaults
 dependencies:
-  - python>=3.3
-  - cutadapt=1.16
+  - python=3.8
+  - cutadapt=2.10
