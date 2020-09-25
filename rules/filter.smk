@@ -65,6 +65,8 @@ rule clean_cutadapt:
         R2='{results_dir}/logs/cutadapt/{sample}_R2.qc.txt'
     output:
         '{results_dir}/logs/cutadapt/{sample}.clean_qc.csv'
+    # enforce conde env to ensure consistent python version for python scripts
+    conda: '../envs/cutadapt.yaml'
     script:
         '../scripts/clean_cutadapt.py'
 

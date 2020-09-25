@@ -55,5 +55,6 @@ rule plot_barnyard:
         barcodes_species=expand('{{results_dir}}/samples/{{sample}}/{species}/barcodes.csv', species=species_list)
     params:
         expected_cells=lambda wildcards: int(samples.loc[wildcards.sample,'expected_cells'])
+    conda: '../envs/r.yaml'
     script: 
         '../scripts/plot_species_plot.R'

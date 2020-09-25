@@ -73,6 +73,8 @@ rule convert_long_to_mtx_species:
         mtx='{results_dir}/samples/{sample}/{species}/{type}/matrix.mtx'
     params:
         samples=lambda wildcards: wildcards.sample
+    # enforce conde env to ensure consistent python version for python scripts
+    conda: '../envs/cutadapt.yaml'
     script:
         "../scripts/convert_mtx.py"
 

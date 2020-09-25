@@ -146,6 +146,8 @@ rule convert_long_to_mtx:
         mtx='{results_dir}/samples/{sample}/{type}/matrix.mtx'
     params:
         samples=lambda wildcards: wildcards.sample
+    # enforce conde env to ensure consistent python version for python scripts
+    conda: '../envs/cutadapt.yaml'
     script:
         "../scripts/convert_mtx.py"
 
