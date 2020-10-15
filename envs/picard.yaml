@@ -3,7 +3,7 @@ channels:
   - anaconda
   - conda-forge
 dependencies:
-  - picard=2.14.1.0
+  - picard=2.20.5
   - font-ttf-dejavu-sans-mono=2.37
   - fontconfig=2.13.1
 

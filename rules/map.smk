@@ -32,6 +32,7 @@ rule STAR_solo_align:
                 --outFilterMismatchNoverLmax {}\
                 --outFilterMismatchNoverReadLmax {}\
                 --outFilterMatchNmin {}\
+                --soloBarcodeReadLength 0\
                 --outFilterScoreMinOverLread {}\
                 --outFilterMatchNminOverLread {}\
                 --outSAMattributes CR CY UR UY NH HI AS nM jM CB UB""".format(
@@ -84,7 +85,7 @@ rule multiqc_star:
         html='{results_dir}/reports/star.html'
     params: '-m star'
     wrapper:
-        '0.36.0/bio/multiqc'
+        '0.66.0/bio/multiqc'
 
 rule pigz_unmapped:
     input:

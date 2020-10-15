@@ -30,11 +30,12 @@ rule create_dict:
         "{ref_path}/{species}_{build}_{release}/genome.dict"
     threads:1
     params:
-        picard="$CONDA_PREFIX/share/picard-2.14.1-0/picard.jar",
+        # picard="$CONDA_PREFIX/share/picard-2.14.1-0/picard.jar",
         temp_directory=config['LOCAL']['temp-directory']
     conda: '../envs/picard.yaml'
     shell:
-        """java -jar -Djava.io.tmpdir={params.temp_directory} {params.picard} CreateSequenceDictionary\
+        """export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} &&\
+        picard CreateSequenceDictionary\
         REFERENCE={input}\
         OUTPUT={output}
         """
@@ -132,4 +133,4 @@ rule create_star_index:
     threads: 24
     conda: '../envs/star.yaml'
     wrapper:
-        "0.50.4/bio/star/index"
+        "0.66.0/bio/star/index"

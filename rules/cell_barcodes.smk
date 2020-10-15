@@ -72,5 +72,7 @@ rule filter_top_barcodes:
         filter_log='{results_dir}/logs/custom/{sample}_unrecognized_barcodes.csv'
     params:
         num_cells=lambda wildcards: round(int(samples.loc[wildcards.sample,'expected_cells']))
+    # enforce conde env to ensure consistent python version for python scripts
+    conda: '../envs/cutadapt.yaml'
     script:
         '../scripts/whitelist_check.py'
