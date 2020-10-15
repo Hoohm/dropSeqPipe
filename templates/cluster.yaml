@@ -1,11 +1,12 @@
 __default__:
-    time: "10:00:00"
+    time: "05:00:00"
     mem: 8g
     output: "logs/cluster/{rule}.{wildcards.sample}.out"
     error: "logs/cluster/{rule}.{wildcards.sample}.err"
     n: '{threads}'
-repair_barcodes:
-    mem: 60g
+repair:
+    jobname: "repair"
+    time: "10:00:00"
 fastqc_barcodes:
     jobname: fastqc_barcodes
     time: "01:00:00"

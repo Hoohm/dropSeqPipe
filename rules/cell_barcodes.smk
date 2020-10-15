@@ -56,7 +56,7 @@ rule bam_hist:
     conda: '../envs/dropseq_tools.yaml'
     shell:
         """export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && BamTagHistogram -m {params.memory}\
-        TAG=CR\
+        TAG=CB\
         I={input}\
         READ_MQ=10\
         O={output}

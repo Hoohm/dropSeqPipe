@@ -30,7 +30,7 @@ rule extract_umi_expression:
         OUTPUT_LONG_FORMAT={output.long}\
         STRAND_STRATEGY={params.strand_strategy}\
         OUTPUT_READS_INSTEAD=false\
-        CELL_BARCODE_TAG=CR\
+        CELL_BARCODE_TAG=CB\
         MOLECULAR_BARCODE_TAG=UR\
         LOCUS_FUNCTION_LIST=null\
         LOCUS_FUNCTION_LIST={{{params.locus_list}}}\
@@ -57,7 +57,7 @@ rule extract_bc_umi_data:
         O={output.data}\
         EDIT_DISTANCE={params.umiBarcodeEditDistance}\
         STRAND_STRATEGY={params.strand_strategy}\
-        CELL_BARCODE_TAG=CR\
+        CELL_BARCODE_TAG=CB\
         MOLECULAR_BARCODE_TAG=UR\
         LOCUS_FUNCTION_LIST=null\
         LOCUS_FUNCTION_LIST={{{params.locus_list}}}\
@@ -87,7 +87,7 @@ rule extract_reads_expression:
         EDIT_DISTANCE={params.umiBarcodeEditDistance}\
         OUTPUT_LONG_FORMAT={output.long}\
         STRAND_STRATEGY={params.strand_strategy}\
-        CELL_BARCODE_TAG=CR\
+        CELL_BARCODE_TAG=CB\
         MOLECULAR_BARCODE_TAG=UR\
         OUTPUT_READS_INSTEAD=true\
         LOCUS_FUNCTION_LIST=null\
@@ -120,7 +120,7 @@ rule SingleCellRnaSeqMetricsCollector:
         """export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && SingleCellRnaSeqMetricsCollector -m {params.memory}\
         INPUT={input.data}\
         OUTPUT={output}\
-        CELL_BARCODE_TAG=CR\
+        CELL_BARCODE_TAG=CB\
         ANNOTATIONS_FILE={input.refFlat}\
         CELL_BC_FILE={input.barcode_whitelist}\
         RIBOSOMAL_INTERVALS={input.rRNA_intervals}

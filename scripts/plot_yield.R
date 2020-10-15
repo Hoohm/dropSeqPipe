@@ -33,7 +33,7 @@ for (i in 1:length(samples)) {
                             skip = 5, sep = "\t",
                             fill = TRUE, stringsAsFactors = FALSE)
   mysample <- samples[i]
-  repaired_log   <- read.csv(snakemake@input$repaired[i])
+  repaired_log   <- read.csv(snakemake@input$repaired[[i]])
   mydata[which(mydata$Sample == mysample), "R1_filtered"] <- repaired_log$R1_too_short[1]
   mydata[which(mydata$Sample == mysample), "R2_filtered"] <- repaired_log$R2_too_short[1]
   mydata[which(mydata$Sample == mysample), "Read_filtered"] <- repaired_log$both_too_short[1]
@@ -56,8 +56,8 @@ for (i in 1:length(samples)) {
  mydata_long <- mydata %>% gather(variable, value, -Sample, -Batch)
 # melt will be retired, use gather instead: https://github.com/hadley/reshape
 #Force factor order.
-mydata_long$variable = factor(mydata_long$variable, levels = c('Cutadapt filtered','Multi mapped','Total reads','Unmapped','Uniquely mapped'))
-color_palette = c('#e88270','#cb7262','#ae6254','#70d6e8')
+mydata_long$variable = factor(mydata_long$variable, levels = c('R1_filtered', 'R2_filtered', 'Read_filtered','Multi mapped','Total reads','Unmapped','Uniquely mapped'))
+#color_palette = c('#e88270','#cb7262','#ae6254','#70d6e8')
 
 
 p1 <- ggplot(subset(mydata_long, mydata_long$variable != "Total reads"),
@@ -82,7 +82,7 @@ mydata_pct <- cbind(Sample = mydata[, "Sample"],
 
 mydata_long_pct <- mydata_pct %>% gather(variable, value, -Sample, -Batch)
 
-mydata_long_pct$variable = factor(mydata_long$variable, levels = c('Cutadapt filtered','Multi mapped','Unmapped','Uniquely mapped'))
+mydata_long_pct$variable = factor(mydata_long$variable, levels = c('R1_filtered', 'R2_filtered', 'Read_filtered','Multi mapped','Total reads','Unmapped','Uniquely mapped'))
 
 p2 <- ggplot(subset(mydata_long_pct, mydata_long_pct$variable != "Total reads"),
              aes(x = Sample, y = value, fill = variable)) +

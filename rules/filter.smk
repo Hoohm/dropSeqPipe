@@ -29,7 +29,6 @@ rule cutadapt_R1:
         --max-n {params.max_n}\
         -a file:{input.adapters}\
         -g file:{input.adapters}\
-        -q {params.barcode_quality},{params.barcode_quality}\
         --cores={threads}\
         --overlap {params.cell_barcode_length}\
         -o {output.fastq} {input.R1}\
