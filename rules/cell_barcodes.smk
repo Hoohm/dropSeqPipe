@@ -45,22 +45,22 @@ rule copy_whitelist:
         """cp {input.whitelist} {output}"""
 
 
-rule bam_hist:
-    input:
-        '{results_dir}/samples/{sample}/final.bam'
-    params:
-        memory=config['LOCAL']['memory'],
-        temp_directory=config['LOCAL']['temp-directory']
-    output:
-        '{results_dir}/logs/dropseq_tools/{sample}_hist_out_cell.txt'
-    conda: '../envs/dropseq_tools.yaml'
-    shell:
-        """export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && BamTagHistogram -m {params.memory}\
-        TAG=CB\
-        I={input}\
-        READ_MQ=10\
-        O={output}
-        """
+# rule bam_hist:
+#     input:
+#         '{results_dir}/samples/{sample}/final.bam'
+#     params:
+#         memory=config['LOCAL']['memory'],
+#         temp_directory=config['LOCAL']['temp-directory']
+#     output:
+#         '{results_dir}/logs/dropseq_tools/{sample}_hist_out_cell.txt'
+#     conda: '../envs/dropseq_tools.yaml'
+#     shell:
+#         """export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && BamTagHistogram -m {params.memory}\
+#         TAG=CB\
+#         I={input}\
+#         READ_MQ=10\
+#         O={output}
+#         """
 
 rule filter_top_barcodes:
     input:

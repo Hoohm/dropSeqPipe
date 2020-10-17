@@ -3,43 +3,41 @@
 #Which rules will be run on the host computer and not sent to nodes
 localrules:
     plot_rna_metrics,
-    convert_long_to_mtx,
-    compress_mtx
 
-rule extract_umi_expression:
-    input:
-        data='{results_dir}/samples/{sample}/final.bam',
-        barcode_whitelist='{results_dir}/samples/{sample}/filtered_barcodes.csv'
-    output:
-        long=temp('{results_dir}/samples/{sample}/umi/expression.long'),
-        dense=temp('{results_dir}/samples/{sample}/umi/expression.tsv')
-    params:
-        count_per_umi=config['EXTRACTION']['minimum-counts-per-UMI'],
-        num_cells=lambda wildcards: int(samples.loc[wildcards.sample,'expected_cells']),
-        umiBarcodeEditDistance=config['EXTRACTION']['UMI-edit-distance'],
-        temp_directory=config['LOCAL']['temp-directory'],
-        memory=config['LOCAL']['memory'],
-        locus_list=','.join(config['EXTRACTION']['LOCUS']),
-        strand_strategy=config['EXTRACTION']['strand-strategy']
-    conda: '../envs/dropseq_tools.yaml'
-    shell:
-        """export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && DigitalExpression -m {params.memory}\
-        I={input.data}\
-        O={output.dense}\
-        EDIT_DISTANCE={params.umiBarcodeEditDistance}\
-        OUTPUT_LONG_FORMAT={output.long}\
-        STRAND_STRATEGY={params.strand_strategy}\
-        OUTPUT_READS_INSTEAD=false\
-        CELL_BARCODE_TAG=CB\
-        MOLECULAR_BARCODE_TAG=UR\
-        LOCUS_FUNCTION_LIST=null\
-        LOCUS_FUNCTION_LIST={{{params.locus_list}}}\
-        MIN_BC_READ_THRESHOLD={params.count_per_umi}\
-        CELL_BC_FILE={input.barcode_whitelist}"""
+# rule extract_umi_expression:
+#     input:
+#         data='{results_dir}/samples/{sample}/final.bam',
+#         barcode_whitelist='{results_dir}/samples/{sample}/filtered_barcodes.csv'
+#     output:
+#         long=temp('{results_dir}/samples/{sample}/umi/expression.long'),
+#         dense=temp('{results_dir}/samples/{sample}/umi/expression.tsv')
+#     params:
+#         count_per_umi=config['EXTRACTION']['minimum-counts-per-UMI'],
+#         num_cells=lambda wildcards: int(samples.loc[wildcards.sample,'expected_cells']),
+#         umiBarcodeEditDistance=config['EXTRACTION']['UMI-edit-distance'],
+#         temp_directory=config['LOCAL']['temp-directory'],
+#         memory=config['LOCAL']['memory'],
+#         locus_list=','.join(config['EXTRACTION']['LOCUS']),
+#         strand_strategy=config['EXTRACTION']['strand-strategy']
+#     conda: '../envs/dropseq_tools.yaml'
+#     shell:
+#         """export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && DigitalExpression -m {params.memory}\
+#         I={input.data}\
+#         O={output.dense}\
+#         EDIT_DISTANCE={params.umiBarcodeEditDistance}\
+#         OUTPUT_LONG_FORMAT={output.long}\
+#         STRAND_STRATEGY={params.strand_strategy}\
+#         OUTPUT_READS_INSTEAD=false\
+#         CELL_BARCODE_TAG=CB\
+#         MOLECULAR_BARCODE_TAG=UR\
+#         LOCUS_FUNCTION_LIST=null\
+#         LOCUS_FUNCTION_LIST={{{params.locus_list}}}\
+#         MIN_BC_READ_THRESHOLD={params.count_per_umi}\
+#         CELL_BC_FILE={input.barcode_whitelist}"""
 
 rule extract_bc_umi_data:
     input: 
-        data='{results_dir}/samples/{sample}/final.bam',
+        data='{results_dir}/samples/{sample}/Aligned.sortedByCoord.out.bam',
         barcode_whitelist='{results_dir}/samples/{sample}/filtered_barcodes.csv'
     output:
         data='{results_dir}/samples/{sample}/bc_umi_long.csv'
@@ -64,43 +62,43 @@ rule extract_bc_umi_data:
         MIN_BC_READ_THRESHOLD={params.count_per_umi}\
         CELL_BC_FILE={input.barcode_whitelist}"""
 
-rule extract_reads_expression:
-    input:
-        data='{results_dir}/samples/{sample}/final.bam',
-        barcode_whitelist='{results_dir}/samples/{sample}/filtered_barcodes.csv'
-    output:
-        long=temp('{results_dir}/samples/{sample}/read/expression.long'),
-        dense=temp('{results_dir}/samples/{sample}/read/expression.tsv')
-    params:
-        count_per_umi=config['EXTRACTION']['minimum-counts-per-UMI'],
-        num_cells=lambda wildcards: int(samples.loc[wildcards.sample,'expected_cells']),
-        umiBarcodeEditDistance=config['EXTRACTION']['UMI-edit-distance'],
-        temp_directory=config['LOCAL']['temp-directory'],
-        memory=config['LOCAL']['memory'],
-        locus_list=','.join(config['EXTRACTION']['LOCUS']),
-        strand_strategy=config['EXTRACTION']['strand-strategy']
-    conda: '../envs/dropseq_tools.yaml'
-    shell:
-        """export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && DigitalExpression -m {params.memory}\
-        I={input.data}\
-        O={output.dense}\
-        EDIT_DISTANCE={params.umiBarcodeEditDistance}\
-        OUTPUT_LONG_FORMAT={output.long}\
-        STRAND_STRATEGY={params.strand_strategy}\
-        CELL_BARCODE_TAG=CB\
-        MOLECULAR_BARCODE_TAG=UR\
-        OUTPUT_READS_INSTEAD=true\
-        LOCUS_FUNCTION_LIST=null\
-        LOCUS_FUNCTION_LIST={{{params.locus_list}}}\
-        MIN_BC_READ_THRESHOLD={params.count_per_umi}\
-        CELL_BC_FILE={input.barcode_whitelist}"""
+# rule extract_reads_expression:
+#     input:
+#         data='{results_dir}/samples/{sample}/final.bam',
+#         barcode_whitelist='{results_dir}/samples/{sample}/filtered_barcodes.csv'
+#     output:
+#         long=temp('{results_dir}/samples/{sample}/read/expression.long'),
+#         dense=temp('{results_dir}/samples/{sample}/read/expression.tsv')
+#     params:
+#         count_per_umi=config['EXTRACTION']['minimum-counts-per-UMI'],
+#         num_cells=lambda wildcards: int(samples.loc[wildcards.sample,'expected_cells']),
+#         umiBarcodeEditDistance=config['EXTRACTION']['UMI-edit-distance'],
+#         temp_directory=config['LOCAL']['temp-directory'],
+#         memory=config['LOCAL']['memory'],
+#         locus_list=','.join(config['EXTRACTION']['LOCUS']),
+#         strand_strategy=config['EXTRACTION']['strand-strategy']
+#     conda: '../envs/dropseq_tools.yaml'
+#     shell:
+#         """export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && DigitalExpression -m {params.memory}\
+#         I={input.data}\
+#         O={output.dense}\
+#         EDIT_DISTANCE={params.umiBarcodeEditDistance}\
+#         OUTPUT_LONG_FORMAT={output.long}\
+#         STRAND_STRATEGY={params.strand_strategy}\
+#         CELL_BARCODE_TAG=CB\
+#         MOLECULAR_BARCODE_TAG=UR\
+#         OUTPUT_READS_INSTEAD=true\
+#         LOCUS_FUNCTION_LIST=null\
+#         LOCUS_FUNCTION_LIST={{{params.locus_list}}}\
+#         MIN_BC_READ_THRESHOLD={params.count_per_umi}\
+#         CELL_BC_FILE={input.barcode_whitelist}"""
 
 
 rule SingleCellRnaSeqMetricsCollector:
     input:
-        data='{results_dir}/samples/{sample}/final.bam',
+        data='{results_dir}/samples/{sample}/Aligned.sortedByCoord.out.bam',
         barcode_whitelist='{results_dir}/samples/{sample}/filtered_barcodes.csv',
-        refFlat=expand("{ref_path}/{species}_{build}_{release}/curated_annotation.refFlat",
+        refFlat=expand("{ref_path}/{species}_{build}_{release}/curated_annotation.gtf",
             ref_path=config['META']['reference-directory'],
             species=species,
             release=release,
@@ -137,30 +135,30 @@ rule plot_rna_metrics:
         '../scripts/plot_rna_metrics.R'
 
 
-rule convert_long_to_mtx:
-    input:
-        '{results_dir}/samples/{sample}/{type}/expression.long'
-    output:
-        barcodes='{results_dir}/samples/{sample}/{type}/barcodes.tsv',
-        features='{results_dir}/samples/{sample}/{type}/features.tsv',
-        mtx='{results_dir}/samples/{sample}/{type}/matrix.mtx'
-    params:
-        samples=lambda wildcards: wildcards.sample
-    # enforce conde env to ensure consistent python version for python scripts
-    conda: '../envs/cutadapt.yaml'
-    script:
-        "../scripts/convert_mtx.py"
+# rule convert_long_to_mtx:
+#     input:
+#         '{results_dir}/samples/{sample}/{type}/expression.long'
+#     output:
+#         barcodes='{results_dir}/samples/{sample}/{type}/barcodes.tsv',
+#         features='{results_dir}/samples/{sample}/{type}/features.tsv',
+#         mtx='{results_dir}/samples/{sample}/{type}/matrix.mtx'
+#     params:
+#         samples=lambda wildcards: wildcards.sample
+#     # enforce conde env to ensure consistent python version for python scripts
+#     conda: '../envs/cutadapt.yaml'
+#     script:
+#         "../scripts/convert_mtx.py"
 
-rule compress_mtx:
-    input: 
-        barcodes='{results_dir}/samples/{sample}/{type}/barcodes.tsv',
-        features='{results_dir}/samples/{sample}/{type}/features.tsv',
-        mtx='{results_dir}/samples/{sample}/{type}/matrix.mtx'
-    output:
-        barcodes='{results_dir}/samples/{sample}/{type}/barcodes.tsv.gz',
-        features='{results_dir}/samples/{sample}/{type}/features.tsv.gz',
-        mtx='{results_dir}/samples/{sample}/{type}/matrix.mtx.gz'
-    conda: '../envs/pigz.yaml'
-    threads: 3
-    shell:
-        """pigz -p {threads} {input.barcodes} {input.features} {input.mtx}"""
+# rule compress_mtx:
+#     input: 
+#         barcodes='{results_dir}/samples/{sample}/{type}/barcodes.tsv',
+#         features='{results_dir}/samples/{sample}/{type}/features.tsv',
+#         mtx='{results_dir}/samples/{sample}/{type}/matrix.mtx'
+#     output:
+#         barcodes='{results_dir}/samples/{sample}/{type}/barcodes.tsv.gz',
+#         features='{results_dir}/samples/{sample}/{type}/features.tsv.gz',
+#         mtx='{results_dir}/samples/{sample}/{type}/matrix.mtx.gz'
+#     conda: '../envs/pigz.yaml'
+#     threads: 3
+#     shell:
+#         """pigz -p {threads} {input.barcodes} {input.features} {input.mtx}"""

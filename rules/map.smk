@@ -24,7 +24,14 @@ rule STAR_solo_align:
         bam='{results_dir}/samples/{sample}/Aligned.sortedByCoord.out.bam',
         unmapped_R1='{results_dir}/samples/{sample}/Unmapped.out.mate1',
         unmapped_R2='{results_dir}/samples/{sample}/Unmapped.out.mate2',
-        logs='{results_dir}/samples/{sample}/Log.final.out'
+        logs='{results_dir}/samples/{sample}/Log.final.out',
+        solo_barcodes='{results_dir}/samples/{sample}/Solo.out/Gene/raw/barcodes.tsv',
+        solo_features='{results_dir}/samples/{sample}/Solo.out/Gene/raw/features.tsv',
+        solo_matrix='{results_dir}/samples/{sample}/Solo.out/Gene/raw/matrix.mtx',
+    log:
+        solo_barcode_stats = '{results_dir}/samples/{sample}/Solo.out/Barcodes.stats',
+        solo_summary = '{results_dir}/samples/{sample}/Solo.out/Gene/Summary.csv',
+        
     params:
         extra="""--outSAMtype BAM SortedByCoordinate\
                 --outReadsUnmapped Fastx\
@@ -32,10 +39,9 @@ rule STAR_solo_align:
                 --outFilterMismatchNoverLmax {}\
                 --outFilterMismatchNoverReadLmax {}\
                 --outFilterMatchNmin {}\
-                --soloBarcodeReadLength 0\
                 --outFilterScoreMinOverLread {}\
                 --outFilterMatchNminOverLread {}\
-                --outSAMattributes CR CY UR UY NH HI AS nM jM CB UB""".format(
+                --outSAMattributes CR CY UR UY NH HI AS nM jM CB UB GX GN""".format(
                 config['MAPPING']['STAR']['outFilterMismatchNmax'],
                 config['MAPPING']['STAR']['outFilterMismatchNoverLmax'],
                 config['MAPPING']['STAR']['outFilterMismatchNoverReadLmax'],
@@ -47,21 +53,23 @@ rule STAR_solo_align:
             species,
             build,
             release) + str(samples.loc[wildcards.sample,'read_length']),
-        extra_solo="""--soloFeatures Gene\
+        extra_solo=lambda wildcards:  """--soloFeatures Gene GeneFull\
             --soloType CB_UMI_Simple\
             --soloCBstart {}\
             --soloCBlen {}\
             --soloUMIstart {}\
             --soloUMIlen {}\
             --soloAdapterSequence {}\
-            --soloCBmatchWLtype 1MM_multi\
+            --soloCBmatchWLtype 1MM\
             --soloUMIdedup 1MM_Directional\
-            --soloCellFilter None""".format(
+            --soloUMIfiltering MultiGeneUMI\
+            --soloCellFilter TopCells {}""".format(
                 config['FILTER']['cell-barcode']['start'],
                 config['FILTER']['cell-barcode']['end'],
                 config['FILTER']['UMI-barcode']['start'],
                 1 + config['FILTER']['UMI-barcode']['end'] - config['FILTER']['UMI-barcode']['start'],
-                config['FILTER']['5-prime-smart-adapter']
+                config['FILTER']['5-prime-smart-adapter'],
+                samples.loc[wildcards.sample,'expected_cells']
             ),
         out_prefix=lambda wildcards: '{}/samples/{}/'.format(wildcards.results_dir, wildcards.sample)
     singularity:
@@ -85,7 +93,7 @@ rule multiqc_star:
         html='{results_dir}/reports/star.html'
     params: '-m star'
     wrapper:
-        '0.66.0/bio/multiqc'
+        '0.36.0/bio/multiqc'
 
 rule pigz_unmapped:
     input:
@@ -99,27 +107,54 @@ rule pigz_unmapped:
     shell:
         """pigz -p 4 {input.R1} {input.R2}"""
 
-
-rule TagReadWithGeneExon:
-    input:
-        data='{results_dir}/samples/{sample}/Aligned.sortedByCoord.out.bam',
-        refFlat=expand("{ref_path}/{species}_{build}_{release}/curated_annotation.refFlat",
-            ref_path=config['META']['reference-directory'],
-            species=species,
-            release=release,
-            build=build)
-    params:
-        memory=config['LOCAL']['memory'],
-        temp_directory=config['LOCAL']['temp-directory']
+rule compress_mtx_out:
+    input: 
+        solo_barcodes='{results_dir}/samples/{sample}/Solo.out/Gene/raw/barcodes.tsv',
+        solo_features='{results_dir}/samples/{sample}/Solo.out/Gene/raw/features.tsv',
+        solo_matrix='{results_dir}/samples/{sample}/Solo.out/Gene/raw/matrix.mtx',
     output:
-        '{results_dir}/samples/{sample}/final.bam'
-    conda: '../envs/dropseq_tools.yaml'
+        solo_barcodes='{results_dir}/samples/{sample}/Solo.out/Gene/raw/barcodes.tsv.gz',
+        solo_features='{results_dir}/samples/{sample}/Solo.out/Gene/raw/features.tsv.gz',
+        solo_matrix='{results_dir}/samples/{sample}/Solo.out/Gene/raw/matrix.mtx.gz',
+    conda: '../envs/pigz.yaml'
+    threads: 3
     shell:
-        """export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && TagReadWithGeneFunction -m {params.memory}\
-        INPUT={input.data}\
-        OUTPUT={output}\
-        ANNOTATIONS_FILE={input.refFlat}
-        """
+        """pigz -p {threads} {input.solo_barcodes} {input.solo_features} {input.solo_matrix}"""
+
+rule mv_outs_mtx:
+    input:
+        solo_barcodes='{results_dir}/samples/{sample}/Solo.out/Gene/raw/barcodes.tsv.gz',
+        solo_features='{results_dir}/samples/{sample}/Solo.out/Gene/raw/features.tsv.gz',
+        solo_matrix='{results_dir}/samples/{sample}/Solo.out/Gene/raw/matrix.mtx.gz',
+    output:
+        '{results_dir}/samples/{sample}/umi/barcodes.tsv.gz',
+        '{results_dir}/samples/{sample}/umi/features.tsv.gz',
+        '{results_dir}/samples/{sample}/umi/matrix.mtx.gz',
+    params:
+        destination = "{results_dir}/samples/{sample}/umi"
+    shell:
+        """mv {input.solo_barcodes} {input.solo_features} {input.solo_matrix} {params.destination}"""
+
+# rule TagReadWithGeneExon:
+#     input:
+#         data='{results_dir}/samples/{sample}/Aligned.sortedByCoord.out.bam',
+#         refFlat=expand("{ref_path}/{species}_{build}_{release}/curated_annotation.refFlat",
+#             ref_path=config['META']['reference-directory'],
+#             species=species,
+#             release=release,
+#             build=build)
+#     params:
+#         memory=config['LOCAL']['memory'],
+#         temp_directory=config['LOCAL']['temp-directory']
+#     output:
+#         '{results_dir}/samples/{sample}/final.bam'
+#     conda: '../envs/dropseq_tools.yaml'
+#     shell:
+#         """export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && TagReadWithGeneFunction -m {params.memory}\
+#         INPUT={input.data}\
+#         OUTPUT={output}\
+#         ANNOTATIONS_FILE={input.refFlat}
+#         """
 
 # rule DetectBeadSubstitutionErrors:
 #     input:

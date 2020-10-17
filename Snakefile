@@ -230,7 +230,7 @@ rule map:
             ['{results_dir}/plots/knee_plots/{sample}_knee_plot.pdf',
             '{results_dir}/reports/star.html',
             '{results_dir}/plots/yield.pdf',
-            '{results_dir}/samples/{sample}/final.bam',
+            '{results_dir}/samples/{sample}/Aligned.sortedByCoord.out.bam',
             '{results_dir}/samples/{sample}/Unmapped.out.mate1.gz'],
                 sample=samples.index,
                 results_dir=results_dir)
