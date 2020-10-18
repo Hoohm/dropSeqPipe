@@ -1,6 +1,7 @@
 localrules:
     violine_plots,
-    summary_stats
+    summary_stats,
+    create_seurat_object
 
 # rule merge_long:
 #     input:
@@ -15,9 +16,24 @@ localrules:
 #     script:
 #         "../scripts/convert_mtx.py"
 
+rule create_seurat_object:
+    input:
+        umi_mtx=expand('{results_dir}/samples/{sample}/umi/matrix.mtx.gz', results_dir=results_dir, sample=samples.index),
+        rna_metrics=expand('{results_dir}/logs/dropseq_tools/{sample}_rna_metrics.txt', results_dir=results_dir, sample=samples.index),
+    output:
+        seurat_object='{results_dir}/summary/Seurat_object.rdata'
+    params:
+        design='samples.csv',
+        samples = samples.index
+    conda:
+        '../envs/r.yaml'
+    script:
+        '../scripts/create_seurat_object.R'
+        
+
 rule violine_plots:
     input:
-        umi_mtx=expand('{results_dir}/summary/{sample}/umi/matrix.mtx.gz', results_dir=results_dir, sample=samples.index),
+        seurat_object='{results_dir}/summary/Seurat_object.rdata',
         design='samples.csv'
     conda: '../envs/r.yaml'
     output:
@@ -25,13 +41,12 @@ rule violine_plots:
         pdf_umivscounts='{results_dir}/plots/UMI_vs_counts.pdf',
         pdf_umi_vs_gene='{results_dir}/plots/UMI_vs_gene.pdf',
         pdf_count_vs_gene='{results_dir}/plots/Count_vs_gene.pdf',
-        R_objects='{results_dir}/summary/R_Seurat_objects.rdata'
     script:
         '../scripts/plot_violine.R'
 
 rule summary_stats:
     input:
-        R_objects='{results_dir}/summary/R_Seurat_objects.rdata',
+        R_objects='{results_dir}/summary/Seurat_object.rdata',
         R2qc=expand('{results_dir}/logs/cutadapt/{sample}_R2.qc.txt', sample=samples.index, results_dir=results_dir),
         hist_cell=expand('{results_dir}/logs/dropseq_tools/{sample}_hist_out_cell.txt', sample=samples.index, results_dir=results_dir)
     conda: '../envs/r.yaml'

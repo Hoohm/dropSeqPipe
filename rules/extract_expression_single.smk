@@ -57,6 +57,7 @@ rule extract_bc_umi_data:
         STRAND_STRATEGY={params.strand_strategy}\
         CELL_BARCODE_TAG=CB\
         MOLECULAR_BARCODE_TAG=UR\
+        GENE_NAME_TAG=GN\
         LOCUS_FUNCTION_LIST=null\
         LOCUS_FUNCTION_LIST={{{params.locus_list}}}\
         MIN_BC_READ_THRESHOLD={params.count_per_umi}\

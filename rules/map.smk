@@ -6,7 +6,9 @@ localrules:
     multiqc_star,
     plot_yield,
     plot_knee_plot,
-    pigz_unmapped
+    pigz_unmapped,
+    mv_outs_mtx,
+    compress_mtx_out
 
 
 rule STAR_solo_align:
@@ -41,7 +43,7 @@ rule STAR_solo_align:
                 --outFilterMatchNmin {}\
                 --outFilterScoreMinOverLread {}\
                 --outFilterMatchNminOverLread {}\
-                --outSAMattributes CR CY UR UY NH HI AS nM jM CB UB GX GN""".format(
+                --outSAMattributes CR CY UR UY NH HI AS nM jM CB UB GX GN XS ch""".format(
                 config['MAPPING']['STAR']['outFilterMismatchNmax'],
                 config['MAPPING']['STAR']['outFilterMismatchNoverLmax'],
                 config['MAPPING']['STAR']['outFilterMismatchNoverReadLmax'],
