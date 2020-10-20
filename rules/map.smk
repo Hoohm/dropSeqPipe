@@ -36,6 +36,7 @@ rule STAR_solo_align:
         
     params:
         extra="""--outSAMtype BAM SortedByCoordinate\
+                --soloBarcodeReadLength 0\
                 --outReadsUnmapped Fastx\
                 --outFilterMismatchNmax {}\
                 --outFilterMismatchNoverLmax {}\
@@ -230,14 +231,14 @@ rule plot_yield:
         '../scripts/plot_yield.R'
 
 
-rule plot_knee_plot:
-    input:
-        data='{results_dir}/logs/dropseq_tools/{sample}_hist_out_cell.txt',
-        barcodes='{results_dir}/samples/{sample}/filtered_barcodes.csv'
-    params:
-        cells=lambda wildcards: int(samples.loc[wildcards.sample,'expected_cells'])
-    conda: '../envs/r.yaml'
-    output:
-        pdf='{results_dir}/plots/knee_plots/{sample}_knee_plot.pdf'
-    script:
-        '../scripts/plot_knee_plot.R'
+# rule plot_knee_plot:
+#     input:
+#         data='{results_dir}/logs/dropseq_tools/{sample}_hist_out_cell.txt',
+#         barcodes='{results_dir}/samples/{sample}/filtered_barcodes.csv'
+#     params:
+#         cells=lambda wildcards: int(samples.loc[wildcards.sample,'expected_cells'])
+#     conda: '../envs/r.yaml'
+#     output:
+#         pdf='{results_dir}/plots/knee_plots/{sample}_knee_plot.pdf'
+#     script:
+#         '../scripts/plot_knee_plot.R'

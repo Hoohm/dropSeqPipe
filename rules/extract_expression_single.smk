@@ -35,33 +35,33 @@ localrules:
 #         MIN_BC_READ_THRESHOLD={params.count_per_umi}\
 #         CELL_BC_FILE={input.barcode_whitelist}"""
 
-rule extract_bc_umi_data:
-    input: 
-        data='{results_dir}/samples/{sample}/Aligned.sortedByCoord.out.bam',
-        barcode_whitelist='{results_dir}/samples/{sample}/filtered_barcodes.csv'
-    output:
-        data='{results_dir}/samples/{sample}/bc_umi_long.csv'
-    params:
-        count_per_umi=config['EXTRACTION']['minimum-counts-per-UMI'],
-        umiBarcodeEditDistance=config['EXTRACTION']['UMI-edit-distance'],
-        temp_directory=config['LOCAL']['temp-directory'],
-        memory=config['LOCAL']['memory'],
-        locus_list=','.join(config['EXTRACTION']['LOCUS']),
-        strand_strategy=config['EXTRACTION']['strand-strategy']
-    conda: '../envs/dropseq_tools.yaml'
-    shell:
-        """export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && GatherMolecularBarcodeDistributionByGene -m {params.memory}\
-        I={input.data}\
-        O={output.data}\
-        EDIT_DISTANCE={params.umiBarcodeEditDistance}\
-        STRAND_STRATEGY={params.strand_strategy}\
-        CELL_BARCODE_TAG=CB\
-        MOLECULAR_BARCODE_TAG=UR\
-        GENE_NAME_TAG=GN\
-        LOCUS_FUNCTION_LIST=null\
-        LOCUS_FUNCTION_LIST={{{params.locus_list}}}\
-        MIN_BC_READ_THRESHOLD={params.count_per_umi}\
-        CELL_BC_FILE={input.barcode_whitelist}"""
+# rule extract_bc_umi_data:
+#     input: 
+#         data='{results_dir}/samples/{sample}/Aligned.sortedByCoord.out.bam',
+#         barcode_whitelist='{results_dir}/samples/{sample}/filtered_barcodes.csv'
+#     output:
+#         data='{results_dir}/samples/{sample}/bc_umi_long.csv'
+#     params:
+#         count_per_umi=config['EXTRACTION']['minimum-counts-per-UMI'],
+#         umiBarcodeEditDistance=config['EXTRACTION']['UMI-edit-distance'],
+#         temp_directory=config['LOCAL']['temp-directory'],
+#         memory=config['LOCAL']['memory'],
+#         locus_list=','.join(config['EXTRACTION']['LOCUS']),
+#         strand_strategy=config['EXTRACTION']['strand-strategy']
+#     conda: '../envs/dropseq_tools.yaml'
+#     shell:
+#         """export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && GatherMolecularBarcodeDistributionByGene -m {params.memory}\
+#         I={input.data}\
+#         O={output.data}\
+#         EDIT_DISTANCE={params.umiBarcodeEditDistance}\
+#         STRAND_STRATEGY={params.strand_strategy}\
+#         CELL_BARCODE_TAG=CB\
+#         MOLECULAR_BARCODE_TAG=UR\
+#         GENE_NAME_TAG=GN\
+#         LOCUS_FUNCTION_LIST=null\
+#         LOCUS_FUNCTION_LIST={{{params.locus_list}}}\
+#         MIN_BC_READ_THRESHOLD={params.count_per_umi}\
+#         CELL_BC_FILE={input.barcode_whitelist}"""
 
 # rule extract_reads_expression:
 #     input:
@@ -95,45 +95,45 @@ rule extract_bc_umi_data:
 #         CELL_BC_FILE={input.barcode_whitelist}"""
 
 
-rule SingleCellRnaSeqMetricsCollector:
-    input:
-        data='{results_dir}/samples/{sample}/Aligned.sortedByCoord.out.bam',
-        barcode_whitelist='{results_dir}/samples/{sample}/filtered_barcodes.csv',
-        refFlat=expand("{ref_path}/{species}_{build}_{release}/curated_annotation.gtf",
-            ref_path=config['META']['reference-directory'],
-            species=species,
-            release=release,
-            build=build),
-        rRNA_intervals=expand("{ref_path}/{species}_{build}_{release}/annotation.rRNA.intervals",
-            ref_path=config['META']['reference-directory'],
-            species=species,
-            release=release,
-            build=build)
-    params:     
-        temp_directory=config['LOCAL']['temp-directory'],
-        memory=config['LOCAL']['memory']
-    output:
-        rna_metrics='{results_dir}/logs/dropseq_tools/{sample}_rna_metrics.txt',
-    conda: '../envs/dropseq_tools.yaml'
-    shell:
-        """export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && SingleCellRnaSeqMetricsCollector -m {params.memory}\
-        INPUT={input.data}\
-        OUTPUT={output}\
-        CELL_BARCODE_TAG=CB\
-        ANNOTATIONS_FILE={input.refFlat}\
-        CELL_BC_FILE={input.barcode_whitelist}\
-        RIBOSOMAL_INTERVALS={input.rRNA_intervals}
-        """
+# rule SingleCellRnaSeqMetricsCollector:
+#     input:
+#         data='{results_dir}/samples/{sample}/Aligned.sortedByCoord.out.bam',
+#         barcode_whitelist='{results_dir}/samples/{sample}/filtered_barcodes.csv',
+#         refFlat=expand("{ref_path}/{species}_{build}_{release}/curated_annotation.gtf",
+#             ref_path=config['META']['reference-directory'],
+#             species=species,
+#             release=release,
+#             build=build),
+#         rRNA_intervals=expand("{ref_path}/{species}_{build}_{release}/annotation.rRNA.intervals",
+#             ref_path=config['META']['reference-directory'],
+#             species=species,
+#             release=release,
+#             build=build)
+#     params:     
+#         temp_directory=config['LOCAL']['temp-directory'],
+#         memory=config['LOCAL']['memory']
+#     output:
+#         rna_metrics='{results_dir}/logs/dropseq_tools/{sample}_rna_metrics.txt',
+#     conda: '../envs/dropseq_tools.yaml'
+#     shell:
+#         """export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && SingleCellRnaSeqMetricsCollector -m {params.memory}\
+#         INPUT={input.data}\
+#         OUTPUT={output}\
+#         CELL_BARCODE_TAG=CB\
+#         ANNOTATIONS_FILE={input.refFlat}\
+#         CELL_BC_FILE={input.barcode_whitelist}\
+#         RIBOSOMAL_INTERVALS={input.rRNA_intervals}
+#         """
 
-rule plot_rna_metrics:
-    input:
-        rna_metrics='{results_dir}/logs/dropseq_tools/{sample}_rna_metrics.txt',
-        barcodes='{results_dir}/samples/{sample}/filtered_barcodes.csv'
-    conda: '../envs/r.yaml'
-    output:
-        pdf='{results_dir}/plots/rna_metrics/{sample}_rna_metrics.pdf'
-    script:
-        '../scripts/plot_rna_metrics.R'
+# rule plot_rna_metrics:
+#     input:
+#         rna_metrics='{results_dir}/logs/dropseq_tools/{sample}_rna_metrics.txt',
+#         barcodes='{results_dir}/samples/{sample}/filtered_barcodes.csv'
+#     conda: '../envs/r.yaml'
+#     output:
+#         pdf='{results_dir}/plots/rna_metrics/{sample}_rna_metrics.pdf'
+#     script:
+#         '../scripts/plot_rna_metrics.R'
 
 
 # rule convert_long_to_mtx:
