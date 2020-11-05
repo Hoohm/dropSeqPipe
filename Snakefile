@@ -169,7 +169,8 @@ elif len(config['META']['species'].keys()) == 1:
                 '{results_dir}/plots/UMI_vs_counts.pdf',
                 '{results_dir}/plots/UMI_vs_gene.pdf',
                 '{results_dir}/plots/Count_vs_gene.pdf',
-                '{results_dir}/summary/Seurat_object.rdata',
+                '{results_dir}/summary/Seurat_object.rds',
+                '{results_dir}/summary/SCE_object.rds',
                 '{results_dir}/summary/barcode_stats_pre_filter.csv',
                 '{results_dir}/summary/barcode_stats_post_filter.csv',
                 '{results_dir}/plots/violinplots_comparison_UMI.pdf'],
@@ -231,7 +232,10 @@ rule map:
             #'{results_dir}/plots/knee_plots/{sample}_knee_plot.pdf',
             '{results_dir}/plots/yield.pdf',
             '{results_dir}/samples/{sample}/Aligned.sortedByCoord.out.bam',
-            '{results_dir}/samples/{sample}/Unmapped.out.mate1.gz'],
+            '{results_dir}/samples/{sample}/Unmapped.out.mate1.gz',
+            '{results_dir}/samples/{sample}/umi/barcodes.tsv.gz',
+            '{results_dir}/samples/{sample}/umi/features.tsv.gz',
+            '{results_dir}/samples/{sample}/umi/matrix.mtx.gz'],
                 sample=samples.index,
                 results_dir=results_dir)
 
@@ -276,7 +280,8 @@ rule merge:
            # '{results_dir}/plots/UMI_vs_counts.pdf',
            # '{results_dir}/plots/UMI_vs_gene.pdf',
            # '{results_dir}/plots/Count_vs_gene.pdf',
-            '{results_dir}/summary/Seurat_object.rdata'
+            '{results_dir}/summary/Seurat_object.rds',
+            '{results_dir}/summary/SCE_object.rds'
            # '{results_dir}/summary/barcode_stats_pre_filter.csv',
            # '{results_dir}/summary/barcode_stats_post_filter.csv',
            # '{results_dir}/plots/violinplots_comparison_UMI.pdf',
