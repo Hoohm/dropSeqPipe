@@ -10,17 +10,19 @@ localrules:
     mv_outs_mtx,
     compress_mtx_out
 
+# read in from config.yaml if using whitelist or not
+use_whitelist = config['MAPPING']['use_whitelist']
 
 rule STAR_solo_align:
     input:
         fq2='{results_dir}/samples/{sample}/trimmed_repaired_R2.fastq.gz',
         fq1='{results_dir}/samples/{sample}/trimmed_repaired_R1.fastq.gz',
+        whitelist='{results_dir}/samples/{sample}/barcodes.csv' if use_whitelist else [],
         index=lambda wildcards: '{}/{}_{}_{}/STAR_INDEXES/'.format(
             config['META']['reference-directory'],
             species,
             build,
             release) + str(samples.loc[wildcards.sample,'read_length']),
-            whitelist='{results_dir}/samples/{sample}/barcodes.csv'
 
     output:
         bam='{results_dir}/samples/{sample}/Aligned.sortedByCoord.out.bam',
@@ -33,9 +35,10 @@ rule STAR_solo_align:
     log:
         solo_barcode_stats = '{results_dir}/samples/{sample}/Solo.out/Barcodes.stats',
         solo_summary = '{results_dir}/samples/{sample}/Solo.out/Gene/Summary.csv',
-        
+        stdout = '{results_dir}/log/STARsolo/{sample}_stdout_stderr.log'
     params:
         extra="""--outSAMtype BAM SortedByCoordinate\
+                --soloBarcodeReadLength 0\
                 --outReadsUnmapped Fastx\
                 --outFilterMismatchNmax {}\
                 --outFilterMismatchNoverLmax {}\
@@ -73,7 +76,10 @@ rule STAR_solo_align:
                 config['FILTER']['5-prime-smart-adapter'],
                 samples.loc[wildcards.sample,'expected_cells']
             ),
-        out_prefix=lambda wildcards: '{}/samples/{}/'.format(wildcards.results_dir, wildcards.sample)
+        out_prefix=lambda wildcards: '{}/samples/{}/'.format(wildcards.results_dir, wildcards.sample),
+        # since input.whitlist can not be accessed in params, we leave 
+        # either input.whitelist or params.whitelist empty but use both in shell: below
+        whitelist = [] if use_whitelist else 'None',
     singularity:
         "shub://seb-mueller/singularity_dropSeqPipe:v04"
     threads: 24
@@ -85,7 +91,9 @@ rule STAR_solo_align:
             --readFilesCommand zcat\
             --readFilesIn {input.fq2} {input.fq1}\
             --outFileNamePrefix {params.out_prefix}\
-            --soloCBwhitelist {input.whitelist}"""
+            --soloCBwhitelist {input.whitelist} {params.whitelist}\
+            2> {log.stdout}
+      """
 
     
 rule multiqc_star:
@@ -230,14 +238,14 @@ rule plot_yield:
         '../scripts/plot_yield.R'
 
 
-rule plot_knee_plot:
-    input:
-        data='{results_dir}/logs/dropseq_tools/{sample}_hist_out_cell.txt',
-        barcodes='{results_dir}/samples/{sample}/filtered_barcodes.csv'
-    params:
-        cells=lambda wildcards: int(samples.loc[wildcards.sample,'expected_cells'])
-    conda: '../envs/r.yaml'
-    output:
-        pdf='{results_dir}/plots/knee_plots/{sample}_knee_plot.pdf'
-    script:
-        '../scripts/plot_knee_plot.R'
+# rule plot_knee_plot:
+#     input:
+#         data='{results_dir}/logs/dropseq_tools/{sample}_hist_out_cell.txt',
+#         barcodes='{results_dir}/samples/{sample}/filtered_barcodes.csv'
+#     params:
+#         cells=lambda wildcards: int(samples.loc[wildcards.sample,'expected_cells'])
+#     conda: '../envs/r.yaml'
+#     output:
+#         pdf='{results_dir}/plots/knee_plots/{sample}_knee_plot.pdf'
+#     script:
+#         '../scripts/plot_knee_plot.R'

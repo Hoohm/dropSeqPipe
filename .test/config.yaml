@@ -36,6 +36,9 @@ FILTER:
             minimum-length: 15
             extra-params: ''
 MAPPING:
+    # if False, --soloCBwhitelist is set to "None" in which all barcodes are used by star solo (e.g. for drop-seq)
+    # if True external whitelist is used (e.g. for 10x)
+    use_whitelist: False
     STAR:
         genomeChrBinNbits: 18
         outFilterMismatchNmax: 10

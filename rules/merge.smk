@@ -16,20 +16,22 @@ localrules:
 #     script:
 #         "../scripts/convert_mtx.py"
 
-rule create_seurat_object:
+rule create_seurat_and_sce_object:
     input:
         umi_mtx=expand('{results_dir}/samples/{sample}/umi/matrix.mtx.gz', results_dir=results_dir, sample=samples.index),
-        rna_metrics=expand('{results_dir}/logs/dropseq_tools/{sample}_rna_metrics.txt', results_dir=results_dir, sample=samples.index),
+        #rna_metrics=expand('{results_dir}/logs/dropseq_tools/{sample}_rna_metrics.txt', results_dir=results_dir, sample=samples.index),
     output:
-        seurat_object='{results_dir}/summary/Seurat_object.rdata'
+        seurat_object='{results_dir}/summary/Seurat_object.rds',
+        SCE_object='{results_dir}/summary/SCE_object.rds'
     params:
         design='samples.csv',
         samples = samples.index
     conda:
         '../envs/r.yaml'
+    log:
+        stdout='{results_dir}/logs/merge/create_seurat_object.Rout',
     script:
         '../scripts/create_seurat_object.R'
-        
 
 rule violine_plots:
     input:

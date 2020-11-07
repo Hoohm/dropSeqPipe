@@ -117,7 +117,7 @@ if len(config['META']['species'].keys()) == 2:
                 '{results_dir}/reports/barcode_filtering.html',
                 '{results_dir}/reports/RNA_filtering.html',
                 '{results_dir}/samples/{sample}/trimmed_repaired_R1.fastq.gz',
-                '{results_dir}/samples/{sample}/top_barcodes.csv',
+                '{results_dir}/samples/{sample}/umitools_barcode_whitelist.csv',
                 #mapping
                 '{results_dir}/plots/knee_plots/{sample}_knee_plot.pdf',
                 '{results_dir}/reports/star.html',
@@ -169,7 +169,8 @@ elif len(config['META']['species'].keys()) == 1:
                 '{results_dir}/plots/UMI_vs_counts.pdf',
                 '{results_dir}/plots/UMI_vs_gene.pdf',
                 '{results_dir}/plots/Count_vs_gene.pdf',
-                '{results_dir}/summary/Seurat_object.rdata',
+                '{results_dir}/summary/Seurat_object.rds',
+                '{results_dir}/summary/SCE_object.rds',
                 '{results_dir}/summary/barcode_stats_pre_filter.csv',
                 '{results_dir}/summary/barcode_stats_post_filter.csv',
                 '{results_dir}/plots/violinplots_comparison_UMI.pdf'],
@@ -220,18 +221,21 @@ rule filter:
             '{results_dir}/reports/RNA_filtering.html',
             '{results_dir}/samples/{sample}/trimmed_repaired_R1.fastq.gz',
             '{results_dir}/samples/{sample}/trimmed_repaired_R2.fastq.gz',
-            '{results_dir}/samples/{sample}/top_barcodes.csv'],
+            '{results_dir}/samples/{sample}/umitools_barcode_whitelist.csv'],
                 results_dir=results_dir,
                 sample=samples.index)
 
 rule map:
     input:
         expand(
-            ['{results_dir}/plots/knee_plots/{sample}_knee_plot.pdf',
-            '{results_dir}/reports/star.html',
+            ['{results_dir}/reports/star.html',
+            #'{results_dir}/plots/knee_plots/{sample}_knee_plot.pdf',
             '{results_dir}/plots/yield.pdf',
             '{results_dir}/samples/{sample}/Aligned.sortedByCoord.out.bam',
-            '{results_dir}/samples/{sample}/Unmapped.out.mate1.gz'],
+            '{results_dir}/samples/{sample}/Unmapped.out.mate1.gz',
+            '{results_dir}/samples/{sample}/umi/barcodes.tsv.gz',
+            '{results_dir}/samples/{sample}/umi/features.tsv.gz',
+            '{results_dir}/samples/{sample}/umi/matrix.mtx.gz'],
                 sample=samples.index,
                 results_dir=results_dir)
 
@@ -272,14 +276,17 @@ rule merge:
     input:
         #merge
         expand(
-            ['{results_dir}/plots/UMI_vs_counts.pdf',
-            '{results_dir}/plots/UMI_vs_gene.pdf',
-            '{results_dir}/plots/Count_vs_gene.pdf',
-            '{results_dir}/summary/Seurat_object.rdata',
-            '{results_dir}/summary/barcode_stats_pre_filter.csv',
-            '{results_dir}/summary/barcode_stats_post_filter.csv',
-            '{results_dir}/plots/violinplots_comparison_UMI.pdf',
-            '{results_dir}/summary/{type}/matrix.mtx.gz'],
+            [
+           # '{results_dir}/plots/UMI_vs_counts.pdf',
+           # '{results_dir}/plots/UMI_vs_gene.pdf',
+           # '{results_dir}/plots/Count_vs_gene.pdf',
+            '{results_dir}/summary/Seurat_object.rds',
+            '{results_dir}/summary/SCE_object.rds'
+           # '{results_dir}/summary/barcode_stats_pre_filter.csv',
+           # '{results_dir}/summary/barcode_stats_post_filter.csv',
+           # '{results_dir}/plots/violinplots_comparison_UMI.pdf',
+           # '{results_dir}/summary/{type}/matrix.mtx.gz'
+            ],
                 results_dir=results_dir,
                 type=types)
 
