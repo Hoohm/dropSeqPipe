@@ -61,18 +61,3 @@ rule copy_whitelist:
 #         READ_MQ=10\
 #         O={output}
 #         """
-
-rule filter_top_barcodes:
-    input:
-        whitelist='{results_dir}/samples/{sample}/barcodes.csv',
-        top_barcodes='{results_dir}/logs/dropseq_tools/{sample}_hist_out_cell.txt'
-    output:
-        filtered_barcodes='{results_dir}/samples/{sample}/filtered_barcodes.csv'
-    log:
-        filter_log='{results_dir}/logs/custom/{sample}_unrecognized_barcodes.csv'
-    params:
-        num_cells=lambda wildcards: round(int(samples.loc[wildcards.sample,'expected_cells']))
-    # enforce conde env to ensure consistent python version for python scripts
-    conda: '../envs/cutadapt.yaml'
-    script:
-        '../scripts/whitelist_check.py'
