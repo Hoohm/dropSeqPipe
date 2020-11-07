@@ -4,9 +4,6 @@ import platform
 # To add missing fields for an annotation of ERCC: awk -F'[\t|;]' '{printf $0" "; gsub(/id/,"name"); print $9";"$10"; exon_version \"1\";"}'
 #Which rules will be run on the host computer and not sent to nodes
 localrules:
-     create_dict,
-     reduce_gtf,
-     create_refFlat,
      create_intervals,
      curate_annotation
 
@@ -23,40 +20,40 @@ rule curate_annotation:
         """cat {input.annotation} | grep -E "{params.patterns}" > {output}"""
 
 
-# rule create_dict:
-#     input:
-#         "{ref_path}/{species}_{build}_{release}/genome.fa"
-#     output:
-#         "{ref_path}/{species}_{build}_{release}/genome.dict"
-#     threads:1
-#     params:
-#         # picard="$CONDA_PREFIX/share/picard-2.14.1-0/picard.jar",
-#         temp_directory=config['LOCAL']['temp-directory']
-#     conda: '../envs/picard.yaml'
-#     shell:
-#         """export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} &&\
-#         picard CreateSequenceDictionary\
-#         REFERENCE={input}\
-#         OUTPUT={output}
-#         """
+rule create_dict:
+    input:
+        "{ref_path}/{species}_{build}_{release}/genome.fa"
+    output:
+        "{ref_path}/{species}_{build}_{release}/genome.dict"
+    threads:1
+    params:
+        picard="$CONDA_PREFIX/share/picard-2.14.1-0/picard.jar",
+        temp_directory=config['LOCAL']['temp-directory']
+    conda: '../envs/picard.yaml'
+    shell:
+        """export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} &&\
+        picard CreateSequenceDictionary\
+        REFERENCE={input}\
+        OUTPUT={output}
+        """
 
-# rule reduce_gtf:
-#     input:
-#         reference_dict="{ref_path}/{species}_{build}_{release}/genome.dict",
-#         annotation="{ref_path}/{species}_{build}_{release}/curated_annotation.gtf"
-#     params:
-#         memory=config['LOCAL']['memory'],
-#         temp_directory=config['LOCAL']['temp-directory']
-#     output:
-#         "{ref_path}/{species}_{build}_{release}/curated_reduced_annotation.gtf"
-#     conda: '../envs/dropseq_tools.yaml'
-#     shell:
-#         """export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && ReduceGtf -m {params.memory}\
-#         GTF={input.annotation}\
-#         OUTPUT={output}\
-#         SEQUENCE_DICTIONARY={input.reference_dict}\
-#         IGNORE_FUNC_TYPE='null'\
-#         ENHANCE_GTF='false'"""
+rule reduce_gtf:
+    input:
+        reference_dict="{ref_path}/{species}_{build}_{release}/genome.dict",
+        annotation="{ref_path}/{species}_{build}_{release}/curated_annotation.gtf"
+    params:
+        memory=config['LOCAL']['memory'],
+        temp_directory=config['LOCAL']['temp-directory']
+    output:
+        "{ref_path}/{species}_{build}_{release}/curated_reduced_annotation.gtf"
+    conda: '../envs/dropseq_tools.yaml'
+    shell:
+        """export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && ReduceGtf -m {params.memory}\
+        GTF={input.annotation}\
+        OUTPUT={output}\
+        SEQUENCE_DICTIONARY={input.reference_dict}\
+        IGNORE_FUNC_TYPE='null'\
+        ENHANCE_GTF='false'"""
 
 # rule create_refFlat:
 #     input:

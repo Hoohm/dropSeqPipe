@@ -117,7 +117,7 @@ if len(config['META']['species'].keys()) == 2:
                 '{results_dir}/reports/barcode_filtering.html',
                 '{results_dir}/reports/RNA_filtering.html',
                 '{results_dir}/samples/{sample}/trimmed_repaired_R1.fastq.gz',
-                '{results_dir}/samples/{sample}/umitools_barcode_whitelist.csv',
+                '{results_dir}/samples/{sample}/top_barcodes.csv',
                 #mapping
                 '{results_dir}/plots/knee_plots/{sample}_knee_plot.pdf',
                 '{results_dir}/reports/star.html',
@@ -156,27 +156,26 @@ elif len(config['META']['species'].keys()) == 1:
                 '{results_dir}/reports/barcode_filtering.html',
                 '{results_dir}/reports/RNA_filtering.html',
                 #mapping
-                '{results_dir}/plots/knee_plots/{sample}_knee_plot.pdf',
+                #'{results_dir}/plots/knee_plots/{sample}_knee_plot.pdf',
                 '{results_dir}/reports/star.html',
                 '{results_dir}/plots/yield.pdf',
                 '{results_dir}/samples/{sample}/Unmapped.out.mate1.gz',
                 #extract
                 '{results_dir}/plots/rna_metrics/{sample}_rna_metrics.pdf',
-                '{results_dir}/summary/{type}/matrix.mtx.gz',
-                '{results_dir}/samples/{sample}/{type}/matrix.mtx.gz',
-                '{results_dir}/samples/{sample}/bc_umi_long.csv',
+                #'{results_dir}/summary/umi/matrix.mtx.gz',
+                '{results_dir}/samples/{sample}/umi/matrix.mtx.gz',
                 #merge
-                '{results_dir}/plots/UMI_vs_counts.pdf',
-                '{results_dir}/plots/UMI_vs_gene.pdf',
-                '{results_dir}/plots/Count_vs_gene.pdf',
+                #'{results_dir}/plots/UMI_vs_counts.pdf',
+                #'{results_dir}/plots/UMI_vs_gene.pdf',
+                #'{results_dir}/plots/Count_vs_gene.pdf',
                 '{results_dir}/summary/Seurat_object.rds',
                 '{results_dir}/summary/SCE_object.rds',
-                '{results_dir}/summary/barcode_stats_pre_filter.csv',
-                '{results_dir}/summary/barcode_stats_post_filter.csv',
-                '{results_dir}/plots/violinplots_comparison_UMI.pdf'],
+                #'{results_dir}/summary/barcode_stats_pre_filter.csv',
+                #'{results_dir}/summary/barcode_stats_post_filter.csv',
+                #'{results_dir}/plots/violinplots_comparison_UMI.pdf'
+                ],
                     read_length=read_lengths,
                     sample=samples.index,
-                    type=types,
                     results_dir=results_dir,
                     ref_path=config['META']['reference-directory'],
                     build=build,
@@ -201,17 +200,6 @@ rule qc:
             'fastqc_adapter.tsv'],
                 results_dir=results_dir)
 
-rule trim:
-    input:
-        expand(
-            ['{results_dir}/plots/adapter_content.pdf',
-            '{results_dir}/reports/barcode_filtering.html',
-            '{results_dir}/reports/RNA_filtering.html',
-            '{results_dir}/samples/{sample}/trimmed_R1.fastq.gz',
-            '{results_dir}/samples/{sample}/trimmed_R2.fastq.gz'],
-                results_dir=results_dir,
-                sample=samples.index)
-
 
 rule filter:
     input:
@@ -221,34 +209,9 @@ rule filter:
             '{results_dir}/reports/RNA_filtering.html',
             '{results_dir}/samples/{sample}/trimmed_repaired_R1.fastq.gz',
             '{results_dir}/samples/{sample}/trimmed_repaired_R2.fastq.gz',
-            '{results_dir}/samples/{sample}/umitools_barcode_whitelist.csv'],
+            '{results_dir}/samples/{sample}/top_barcodes.csv'],
                 results_dir=results_dir,
                 sample=samples.index)
-
-rule map:
-    input:
-        expand(
-            ['{results_dir}/reports/star.html',
-            #'{results_dir}/plots/knee_plots/{sample}_knee_plot.pdf',
-            '{results_dir}/plots/yield.pdf',
-            '{results_dir}/samples/{sample}/Aligned.sortedByCoord.out.bam',
-            '{results_dir}/samples/{sample}/Unmapped.out.mate1.gz',
-            '{results_dir}/samples/{sample}/umi/barcodes.tsv.gz',
-            '{results_dir}/samples/{sample}/umi/features.tsv.gz',
-            '{results_dir}/samples/{sample}/umi/matrix.mtx.gz'],
-                sample=samples.index,
-                results_dir=results_dir)
-
-rule extract:
-    input:
-        expand(
-            ['{results_dir}/plots/rna_metrics/{sample}_rna_metrics.pdf',
-            '{results_dir}/summary/{type}/matrix.mtx.gz',
-            '{results_dir}/samples/{sample}/{type}/matrix.mtx.gz',
-            '{results_dir}/samples/{sample}/bc_umi_long.csv'],
-                results_dir=results_dir,
-                sample=samples.index,
-                type=types)
 
 rule split_species:
     input:
@@ -304,7 +267,6 @@ include: "rules/fastqc.smk"
 include: "rules/filter.smk"
 include: "rules/cell_barcodes.smk"
 include: "rules/map.smk"
-include: "rules/extract_expression_single.smk"
 include: "rules/split_species.smk"
 include: "rules/extract_expression_species.smk"
 include: "rules/merge.smk"

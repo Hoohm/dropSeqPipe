@@ -8,16 +8,16 @@ localrules:
     plot_knee_plot,
     pigz_unmapped,
     mv_outs_mtx,
-    compress_mtx_out
-
-# read in from config.yaml if using whitelist or not
-use_whitelist = config['MAPPING']['use_whitelist']
+    compress_mtx_out,
+    plot_rna_metrics,
+    SingleCellRnaSeqMetricsCollector
+    
 
 rule STAR_solo_align:
     input:
         fq2='{results_dir}/samples/{sample}/trimmed_repaired_R2.fastq.gz',
         fq1='{results_dir}/samples/{sample}/trimmed_repaired_R1.fastq.gz',
-        whitelist='{results_dir}/samples/{sample}/barcodes.csv' if use_whitelist else [],
+        whitelist='{results_dir}/samples/{sample}/barcodes.csv',
         index=lambda wildcards: '{}/{}_{}_{}/STAR_INDEXES/'.format(
             config['META']['reference-directory'],
             species,
@@ -76,10 +76,7 @@ rule STAR_solo_align:
                 config['FILTER']['5-prime-smart-adapter'],
                 samples.loc[wildcards.sample,'expected_cells']
             ),
-        out_prefix=lambda wildcards: '{}/samples/{}/'.format(wildcards.results_dir, wildcards.sample),
-        # since input.whitlist can not be accessed in params, we leave 
-        # either input.whitelist or params.whitelist empty but use both in shell: below
-        whitelist = [] if use_whitelist else 'None',
+        out_prefix=lambda wildcards: '{}/samples/{}/'.format(wildcards.results_dir, wildcards.sample)
     singularity:
         "shub://seb-mueller/singularity_dropSeqPipe:v04"
     threads: 24
@@ -91,7 +88,7 @@ rule STAR_solo_align:
             --readFilesCommand zcat\
             --readFilesIn {input.fq2} {input.fq1}\
             --outFileNamePrefix {params.out_prefix}\
-            --soloCBwhitelist {input.whitelist} {params.whitelist}\
+            --soloCBwhitelist {input.whitelist}\
             2> {log.stdout}
       """
 
@@ -145,80 +142,6 @@ rule mv_outs_mtx:
     shell:
         """mv {input.solo_barcodes} {input.solo_features} {input.solo_matrix} {params.destination}"""
 
-# rule TagReadWithGeneExon:
-#     input:
-#         data='{results_dir}/samples/{sample}/Aligned.sortedByCoord.out.bam',
-#         refFlat=expand("{ref_path}/{species}_{build}_{release}/curated_annotation.refFlat",
-#             ref_path=config['META']['reference-directory'],
-#             species=species,
-#             release=release,
-#             build=build)
-#     params:
-#         memory=config['LOCAL']['memory'],
-#         temp_directory=config['LOCAL']['temp-directory']
-#     output:
-#         '{results_dir}/samples/{sample}/final.bam'
-#     conda: '../envs/dropseq_tools.yaml'
-#     shell:
-#         """export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && TagReadWithGeneFunction -m {params.memory}\
-#         INPUT={input.data}\
-#         OUTPUT={output}\
-#         ANNOTATIONS_FILE={input.refFlat}
-#         """
-
-# rule DetectBeadSubstitutionErrors:
-#     input:
-#         '{results_dir}/samples/{sample}/gene_exon_tagged.bam'
-#     output:
-#         data=temp('{results_dir}/samples/{sample}/gene_exon_tagged_bead_sub.bam'),
-#         report='{results_dir}/logs/dropseq_tools/{sample}_beadSubstitutionReport.txt',
-#         summary='{results_dir}/logs/dropseq_tools/{sample}_beadSubstitutionSummary.txt'
-#     params:
-#         SmartAdapter=config['FILTER']['5-prime-smart-adapter'],
-#         memory=config['LOCAL']['memory'],
-#         temp_directory=config['LOCAL']['temp-directory']
-#     conda: '../envs/dropseq_tools.yaml'
-#     threads: 5
-#     shell:
-#         """
-#         export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && DetectBeadSubstitutionErrors -m {params.memory}\
-#         I={input}\
-#         O={output.data}\
-#         OUTPUT_REPORT={output.report}\
-#         OUTPUT_SUMMARY={output.summary}\
-#         CELL_BARCODE_TAG=CB\
-#         MOLECULAR_BARCODE_TAG=UB\
-#         NUM_THREADS={threads}
-#         """
-
-# rule bead_errors_metrics:
-#     input:
-#         '{results_dir}/samples/{sample}/gene_exon_tagged_bead_sub.bam'
-#     output:
-#         '{results_dir}/samples/{sample}/final.bam'
-#     params:
-#         out_stats='{results_dir}/logs/dropseq_tools/{sample}_synthesis_stats.txt',
-#         summary='{results_dir}/logs/dropseq_tools/{sample}_synthesis_stats_summary.txt',
-#         barcodes=lambda wildcards: int(samples.loc[wildcards.sample,'expected_cells']) * 2,
-#         memory =config['LOCAL']['memory'],
-#         SmartAdapter=config['FILTER']['5-prime-smart-adapter'],
-#         temp_directory=config['LOCAL']['temp-directory']
-#     conda: '../envs/dropseq_tools.yaml'
-#     threads: 5
-#     shell:
-#         """export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && DetectBeadSynthesisErrors -m {params.memory}\
-#         INPUT={input}\
-#         OUTPUT={output}\
-#         OUTPUT_STATS={params.out_stats}\
-#         SUMMARY={params.summary}\
-#         NUM_BARCODES={params.barcodes}\
-#         PRIMER_SEQUENCE={params.SmartAdapter}\
-#         CELL_BARCODE_TAG=CB\
-#         MOLECULAR_BARCODE_TAG=UB\
-#         NUM_THREADS={threads}
-#         """
-
-
 
 rule plot_yield:
     input:
@@ -249,3 +172,42 @@ rule plot_yield:
 #         pdf='{results_dir}/plots/knee_plots/{sample}_knee_plot.pdf'
 #     script:
 #         '../scripts/plot_knee_plot.R'
+
+rule SingleCellRnaSeqMetricsCollector:
+    input:
+        data='{results_dir}/samples/{sample}/Aligned.sortedByCoord.out.bam',
+        barcode_whitelist='{results_dir}/samples/{sample}/barcodes.csv',
+        refFlat=expand("{ref_path}/{species}_{build}_{release}/curated_annotation.gtf",
+            ref_path=ref_path,
+            release=release,
+            species=species,
+            build=build),
+        rRNA_intervals=expand("{ref_path}/{species}_{build}_{release}/annotation.rRNA.intervals",
+            ref_path=ref_path,
+            release=release,
+            build=build,
+            species=species)
+    params:
+        cells=lambda wildcards: int(samples.loc[wildcards.sample,'expected_cells']),        
+        memory=config['LOCAL']['memory'],
+        temp_directory=config['LOCAL']['temp-directory']
+    output:
+        '{results_dir}/logs/dropseq_tools/{sample}_rna_metrics.txt'
+    conda: '../envs/dropseq_tools.yaml'
+    shell:
+        """export _JAVA_OPTIONS=-Djava.io.tmpdir={params.temp_directory} && SingleCellRnaSeqMetricsCollector -m {params.memory}\
+        INPUT={input.data}\
+        OUTPUT={output}\
+        ANNOTATIONS_FILE={input.refFlat}\
+        CELL_BC_FILE={input.barcode_whitelist}\
+        RIBOSOMAL_INTERVALS={input.rRNA_intervals}
+        """
+rule plot_rna_metrics:
+    input:
+        rna_metrics='{results_dir}/logs/dropseq_tools/{sample}_rna_metrics.txt',
+        barcode='{results_dir}/samples/{sample}/barcodes.csv'
+    conda: '../envs/r.yaml'
+    output:
+        pdf='{results_dir}/plots/rna_metrics/{sample}_rna_metrics.pdf'
+    script:
+        '../scripts/plot_rna_metrics.R'
