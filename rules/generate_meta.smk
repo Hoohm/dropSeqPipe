@@ -5,7 +5,12 @@ import platform
 #Which rules will be run on the host computer and not sent to nodes
 localrules:
      create_intervals,
-     curate_annotation
+     curate_annotation,
+     reduce_gtf,
+     curate_annotation,
+     create_dict,
+     create_intervals,
+     get_genomeChrBinNbits
 
 
 rule curate_annotation:
@@ -92,30 +97,27 @@ rule create_intervals:
         PREFIX={params.prefix}
         """
 
-rule get_genomeChrBinNbits:
-    input:
-        reference_file="{ref_path}/{species}_genome.fa"
-    params:
-        samples_file='samples.csv',
-        reference_directory=config['META']['reference-directory']
-    output:
-        '{params.reference_directory}/index_params.txt'
-    run:
-        """
-        from math import log2
-        from platform import system
-        if (system() == 'Darwin'):
-            genomeLength = shell("wc -c {} | cut -d' ' -f2".format(snakemake.reference_file), iterable=True)
-        else:
-            genomeLength = shell("wc -c {} | cut -d' ' -f1".format(snakemake.reference_file), iterable=True)
-        genomeLength = int(next(genomeLength))
-        referenceNumber = shell('grep "^>" {} | wc -l'.format(snakemake.reference_file), iterable=True)
-        referenceNumber = int(next(referenceNumber))
-        value = min([18,int(log2(genomeLength/referenceNumber))])
-        """
-
-def get_sjdbOverhang(wildcards):
-    return(int(wildcards.read_length)-1)
+# rule get_genomeChrBinNbits:
+#     input:
+#         reference_file="{ref_path}/{species}_genome.fa"
+#     params:
+#         samples_file='samples.csv',
+#         reference_directory=config['META']['reference-directory']
+#     output:
+#         '{params.reference_directory}/index_params.txt'
+#     run:
+#         """
+#         from math import log2
+#         from platform import system
+#         if (system() == 'Darwin'):
+#             genomeLength = shell("wc -c {} | cut -d' ' -f2".format(snakemake.reference_file), iterable=True)
+#         else:
+#             genomeLength = shell("wc -c {} | cut -d' ' -f1".format(snakemake.reference_file), iterable=True)
+#         genomeLength = int(next(genomeLength))
+#         referenceNumber = shell('grep "^>" {} | wc -l'.format(snakemake.reference_file), iterable=True)
+#         referenceNumber = int(next(referenceNumber))
+#         value = min([18,int(log2(genomeLength/referenceNumber))])
+#         """
 
 
 rule create_star_index:
@@ -123,11 +125,10 @@ rule create_star_index:
         fasta="{ref_path}/{species}_{build}_{release}/genome.fa",
         gtf="{ref_path}/{species}_{build}_{release}/curated_annotation.gtf"  
     params:
-        extra="--genomeChrBinNbits {} --genomeSAsparseD 2".format(config['MAPPING']['STAR']['genomeChrBinNbits']),
-        sjdbOverhang=lambda wildcards: str(int(wildcards.read_length)-1)
+        extra="--genomeSAsparseD 2"
     output:
-        directory('{ref_path}/{species}_{build}_{release}/STAR_INDEXES/{read_length}')
+        directory('{ref_path}/{species}_{build}_{release}/STAR_INDEXES/')
     threads: 24
     conda: '../envs/star.yaml'
     wrapper:
-        "0.66.0/bio/star/index"
+        "0.72.0/bio/star/index"

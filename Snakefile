@@ -77,7 +77,7 @@ samples = pd.read_table("samples.csv", sep=',').set_index("samples", drop=False)
 validate(samples, schema=os.path.join(snakefile_root_path,"schemas","samples.schema.yaml"))
 types=['read','umi']
 # Get read_lengths from samples.csv
-read_lengths = list(samples.loc[:,'read_length'])
+#read_lengths = list(samples.loc[:,'read_length'])
 
 wildcard_constraints:
     sample="({})".format("|".join(samples.index)),
@@ -106,7 +106,7 @@ if len(config['META']['species'].keys()) == 2:
     rule all:
         input:
             expand(
-                ['{ref_path}/{species}_{build}_{release}/STAR_INDEXES/{read_length}',
+                ['{ref_path}/{species}_{build}_{release}/STAR_INDEXES/',
                 #qc
                 '{results_dir}/reports/fastqc_reads.html',
                 '{results_dir}/reports/fastqc_barcodes.html',
@@ -126,7 +126,6 @@ if len(config['META']['species'].keys()) == 2:
                 #splitting
                 '{results_dir}/plots/barnyard/{sample}_genes.pdf',
                 '{results_dir}/plots/barnyard/{sample}_transcripts.pdf'],
-                    read_length=read_lengths,
                     sample=samples.index,
                     type=types,
                     results_dir=results_dir,
@@ -147,7 +146,7 @@ elif len(config['META']['species'].keys()) == 1:
         input:
             #meta
             expand(
-                ['{ref_path}/{species}_{build}_{release}/STAR_INDEXES/{read_length}',
+                ['{ref_path}/{species}_{build}_{release}/STAR_INDEXES/',
                 #qc
                 '{results_dir}/reports/fastqc_reads.html',
                 '{results_dir}/reports/fastqc_barcodes.html',
@@ -174,7 +173,6 @@ elif len(config['META']['species'].keys()) == 1:
                 #'{results_dir}/summary/barcode_stats_post_filter.csv',
                 #'{results_dir}/plots/violinplots_comparison_UMI.pdf'
                 ],
-                    read_length=read_lengths,
                     sample=samples.index,
                     results_dir=results_dir,
                     ref_path=config['META']['reference-directory'],
