@@ -9,8 +9,7 @@ localrules:
      reduce_gtf,
      curate_annotation,
      create_dict,
-     create_intervals,
-     get_genomeChrBinNbits
+     create_intervals
 
 
 rule curate_annotation:

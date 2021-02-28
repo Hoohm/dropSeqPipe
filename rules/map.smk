@@ -5,14 +5,12 @@
 localrules:
     multiqc_star,
     plot_yield,
-    plot_knee_plot,
     pigz_unmapped,
     mv_outs_mtx,
     compress_mtx_out,
     plot_rna_metrics,
     SingleCellRnaSeqMetricsCollector,
-    extract_bc_umi_data,
-    bam_hist
+    extract_bc_umi_data
 
 ruleorder: STAR_solo_align_wl > STAR_solo_align
 
@@ -175,6 +173,7 @@ rule STAR_solo_align:
             --readFilesCommand zcat\
             --readFilesIn {input.fq2} {input.fq1}\
             --outFileNamePrefix {params.out_prefix}\
+            --soloCBwhitelist None\
             2> {log.stdout}
       """
     

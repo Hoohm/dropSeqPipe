@@ -1,6 +1,6 @@
 channels:
+  - conda-forge
   - bioconda
 dependencies:
   - pysam=0.16 #wraps htslib/bcftools version 1.10.2 and samtools version 1.10
   - biopython=1.78
-  - python=3.8

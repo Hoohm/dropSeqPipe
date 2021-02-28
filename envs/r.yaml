@@ -20,3 +20,4 @@ dependencies:
   - fontconfig=2.13.1
   - readline
   - r-matrix
+  - bioconductor-dropletutils

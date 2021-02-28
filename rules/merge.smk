@@ -1,7 +1,5 @@
 localrules:
-    violine_plots,
-    summary_stats,
-    create_seurat_object
+    violine_plots
 
 
 rule create_seurat_and_sce_object:
