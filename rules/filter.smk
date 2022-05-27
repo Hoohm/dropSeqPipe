@@ -85,7 +85,7 @@ rule repair:
     params:
         memory='{}g'.format(int(config['LOCAL']['memory'].rstrip('g')) )
     conda: '../envs/bbmap.yaml'
-    threads: 4
+    threads: 10
     shell:
         """repair.sh\
         -Xmx{params.memory}\

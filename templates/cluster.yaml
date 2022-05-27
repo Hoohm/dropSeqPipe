@@ -1,5 +1,5 @@
 __default__:
-    time: "03:00:00"
+    time: "06:00:00"
     mem: 4g
     output: "logs/cluster/{rule}.{wildcards.sample}.out"
     error: "logs/cluster/{rule}.{wildcards.sample}.err"
@@ -20,3 +20,6 @@ create_star_index:
     mem: 64g
     output: "logs/cluster/{rule}.out"
     error: "logs/cluster/{rule}.err"
+repair:
+    mem: 30g
+    time: "10:00:00"

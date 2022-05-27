@@ -143,7 +143,7 @@ rule create_star_index:
         genomeDir='{ref_path}/{species}_{build}_{release}/STAR_INDEX/SA_{read_length}',
         genomeChrBinNbits=config['MAPPING']['STAR']['genomeChrBinNbits']
     output:
-        '{ref_path}/{species}_{build}_{release}/STAR_INDEX/SA_{read_length}/SA'
+        directory('{ref_path}/{species}_{build}_{release}/STAR_INDEX/SA_{read_length}/SA')
     threads: 24
     conda: '../envs/star.yaml'
     shell:
